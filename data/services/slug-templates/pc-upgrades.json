@@ -1,47 +1,50 @@
 {
-  "id": "pc-upgrades-{{city_lower}}",
-  "title": "PC & Laptop Upgrades in {{city_upper}}, FL",
-  "headline": "SSD, RAM, and performance tuning that lasts.",
-  "description": "Speed up your computer in {{city_upper}} with SSD and RAM upgrades, thermal servicing, and performance tuning. Extend the life of your hardware with practical improvements.",
+  "id": "pc-upgrades",
+  "title": "PC & Laptop Upgrades",
+  "headline": "SSD, RAM, and performance tuning that actually lasts.",
+  "description": "Professional PC and laptop upgrades including SSD and RAM installations, thermal servicing, and performance tuning, helping homeowners and small businesses across Ocala, Belleview, The Villages, and Central Florida extend the life of their hardware.",
   "keywords": [
-    "pc upgrades {{city_upper}}",
-    "laptop upgrades {{city_upper}}",
-    "ssd upgrade {{city_upper}}",
-    "ram upgrade {{city_upper}}",
-    "computer speed up {{city_upper}}"
+    "PC upgrades Ocala FL",
+    "PC upgrades Belleview FL",
+    "PC upgrades The Villages FL",
+    "laptop upgrades Ocala",
+    "SSD upgrade Florida",
+    "RAM upgrade services",
+    "computer performance upgrades",
+    "speed up slow computer",
+    "hardware optimization services"
   ],
-  "url": "/services/{{city_lower}}/pc-upgrades",
+  "url": "/services/pc-upgrades",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Running out of RAM slows the system even if the CPU is not busy.",
-        "Replacing a mechanical hard drive with an SSD can improve load times.",
-        "Many laptops can support more RAM and faster storage than they shipped with by default.",
-        "Firmware and BIOS updates can improve hardware compatibility, stability, and even performance.",
-        "Dust buildup and degraded thermal paste cause overheating, which triggers thermal throttling and reduces performance."
+        "Insufficient RAM can slow a system dramatically even when the processor is not fully utilized.",
+        "Replacing a mechanical hard drive with a solid-state drive can improve load times and responsiveness by several times.",
+        "Many laptops and desktops support more memory and faster storage than they ship with by default.",
+        "Firmware and BIOS updates can improve hardware compatibility, stability, and in some cases performance.",
+        "Dust buildup and degraded thermal paste can cause overheating, triggering thermal throttling and reduced system speed."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We upgrade and optimize PCs and laptops to improve speed, stability, and lifespan. We handle parts sourcing, installation, and testing to ensure reliable results.",
-        "Our service includes diagnostics, careful hardware installation, firmware updates, and performance tuning so you get measurable improvements."
+        "We upgrade and optimize PCs and laptops to improve speed, stability, and overall lifespan, handling diagnostics, parts sourcing, installation, and testing."
       ],
       "items": [
-        "SSD installation and operating system migration",
-        "RAM upgrades and stability optimization",
-        "Battery replacements and storage expansion",
-        "Thermal paste refresh and dust removal",
-        "Firmware and BIOS updates with validation"
+        "SSD installation with safe operating system and data migration",
+        "RAM upgrades with stability and compatibility validation",
+        "Battery replacement and storage expansion",
+        "Thermal paste replacement and internal dust removal",
+        "Firmware and BIOS updates with post-upgrade testing"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We inspect your current system and recommend the most cost-effective upgrades. After sourcing quality parts, we install, test, and verify stability.",
-        "You receive a faster, quieter machine along with a clear report of the work performed."
+        "We evaluate your system and recommend the most cost-effective upgrades based on how you use your computer.",
+        "After sourcing quality components, we install, test, and verify stability before returning a noticeably faster and quieter system."
       ]
     }
   ],

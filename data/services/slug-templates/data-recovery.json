@@ -1,48 +1,50 @@
 {
-  "id": "data-recovery-{{city_lower}}",
-  "title": "Data Recovery & Encrypted Backup Solutions in {{city_upper}}, FL",
-  "headline": "Recover lost files, or make sure you never lose them again.",
-  "description": "Recover lost files and secure your data with encrypted backup systems. Local data recovery experts in {{city_upper}} for drives, USBs, and more.",
+  "id": "data-recovery",
+  "title": "Data Recovery & Encrypted Backup Solutions",
+  "headline": "Recover lost files—or make sure you never lose them again.",
+  "description": "Professional data recovery and encrypted backup solutions for individuals and small businesses, helping recover lost files and protect critical data across Ocala, Belleview, The Villages, and surrounding Florida communities.",
   "keywords": [
-    "data recovery {{city_upper}}",
-    "encrypted backup {{city_upper}}",
-    "file recovery services {{city_upper}}",
-    "hard drive recovery {{city_upper}}",
-    "ransomware data recovery {{city_upper}}",
-    "backup setup {{city_upper}}",
-    "small business data protection {{city_upper}}"
+    "data recovery Ocala FL",
+    "data recovery Belleview FL",
+    "data recovery The Villages FL",
+    "encrypted backup solutions",
+    "hard drive data recovery",
+    "file recovery services",
+    "ransomware data recovery",
+    "backup setup and configuration",
+    "small business data protection"
   ],
-  "url": "/services/{{city_lower}}/data-recovery",
+  "url": "/services/data-recovery",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Over 90 percent of people have no recent backup of their personal or business data.",
-        "Drives can fail suddenly due to age, firmware bugs, electrical damage, or overheating. SSDs often show no warning at all before failure.",
-        "Ransomware can lock your files instantly, but with a secure backup in place, recovery is quick and stress-free."
+        "Over 90 percent of individuals and small businesses do not have a reliable, recent backup of their data.",
+        "Storage devices can fail suddenly due to age, firmware issues, electrical damage, or overheating, often without warning.",
+        "With a properly configured encrypted backup, recovery from accidental deletion, hardware failure, or ransomware is fast and stress-free."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We recover lost data when your system fails and set up long-term backup strategies to prevent it from happening again. Our goal is to protect your files and give you peace of mind, whether you're an individual, family, or small business."
+        "We recover lost or inaccessible data and design long-term backup strategies that prevent future loss, giving you confidence that your files are protected."
       ],
       "items": [
-        "Recover deleted, corrupted, or inaccessible files from drives and USB devices",
-        "Identify hardware warning signs before complete failure occurs",
-        "Configure encrypted, automated backup systems that work in the background",
-        "Migrate files across computers, operating systems, or secure cloud platforms",
-        "Create backup strategies with both onsite and offsite protection",
-        "Use trusted tools that respect your privacy and keep you in control"
+        "Recover deleted, corrupted, or inaccessible files from hard drives, SSDs, and USB devices",
+        "Assess storage devices for failure risks before complete data loss occurs",
+        "Configure encrypted, automated backup systems that run quietly in the background",
+        "Migrate data securely between computers, operating systems, or storage platforms",
+        "Design backup strategies with both local and offsite protection",
+        "Use trusted, privacy-respecting tools that keep you in full control of your data"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We start with a no-risk assessment to determine if recovery is possible without sending your drive to a lab.",
-        "If your data can be accessed, we recover what we can using proven tools and validate the results with you.",
-        "Then we help set up a backup system that protects you going forward. No subscriptions. No recurring fees. Just secure access to your data when you need it."
+        "We begin with a no-risk assessment to determine whether recovery is possible without sending your device to a data lab.",
+        "If recovery is feasible, we retrieve and verify your data using proven tools and transparent methods.",
+        "Once recovery is complete, we help you implement a secure backup solution to protect your data going forward—without subscriptions or hidden fees."
       ]
     }
   ],

@@ -11,7 +11,6 @@ This software is provided for use only by authorized employees, contractors, or
 licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
-
 import {
   Network,
   Laptop2,
@@ -22,13 +21,11 @@ import {
 import Link from "next/link";
 import { localBusinessLd } from "@/lib/json-ld";
 import companyInfo from "../../data/company-info.json";
-import { LocationPicker, useLocation } from "@/providers/location";
-import { getNormalizedCityName, Meta, PageContainer } from "@/components";
+import { Meta, PageContainer } from "@/components";
 
 const { services_cta } = companyInfo;
 
-function CallToActionButtons({ location }: { location: string | null }) {
-  // shared styles
+function CallToActionButtons() {
   const base =
     "px-6 py-4 rounded-md font-semibold glow-hover transition-colors";
   const primary =
@@ -36,17 +33,12 @@ function CallToActionButtons({ location }: { location: string | null }) {
   const secondary =
     "border border-black dark:border-gray-200 text-black dark:text-white hover:bg-blue-500 hover:text-white hover:dark:bg-sky-500/60 hover:border-blue-700 hover:dark:border-sky-600";
 
-  // compute the href for the “View Services” button
-  const city = getNormalizedCityName(location);
-  const viewServicesHref = city ? `/services/${city}` : `/services`;
-
-  // small helper to choose href & classes per button
   const getButtonConfig = (text: string, fallbackLink: string) => {
     const isViewServices = text.toLowerCase() === "view services";
     return {
-      href: isViewServices ? viewServicesHref : fallbackLink,
+      href: isViewServices ? "/services" : fallbackLink,
       className: `${base} ${isViewServices ? secondary : primary}`,
-      ariaLabel: isViewServices ? "View services for your selected city" : text,
+      ariaLabel: text,
     };
   };
 
@@ -74,39 +66,19 @@ type ServiceLinkProps = {
   text: string;
   Icon: LucideIcon;
 };
+
 function ServiceLink({ href, text, Icon }: ServiceLinkProps) {
   return (
     <Link
       href={href}
-      className="
-        group flex flex-col items-center text-center max-w-[140px] sm:max-w-[200px] w-full
-        focus:outline-none focus-visible:ring-2
-        focus-visible:ring-blue-400/60 dark:focus-visible:ring-sky-400/60
-      "
+      className="group flex flex-col items-center text-center max-w-[140px] sm:max-w-[200px] w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 dark:focus-visible:ring-sky-400/60"
       aria-label={text}
     >
       <Icon
-        xlinkTitle={text}
         aria-hidden="true"
-        className="
-          h-10 w-10 mb-2 transition-colors
-          text-gray-900 dark:text-gray-300
-          group-hover:text-blue-500  dark:group-hover:text-sky-400
-          group-focus-visible:text-blue-500 dark:group-focus-visible:text-sky-400
-         
-        "
+        className="h-10 w-10 mb-2 transition-colors text-gray-900 dark:text-gray-300 group-hover:text-blue-500 dark:group-hover:text-sky-400"
       />
-      <strong
-        className="
-          transition-colors
-          
-          text-blue-500 dark:text-sky-400
-          group-hover:text-gray-900 dark:group-hover:text-gray-300
-          group-focus-visible:text-gray-900 dark:group-focus-visible:text-gray-300
-          group-hover:underline group-focus-visible:underline
-          underline-offset-4
-        "
-      >
+      <strong className="text-blue-500 dark:text-sky-400 group-hover:underline underline-offset-4">
         {text}
       </strong>
     </Link>
@@ -114,59 +86,51 @@ function ServiceLink({ href, text, Icon }: ServiceLinkProps) {
 }
 
 export default function Home() {
-  const { location } = useLocation();
-  const _location = location !== "remote" ? location : null;
-  const links = {
-    cybersecurity: _location
-      ? `/services/${_location}/custom-solutions`
-      : "/services/the-villages/custom-solutions",
-    network: _location
-      ? `/services/${_location}/network-setup`
-      : "/services/the-villages/network-setup",
-    onsite: _location
-      ? `/services/${_location}/onsite-tech-support`
-      : "/services/the-villages/onsite-tech-support",
-    personalized: _location
-      ? `/services/${location}/custom-solutions`
-      : "/services/the-villages/custom-solutions",
-  };
-
   const serviceLinks = [
-    { text: "Cybersecurity", Icon: ShieldCheck, link: links.cybersecurity },
-    { text: "Network Support", Icon: Network, link: links.network },
-    { text: "Tech Support", Icon: Laptop2, link: links.onsite },
+    {
+      text: "Cybersecurity",
+      Icon: ShieldCheck,
+      link: "/services/cybersecurity",
+    },
+    {
+      text: "Network Support",
+      Icon: Network,
+      link: "/services/network-setup",
+    },
+    {
+      text: "Tech Support",
+      Icon: Laptop2,
+      link: "/services/onsite-tech-support",
+    },
     {
       text: "Personalized Service",
       Icon: UserCheck,
-      link: links.personalized,
+      link: "/services/custom-solutions",
     },
   ];
 
   return (
     <>
       <Meta
-        title="Defend I.T. Solutions | Cybersecurity & IT Support in Ocala, Belleview, & The Villages"
-        description="Defend I.T. Solutions provides local, on-site tech support and cybersecurity services for retirees, homeowners, and small businesses in Ocala, Belleview, The Villages, and Central Florida."
+        title="Defend I.T. Solutions | Cybersecurity & IT Support"
+        description="Defend I.T. Solutions provides professional cybersecurity and I.T. support for homeowners, retirees, and small businesses."
         image="https://www.wedefendit.com/og-image.png"
         url="https://www.wedefendit.com/"
         canonical="https://www.wedefendit.com/"
-        keywords="cybersecurity, IT support, Ocala, The Villages, Belleview, small business IT, home tech support, network security, cybersecurity, computer repair, tech services, elderly scams, online safety"
+        keywords="cybersecurity, IT support, small business IT, home tech support, network security, computer repair, online safety"
         structuredData={localBusinessLd}
       />
 
       <PageContainer>
-        {/* Intro Section */}
         <header className="text-center p-2">
-          <h1 className="flex text-3xl sm:text-4xl md:text-5xl font-bold leading-tight w-[85%] max-w-4xl mx-auto">
-            Cybersecurity & IT Support in Ocala, Belleview and The Villages
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight max-w-4xl mx-auto">
+            Cybersecurity Support You Can Trust
           </h1>
-          <h2 className="flex mt-2 text-md sm:text-xl md:text-2xl font-semibold text-blue-500 dark:text-sky-400 w-[75%] max-w-2xl mx-auto leading-normal">
-            Providing On-Site Tech Support, Cybersecurity & Personalized IT You
-            Can Trust
+          <h2 className="mt-2 text-md sm:text-xl md:text-2xl font-semibold text-blue-500 dark:text-sky-400 max-w-2xl mx-auto">
+            Clear and practical solutions for homes and small businesses
           </h2>
         </header>
 
-        {/* Services */}
         <section
           id="common-services"
           aria-labelledby="services-heading"
@@ -178,10 +142,11 @@ export default function Home() {
           >
             Our Core Services
           </h2>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 justify-items-center mt-10">
             {serviceLinks.map((service) => (
               <ServiceLink
-                key={service.text.trim()}
+                key={service.text}
                 href={service.link}
                 text={service.text}
                 Icon={service.Icon}
@@ -189,34 +154,29 @@ export default function Home() {
             ))}
           </div>
 
-          <p className="text-base md:text-lg text-gray-800 dark:text-gray-300 leading-normal w-full max-w-3xl mx-auto px-6 md:px-4 text-center mt-8">
-            At Defend I.T. Solutions, we bring local, hands-on support to homes
-            and businesses across Central Florida. Whether it&apos;s protecting
-            your devices with strong cybersecurity, removing viruses and
-            malware, fixing a computer that will not start, or setting up a
-            reliable network, our focus is on clear communication and practical
-            solutions.
+          <p className="text-base md:text-lg text-gray-800 dark:text-gray-300 leading-normal max-w-3xl mx-auto px-6 text-center mt-8">
+            We help protect devices, secure networks, remove malware, and solve
+            everyday technology problems with transparency and clear
+            communication.
           </p>
-          <p className="text-base md:text-lg text-gray-800 dark:text-gray-300 leading-normal w-full max-w-3xl mx-auto px-6 md:px-4 text-center mt-6 mb-12">
-            You will always know what we are doing, why it matters, and what it
-            costs. No jargon. No hidden fees.
+
+          <p className="text-base md:text-lg text-gray-800 dark:text-gray-300 leading-normal max-w-3xl mx-auto px-6 text-center mt-6 mb-12">
+            No jargon. No hidden fees. Just reliable support.
           </p>
         </section>
 
-        {/* CTA */}
         <section
-          className="relative flex flex-col items-center justify-center w-full space-y-8 mt-4 border-t border-gray-200 dark:border-gray-700 pt-8 pb-6"
+          className="flex flex-col items-center justify-center w-full space-y-8 mt-4 border-t border-gray-200 dark:border-gray-700 pt-8 pb-6"
           aria-labelledby="cta-heading"
         >
           <h2
             id="cta-heading"
-            className="text-2xl md:text-3xl font-bold text-center my-4"
+            className="text-2xl md:text-3xl font-bold text-center"
           >
-            Need Local IT Help You Can Trust?
+            Need IT Help You Can Trust?
           </h2>
 
-          <LocationPicker showHelper={true} />
-          <CallToActionButtons location={location} />
+          <CallToActionButtons />
         </section>
       </PageContainer>
     </>

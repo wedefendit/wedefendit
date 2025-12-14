@@ -1,16 +1,20 @@
 {
-  "id": "virus-removal-{{city_lower}}",
-  "title": "Virus and Malware Removal in {{city_upper}}, FL",
+  "id": "virus-removal",
+  "title": "Virus & Malware Removal",
   "headline": "Clean infections, restore trust, and lock down your devices professionally.",
-  "description": "Professional virus and malware removal in {{city_upper}}. We eliminate threats, recover your system, and strengthen it against future attacks. Fast, local, and discreet service for your peace of mind.",
+  "description": "Professional virus and malware removal for laptops and desktops, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities, including threat removal, system recovery, and post-cleanup hardening to prevent reinfection.",
   "keywords": [
-    "Virus removal {{city_upper}}",
-    "Malware cleanup {{city_upper}}",
-    "Computer infection removal {{city_upper}}",
-    "Spyware and rootkit cleanup {{city_upper}}",
-    "Cybersecurity support {{city_upper}}"
+    "virus removal Ocala FL",
+    "virus removal Belleview FL",
+    "virus removal The Villages FL",
+    "malware removal Ocala FL",
+    "malware cleanup Central Florida",
+    "computer virus removal Florida",
+    "spyware and rootkit removal",
+    "infected computer repair",
+    "cybersecurity cleanup services"
   ],
-  "url": "/services/{{city_lower}}/virus-removal",
+  "url": "/services/virus-removal",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
@@ -18,25 +22,28 @@
       "paragraph": [
         "Many modern threats bypass antivirus software by hiding in trusted folders, memory, or scheduled tasks.",
         "Malware can silently log keystrokes, steal browser data, or connect your device to a botnet without showing obvious symptoms.",
-        "Some infections can survive reboot, antivirus scans, or even factory resets. The only guaranteed way to remove advanced threats is to rebuild the system from a clean base."
+        "Some infections can survive reboot, antivirus scans, or even factory resets, requiring professional remediation."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We offer two levels of service depending on the severity of the infection and your needs. In both cases, our priority is restoring your system and securing it against future attacks."
+        "We remove active malware, repair system damage, and secure your computer against future attacks using proven, security-first methods."
       ],
       "items": [
-        "Standard Removal – We attempt non-destructive cleanup by removing active malware, repairing damage, and securing the system. This option preserves your apps and files, but may not catch deeply embedded threats.",
-        "Wipe and Rebuild – For maximum assurance, we back up your files, wipe the system, reinstall the operating system from a trusted source, and restore your data safely. This is the only method that guarantees full removal of persistent or hidden malware."
+        "Non-destructive malware and spyware removal",
+        "System integrity checks and repair",
+        "Browser, startup, and persistence cleanup",
+        "Security hardening after removal",
+        "Full wipe-and-rebuild option for deeply compromised systems"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We begin with an assessment to determine whether the system is infected.",
-        "If deep compromise is suspected, we recommend the rebuild option and walk you through secure data backup and recovery.",
-        "Either way, we harden your system afterward using trusted tools and best practices to reduce the risk of future infection."
+        "We assess your system to determine infection severity and recommend the safest remediation path.",
+        "If advanced compromise is suspected, we explain rebuild options and secure data handling.",
+        "After cleanup, we harden the system to reduce future infection risk."
       ]
     }
   ],

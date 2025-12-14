@@ -1,45 +1,49 @@
 {
-  "id": "smart-home-setup-{{city_lower}}",
-  "title": "Smart Home Setup & Security in {{city_upper}}, FL",
+  "id": "smart-home-setup",
+  "title": "Smart Home Setup & Security",
   "headline": "Make it smart without making it risky.",
-  "description": "Professional setup and security for smart home devices in {{city_upper}}. We configure cameras, assistants, and automations with privacy-first, least-privilege access.",
+  "description": "Professional smart home setup and security services for cameras, assistants, and home automation systems, configured with privacy-first, least-privilege access for homeowners in Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
   "keywords": [
-    "smart home setup {{city_upper}}",
-    "home automation {{city_upper}}",
-    "smart camera install {{city_upper}}",
-    "home assistant setup {{city_upper}}",
-    "iot security {{city_upper}}"
+    "smart home setup Ocala FL",
+    "smart home setup Belleview FL",
+    "smart home setup The Villages FL",
+    "home automation installation Florida",
+    "smart camera installation",
+    "home assistant setup",
+    "IoT security services",
+    "secure smart home configuration",
+    "privacy-focused smart home"
   ],
-  "url": "/services/{{city_lower}}/smart-home-setup",
+  "url": "/services/smart-home-setup",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Some devices send telemetry to external servers by default.",
-        "Insecure IoT devices have been used in large-scale botnet attacks such as Mirai.",
-        "Keeping firmware updated is one of the most effective ways to prevent remote exploitation.",
-        "Many smart devices ship with insecure defaults such as open ports, UPnP enabled, or weak default passwords."
+        "Many smart devices transmit telemetry to external servers by default, sometimes without clear user visibility.",
+        "Insecure IoT devices have been leveraged in large-scale botnet attacks such as Mirai.",
+        "Keeping firmware updated is one of the most effective ways to prevent remote exploitation of smart devices.",
+        "Default settings like open ports, UPnP, or weak passwords significantly increase smart home security risk."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We set up your smart home for both convenience and security, with clear boundaries to protect your privacy and network."
+        "We design and configure smart home environments that balance convenience with strong security and privacy controls."
       ],
       "items": [
-        "Configure cameras, doorbells, sensors, and hubs",
-        "Set up voice assistants and local control dashboards",
-        "Create reliable automations and routines",
+        "Install and configure cameras, doorbells, sensors, and smart hubs",
+        "Set up voice assistants and local or hybrid control dashboards",
+        "Create reliable, secure automations and routines",
         "Configure guest access and role-based permissions",
-        "Apply privacy-respecting defaults and enable logging"
+        "Apply privacy-respecting defaults, logging, and monitoring"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We start by reviewing your goals, devices, and network layout. Then we install, configure, and secure your smart home with proper segmentation, strong authentication, and minimal required permissions.",
-        "We document every change so you stay in control. No hidden subscriptions, no vendor lock-in."
+        "We review your goals, devices, and network layout, then install and secure your smart home using proper segmentation, strong authentication, and minimal required permissions.",
+        "All changes are documented so you remain in full control, with no hidden subscriptions or vendor lock-in."
       ]
     }
   ],

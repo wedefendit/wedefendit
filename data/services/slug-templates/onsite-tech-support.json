@@ -1,46 +1,47 @@
 {
-  "id": "onsite-tech-support-{{city_lower}}",
-  "title": "On-Site Tech Support Services in {{city_upper}}, FL",
-  "headline": "Fast, professional tech help. We come to you.",
-  "description": "Expert in-home tech support in {{city_upper}} for computers, Wi-Fi, printers, and smart devices. We diagnose, fix, and optimize without the hassle of a shop visit.",
+  "id": "onsite-tech-support",
+  "title": "On-Site Tech Support Services",
+  "headline": "Fast, professional tech help—we come to you.",
+  "description": "Professional in-home tech support for computers, Wi-Fi, printers, and smart devices, serving homeowners and small businesses in Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
   "keywords": [
-    "on-site tech support {{city_upper}}",
-    "in-home computer help {{city_upper}}",
-    "home tech support {{city_upper}}",
-    "printer setup {{city_upper}}",
-    "wifi troubleshooting {{city_upper}}"
+    "on-site tech support Ocala FL",
+    "in-home computer help Ocala",
+    "home tech support Belleview FL",
+    "on-site IT support The Villages FL",
+    "printer setup and troubleshooting",
+    "Wi-Fi troubleshooting",
+    "in-home computer repair Florida"
   ],
-  "url": "/services/{{city_lower}}/onsite-tech-support",
+  "url": "/services/onsite-tech-support",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Up to 70% of slow computers are fixed by removing unnecessary startup programs and malware.",
-        "Poor router placement can cut Wi-Fi speeds by more than 50% even with a fast plan.",
-        "Overheating is a leading cause of random shutdowns in laptops and desktops.",
-        "Driver or software issues account for most printer errors, not broken hardware.",
-        "Loose or damaged cables are one of the most common causes of 'no internet' problems."
+        "Many slow computers can be fixed by removing unnecessary startup programs, malware, or misconfigured software.",
+        "Poor router placement or interference can significantly reduce Wi-Fi performance, even on fast internet plans.",
+        "Overheating and driver issues are common causes of random shutdowns, crashes, and printer errors."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We bring fast, reliable technical help directly to your home. Saving you time, effort, and frustration."
+        "We provide hands-on technical support directly in your home, resolving issues efficiently without the inconvenience of a repair shop."
       ],
       "items": [
-        "Diagnose and repair PC & Mac issues",
-        "Troubleshoot and optimize Wi-Fi networks",
-        "Set up printers, scanners, and peripherals",
-        "Configure new devices and transfer data",
-        "Tune up email, browsers, and accounts for speed and security"
+        "Diagnose and repair PC and Mac performance or hardware issues",
+        "Troubleshoot and optimize home Wi-Fi and wired networks",
+        "Set up printers, scanners, and peripheral devices",
+        "Configure new computers, phones, and tablets and transfer data",
+        "Optimize email, browsers, and accounts for speed and security"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "Tell us your issue and choose a time that works for you. Our technician arrives at your location, performs a hands-on diagnosis, and either resolves the problem on the spot or provides a clear plan and cost estimate.",
-        "We use transparent pricing, explain everything in plain language, and ensure you stay in control of all changes."
+        "You describe the issue and schedule a visit at a convenient time.",
+        "A technician arrives on-site, performs a hands-on diagnosis, and resolves the problem or provides a clear repair plan and pricing.",
+        "All work is explained in plain language with transparent pricing so you stay in control."
       ]
     }
   ],

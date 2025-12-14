@@ -1,49 +1,49 @@
 {
-  "id": "custom-solutions-{{city_lower}}",
-  "title": "Advanced Cybersecurity & Custom Tech Consulting in {{city_upper}}, FL",
-  "headline": "Need something more advanced? Let's build a secure, personalized tech plan that fits you.",
-  "description": "Custom I.T. solutions in {{city_upper}} for privacy, security, and performance. We help design advanced networks, lock down smart homes, and build tailored tech systems.",
+  "id": "custom-solutions",
+  "title": "Advanced Cybersecurity & Custom Tech Consulting",
+  "headline": "Design secure, privacy-first technology tailored to how you actually use it.",
+  "description": "Custom cybersecurity and technology consulting for privacy, security, and performance, serving homeowners and small businesses in Ocala, Belleview, The Villages, and surrounding Florida communities.",
   "keywords": [
-    "custom I.T. solutions {{city_upper}}",
-    "cybersecurity consulting {{city_upper}}",
-    "smart home lockdown {{city_upper}}",
-    "advanced tech planning {{city_upper}}",
-    "homelab setup {{city_upper}}",
-    "network design {{city_upper}}",
-    "privacy tech consulting {{city_upper}}",
-    "secure tech support {{city_upper}}"
+    "custom IT solutions Ocala FL",
+    "cybersecurity consulting Ocala",
+    "advanced network design Florida",
+    "smart home security consulting",
+    "privacy technology consulting",
+    "homelab setup and security",
+    "secure system architecture",
+    "custom cybersecurity solutions"
   ],
-  "url": "/services/{{city_lower}}/custom-solutions",
+  "url": "/services/custom-solutions",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Most off-the-shelf solutions prioritize convenience over security. Default settings often leak data, expose unnecessary services, or rely on third-party clouds you cannot control.",
-        "If you are running a homelab, hosting sensitive data, or integrating smart devices, you need more than generic tools and default configurations.",
-        "Advanced setups let you self-host services, restrict access, and reduce reliance on external platforms while improving both privacy and performance."
+        "Most off-the-shelf technology solutions prioritize convenience over security, often exposing unnecessary services or relying heavily on third-party cloud platforms.",
+        "Advanced environments such as homelabs, smart homes, or self-hosted services require deliberate design to avoid data leakage and access risks.",
+        "Well-designed custom systems can improve privacy, reliability, and performance while reducing long-term complexity."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We help privacy-conscious individuals, professionals, and small businesses implement secure, efficient systems that go beyond basic tech support."
+        "We help individuals and small organizations design and implement secure, efficient technology systems that go beyond basic tech support."
       ],
       "items": [
-        "Design secure, high-performance network environments tailored to your needs",
-        "Lock down smart home platforms and reduce reliance on cloud services",
-        "Set up private file sharing, encrypted backup, or self-hosted services",
-        "Optimize or repurpose hardware for privacy-first applications",
-        "Develop or configure automation tools and privacy-focused software",
-        "Build custom websites or applications with security and data control in mind"
+        "Design secure, high-performance network architectures",
+        "Harden smart home platforms and limit unnecessary cloud exposure",
+        "Implement encrypted storage, backups, and private file sharing",
+        "Build and secure homelabs or self-hosted services",
+        "Configure privacy-focused software and automation tools",
+        "Develop custom applications or systems with security-first principles"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We start with a consultation to understand your goals, technical environment, and potential risks.",
-        "Based on that, we create a detailed plan using open, trusted tools to meet your performance, security, or privacy requirements.",
-        "You stay in full control of your systems with clear documentation and long-term maintainability built in from the start."
+        "We begin with a technical consultation to understand your goals, environment, and risk profile.",
+        "From there, we design a clear, maintainable solution using trusted tools and proven security practices.",
+        "You retain full control of your systems with documentation and long-term sustainability built in."
       ]
     }
   ],
@@ -52,8 +52,8 @@
       "label": "Home Network Security & Wi-Fi Hardening",
       "slug": "home-network-security"
     },
-    { "label": "Smart Home Setup", "slug": "smart-home-setup" },
-    { "label": "Network Setup", "slug": "network-setup" }
+    { "label": "Smart Home Setup & Security", "slug": "smart-home-setup" },
+    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" }
   ],
   "cta": {
     "label": "Talk to an Expert",

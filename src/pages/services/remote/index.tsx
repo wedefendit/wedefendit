@@ -29,7 +29,7 @@ export default function RemoteServicesPage() {
       }}
       h1="Remote Services"
       services={remote.services}
-      city="remote"
+      remote={true}
     />
   );
 }

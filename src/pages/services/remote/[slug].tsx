@@ -65,12 +65,5 @@ type PageProps = ServiceSlugProps & {
 };
 
 export default function RemoteServicePage({ service, related }: PageProps) {
-  return (
-    <ServiceSlug
-      service={service}
-      isRemote={false}
-      citySlug="remote"
-      related={related}
-    />
-  );
+  return <ServiceSlug service={service} remote related={related} />;
 }

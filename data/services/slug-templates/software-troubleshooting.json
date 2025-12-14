@@ -1,16 +1,20 @@
 {
-  "id": "software-troubleshooting-{{city_lower}}",
-  "title": "Software Installation & Troubleshooting in {{city_upper}}, FL",
-  "headline": "OS installs, drivers, and app fixes.",
-  "description": "Clean installs, updates, drivers, and app fixes in {{city_upper}}. We stabilize your system, remove conflicts, and document the changes.",
+  "id": "software-troubleshooting",
+  "title": "Software Installation & Troubleshooting",
+  "headline": "OS installs, drivers, and application fixes done right.",
+  "description": "Professional software installation and troubleshooting for Windows and macOS systems, including clean installs, driver fixes, update recovery, and application repair for homeowners and small businesses in Ocala, Belleview, The Villages, and surrounding Central Florida areas.",
   "keywords": [
-    "software help {{city_upper}}",
-    "windows install {{city_upper}}",
-    "macOS install {{city_upper}}",
-    "driver update {{city_upper}}",
-    "application troubleshooting {{city_upper}}"
+    "software troubleshooting Ocala FL",
+    "software troubleshooting Belleview FL",
+    "software troubleshooting The Villages FL",
+    "Windows installation Florida",
+    "macOS installation Florida",
+    "driver update services",
+    "application troubleshooting",
+    "fix software errors",
+    "computer software repair"
   ],
-  "url": "/services/{{city_lower}}/software-troubleshooting",
+  "url": "/services/software-troubleshooting",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
@@ -18,20 +22,20 @@
       "paragraph": [
         "Corrupt updates are one of the most common causes of Windows blue screen errors.",
         "Installing the wrong driver can disable hardware completely until corrected.",
-        "Slow performance on macOS is often caused by background processes, not hardware failure.",
-        "Many failed installs can be repaired without wiping the system or losing files.",
-        "Bloatware can increase boot times by several minutes and cause app conflicts."
+        "Slow performance on macOS is often caused by background processes rather than hardware failure.",
+        "Many failed installations can be repaired without wiping the system or losing files.",
+        "Bloatware can significantly increase boot times and cause application conflicts."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We install, repair, and configure software to restore stability, improve speed, and ensure compatibility."
+        "We install, repair, and configure software to restore stability, improve performance, and ensure compatibility across your system."
       ],
       "items": [
-        "Windows and macOS installation or repair",
+        "Windows and macOS installation or in-place repair",
         "Driver updates, conflict resolution, and crash fixes",
-        "Failed update recovery and rollback loop fixes",
+        "Failed update recovery and rollback loop resolution",
         "Application installation, repair, and cleanup",
         "Bloatware removal and configuration optimization"
       ]
@@ -39,8 +43,8 @@
     {
       "heading": "How It Works",
       "paragraph": [
-        "We start with a quick system assessment and recommend backups if needed. Then we apply targeted, documented fixes to restore normal operation.",
-        "Our approach avoids unnecessary reinstalls and mystery changes, keeping you informed and in control at every step."
+        "We begin with a targeted system assessment and recommend backups if needed, then apply documented, non-destructive fixes to restore normal operation.",
+        "Our approach avoids unnecessary reinstalls and unexplained changes so you stay informed and in control."
       ]
     }
   ],

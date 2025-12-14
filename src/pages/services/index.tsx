@@ -12,12 +12,12 @@ licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
 
-import jsonData from "@/data/services/lander.json";
+import jsonData from "@/data/services/list.json";
 import { Service, ServicePage } from "@/components/Service";
-import { useLocationRedirect } from "@/hooks/useLocationRedirect";
+// import { useLocationRedirect } from "@/hooks/useLocationRedirect";
 import { generateBreadCrumbJsonLd, generateServiceLd } from "@/lib/json-ld";
 export default function ServicesPage() {
-  useLocationRedirect(true); // auto-redirects if match found
+  // useLocationRedirect(true); // auto-redirects if match found
 
   const canonical = "https://www.wedefendit.com/services";
   const services = jsonData.services as Service[]; // expects { name, slug, description? }
@@ -62,7 +62,6 @@ export default function ServicesPage() {
       }}
       h1="Our Services"
       services={services}
-      city=""
     />
   );
 }

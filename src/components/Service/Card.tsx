@@ -22,30 +22,47 @@ export type ServiceCardProps = {
   icons: string[];
   summary: string;
   cta: string;
+  slug?: string;
+  remote?: boolean;
 };
 
-const cities = ["the-villages", "ocala", "belleview", "remote"];
+function toSlug(s: string) {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
-export function ServiceCard({ id, title, summary, icons }: ServiceCardProps) {
-  const city = cities.find((c) => id.includes(c)) || cities[0]; // Default to The Villages if not found
-  const slug = id.replace(`-${city}`, ""); // e.g. "computer-repair"
-  const href = `/services/${city}/${slug}`;
+export function ServiceCard({
+  id,
+  title,
+  summary,
+  icons,
+  slug,
+  remote,
+}: ServiceCardProps) {
+  const finalSlug = slug || id || toSlug(title);
+  const isRemote = remote || false;
+  const href = `/services/${isRemote ? `remote/${finalSlug}` : finalSlug}`;
 
   return (
     <Link
       href={href}
-      className="p-6 bg-white/10 flex flex-col justify-around items-start dark:bg-slate-800/20  border border-gray-100 dark:border-gray-800 rounded-md shadow-sm hover:shadow-md hover:shadow-blue-500 hover:bg-blue-200/10 dark:hover:shadow-sky-400 hover:border-blue-500 dark:hover:bg-sky-700/10 dark:hover:border-sky-400 transition space-y-3 "
+      className="p-6 bg-white/10 flex flex-col justify-around items-start dark:bg-slate-800/20 border border-gray-100 dark:border-gray-800 rounded-md shadow-sm hover:shadow-md hover:shadow-blue-500 hover:bg-blue-200/10 dark:hover:shadow-sky-400 hover:border-blue-500 dark:hover:bg-sky-700/10 dark:hover:border-sky-400 transition space-y-3"
     >
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
         {title}
       </h3>
+
       <div className="flex items-center gap-3 flex-wrap">
         {icons.map((iconName, idx) => {
           const name = iconName
             .split("-")
             .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
             .join("");
-          // eslint-disable-next-line
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const LucideIcon = (Icons as any)[name];
           return LucideIcon ? (
             <LucideIcon
@@ -55,6 +72,7 @@ export function ServiceCard({ id, title, summary, icons }: ServiceCardProps) {
           ) : null;
         })}
       </div>
+
       <p className="text-gray-700 dark:text-gray-300 text-sm">{summary}</p>
     </Link>
   );

@@ -1,20 +1,20 @@
 {
-  "id": "computer-repair-{{city_lower}}",
-  "title": "Computer Repair in {{city_upper}}, FL",
+  "id": "computer-repair",
+  "title": "Computer Repair",
   "headline": "Fix slow or broken devices with fast, local help. No waiting, no surprises.",
-  "description": "Get expert computer repair in {{city_upper}} for laptops and desktops. We fix slow systems, replace failing hardware, recover data, and optimize performance. Local and without unnecessary upsells.",
+  "description": "Professional computer repair for laptops and desktops, including diagnostics, hardware replacement, data recovery, and performance optimization, serving Ocala, Belleview, The Villages, and surrounding Florida communities with transparent pricing and no unnecessary upsells.",
   "keywords": [
-    "computer repair {{city_upper}}",
-    "laptop repair {{city_upper}}",
-    "desktop repair {{city_upper}}",
-    "PC diagnostics {{city_upper}}",
-    "computer troubleshooting {{city_upper}}",
-    "data recovery {{city_upper}}",
-    "slow computer fix {{city_upper}}",
-    "SSD upgrade {{city_upper}}",
-    "IT support {{city_upper}}"
+    "computer repair Ocala FL",
+    "computer repair Belleview FL",
+    "computer repair The Villages FL",
+    "laptop repair Ocala",
+    "desktop repair Ocala",
+    "PC diagnostics Florida",
+    "data recovery Ocala",
+    "slow computer repair Florida",
+    "IT support Ocala FL"
   ],
-  "url": "/services/{{city_lower}}/computer-repair",
+  "url": "/services/computer-repair",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {

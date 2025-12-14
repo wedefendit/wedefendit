@@ -23,7 +23,6 @@ export default function Document() {
     >
       <Head>
         <link rel="shortcut icon" href="/favicon.svg" type="image/svg" />
-        <meta name="theme-color" content="#0f1117" />
       </Head>
       <body className="antialiased w-full h-full">
         <Main />

@@ -1,65 +1,63 @@
 {
-  "id": "home-network-security-hardening-{{city_lower}}",
-  "title": "Home Network Security & Wi-Fi Hardening in {{city_upper}}, FL",
-  "headline": "Protect your household from scams, spying, and insecure smart devices using tools and practices trusted by security professionals.",
-  "description": "Secure your home network in {{city_upper}} with DNS filtering, Wi-Fi hardening, smart-device isolation, and privacy-first controls. Implemented with open, local-first tools.",
+  "id": "home-network-security",
+  "title": "Home Network Security & Wi-Fi Hardening",
+  "headline": "Protect your home from scams, spying, and insecure smart devices using security-first networking practices.",
+  "description": "Professional home network security and Wi-Fi hardening services using DNS filtering, device isolation, firewall configuration, and privacy-first controls, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
   "keywords": [
-    "home network security {{city_upper}}",
-    "Wi-Fi hardening {{city_upper}}",
-    "smart home security {{city_upper}}",
-    "DNS filtering {{city_upper}}",
-    "IoT lockdown {{city_upper}}",
-    "{{city_upper}} home cybersecurity",
-    "network hardening {{city_upper}}",
-    "IoT security {{city_upper}}",
-    "home firewall setup {{city_upper}}",
-    "secure Wi-Fi installation {{city_upper}}",
-    "privacy-focused networking {{city_upper}}"
+    "home network security Ocala FL",
+    "Wi-Fi hardening Ocala",
+    "home cybersecurity Florida",
+    "smart home security",
+    "DNS filtering setup",
+    "IoT device security",
+    "home firewall configuration",
+    "secure Wi-Fi installation",
+    "privacy-focused networking"
   ],
-  "url": "/services/{{city_lower}}/home-network-security",
+  "url": "/services/home-network-security",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Smart TVs, speakers, and voice assistants often collect behavioral data and phone it home, sometimes bypassing basic router controls.",
-        "Most home routers ship with weak settings, default passwords, and open ports that expose you to malware and tracking.",
-        "By default, many networks send DNS requests to providers that can log browsing activity, impacting privacy."
+        "Multiple large-scale security studies consistently find that a significant majority of consumer and small-office (SOHO) routers ship with known vulnerabilities, insecure defaults, or outdated firmware, leaving most home networks exposed unless deliberately hardened.",
+        "Smart TVs, voice assistants, and IoT devices often collect behavioral data and communicate externally, sometimes bypassing basic router protections.",
+        "DNS requests often reveal browsing activity unless deliberately filtered or redirected to privacy-respecting resolvers."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We apply practical controls based on NIST/CISA-aligned principles, tailored for residential environments. The goal: reduce digital risk, improve privacy, and keep you in control. Without subscriptions or vendor lock-in."
+        "We implement practical, security-first controls based on established best practices to reduce digital risk and improve privacy in residential networks."
       ],
       "items": [
-        "DNS filtering to block malware, tracking, and phishing domains",
-        "Wi-Fi hardening with strong encryption and restricted access",
-        "Guest and untrusted device networks isolated from your main devices",
-        "Custom firewall rules to block unwanted or unknown traffic",
-        "Segmentation/VLANs to contain vulnerable IoT devices",
-        "Local-first, open-source tooling. No cloud dashboards or spyware"
+        "DNS filtering to block malware, phishing, ads, and tracking domains",
+        "Wi-Fi hardening with strong encryption and restricted access policies",
+        "Isolation of guest and untrusted devices from primary systems",
+        "Custom firewall rules to limit unnecessary inbound and outbound traffic",
+        "Network segmentation to contain vulnerable or legacy IoT devices",
+        "Use of local-first, open-source tools with no forced cloud dependency"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We start with a review of your layout, devices, and router defaults to identify weak points.",
-        "Then we implement the right mix of filtering, isolation, and configuration to improve security and privacy without adding complexity.",
-        "You stay informed and in control with clear documentation and no ongoing fees."
+        "We begin by reviewing your existing network layout, devices, and router configuration to identify weaknesses.",
+        "Next, we apply the appropriate combination of filtering, isolation, and configuration to improve security without sacrificing usability.",
+        "You receive clear documentation and maintain full control of your network with no subscriptions or ongoing fees."
       ]
     }
   ],
   "related": [
     { "label": "Smart Home Setup & Security", "slug": "smart-home-setup" },
-    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
+    { "label": "Wi-Fi & Network Setup", "lug": "network-setup" },
     {
       "label": "Password Management & Digital Safety",
       "slug": "password-management"
     }
   ],
   "cta": {
-    "label": "Harden My Network Today",
+    "label": "Harden My Network",
     "link": "/contact#schedule-service"
   }
 }

@@ -14,28 +14,18 @@ party without express written consent.
 
 import {
   makeGetStaticSlugProps,
-  type CityPageProps,
+  type IndividualServiceSlugProps,
   getStaticPathsForServices,
 } from "@/lib/service-page";
 import { ServiceSlug } from "@/components/Service";
 import type { GetStaticPaths, GetStaticProps } from "next";
 
 export const getStaticPaths: GetStaticPaths = getStaticPathsForServices;
-export const getStaticProps: GetStaticProps = makeGetStaticSlugProps({
-  cityLower: "the-villages",
-  cityUpper: "The Villages",
-});
+export const getStaticProps: GetStaticProps = makeGetStaticSlugProps();
 
-export default function VillagesServicePage({
+export default function IndividualServicePage({
   service,
   related,
-}: CityPageProps) {
-  return (
-    <ServiceSlug
-      service={service}
-      citySlug="the-villages"
-      related={related}
-      isRemote={false}
-    />
-  );
+}: IndividualServiceSlugProps) {
+  return <ServiceSlug service={service} related={related} />;
 }

@@ -1,0 +1,100 @@
+{
+  "services": [
+    {
+      "id": "computer-repair",
+      "title": "Computer Repair",
+      "headline": "Fix slow, crashing, or broken computers—fast.",
+      "icons": ["pc-case", "monitor-smartphone", "wrench"],
+      "summary": "Professional desktop and laptop repair for performance issues, hardware failures, crashes, and software conflicts, with clear diagnostics and no unnecessary upsells.",
+      "cta": "Get Computer Repair"
+    },
+    {
+      "id": "virus-removal",
+      "title": "Virus & Malware Removal",
+      "headline": "Remove infections and secure your system.",
+      "icons": ["shield-plus", "worm", "alert-triangle"],
+      "summary": "Thorough detection and removal of malware, spyware, and unwanted software, followed by system hardening to prevent reinfection.",
+      "cta": "Remove Malware"
+    },
+    {
+      "id": "home-network-security",
+      "title": "Home Network Security",
+      "headline": "Protect your Wi-Fi and connected devices.",
+      "icons": ["house-wifi", "router", "shield-check"],
+      "summary": "Assessment and hardening of home networks to reduce risk from intrusions, misconfigurations, and insecure devices.",
+      "cta": "Secure My Network"
+    },
+    {
+      "id": "scam-protection",
+      "title": "Scam & Fraud Protection",
+      "headline": "Avoid scams before they cause damage.",
+      "icons": ["presentation", "glasses", "shield-alert"],
+      "summary": "Education and device configuration to help you recognize, block, and avoid phone, email, and online scams.",
+      "cta": "Get Scam Protection"
+    },
+    {
+      "id": "custom-solutions",
+      "title": "Custom Technology Solutions",
+      "headline": "Advanced solutions for complex needs.",
+      "icons": ["puzzle", "monitor-cog", "user"],
+      "summary": "Tailored technology and security solutions including privacy planning, advanced system design, and specialized setups.",
+      "cta": "Discuss My Needs"
+    },
+    {
+      "id": "network-setup",
+      "title": "Wi-Fi & Network Setup",
+      "headline": "Reliable, fast, and secure home networking.",
+      "icons": ["router", "ethernet-port", "house-plug"],
+      "summary": "Installation and optimization of Wi-Fi, wired networks, and access points to improve speed, coverage, and security.",
+      "cta": "Set Up My Network"
+    },
+    {
+      "id": "data-recovery",
+      "title": "Backup & Data Recovery",
+      "headline": "Recover lost data and prevent future loss.",
+      "icons": ["hard-drive", "clock", "file-check"],
+      "summary": "Recovery of lost or deleted files when possible, plus setup of secure, automated backups to protect critical data.",
+      "cta": "Protect My Data"
+    },
+    {
+      "id": "password-management",
+      "title": "Password Management & Digital Safety",
+      "headline": "Secure accounts with strong password practices.",
+      "icons": ["lock", "key-round", "book-lock"],
+      "summary": "Setup and training for password managers, strong passphrases, and account protection against breaches and fraud.",
+      "cta": "Secure My Accounts"
+    },
+    {
+      "id": "onsite-tech-support",
+      "title": "On-Site Tech Support",
+      "headline": "In-home help when you need it.",
+      "icons": ["badge-check", "home", "wrench"],
+      "summary": "On-site troubleshooting and setup for computers, networks, printers, and devices without the hassle of a repair shop.",
+      "cta": "Book On-Site Support"
+    },
+    {
+      "id": "software-troubleshooting",
+      "title": "Software Installation & Troubleshooting",
+      "headline": "Fix software issues and system errors.",
+      "icons": ["cpu", "settings", "terminal"],
+      "summary": "Operating system installs, updates, driver fixes, and resolution of unstable or misbehaving applications.",
+      "cta": "Fix Software Issues"
+    },
+    {
+      "id": "pc-upgrades",
+      "title": "PC & Laptop Upgrades",
+      "headline": "Extend the life of your computer.",
+      "icons": ["hard-drive", "gauge", "bolt"],
+      "summary": "Performance upgrades including SSDs, RAM, batteries, and thermal optimization to keep systems running smoothly.",
+      "cta": "Upgrade My Computer"
+    },
+    {
+      "id": "smart-home-setup",
+      "title": "Smart Home Setup & Security",
+      "headline": "Smart technology without added risk.",
+      "icons": ["house-wifi", "camera", "shield-check"],
+      "summary": "Configuration and security of smart home devices with privacy-first settings and least-privilege access.",
+      "cta": "Set Up My Smart Home"
+    }
+  ]
+}

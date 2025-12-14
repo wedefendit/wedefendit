@@ -130,10 +130,9 @@ export function generateServiceLd({
     })),
   };
 }
-
 export function generateRelatedServiceLd(
   services: { label: string; slug: string }[],
-  city: { name: string; slug: string }
+  isRemote: boolean = false
 ): object {
   return {
     "@context": "https://schema.org",
@@ -142,7 +141,9 @@ export function generateRelatedServiceLd(
       "@type": "ListItem",
       position: i + 1,
       name: r.label,
-      url: `https://www.wedefendit.com/services/${city.slug}/${r.slug}`,
+      url: isRemote
+        ? `https://www.wedefendit.com/services/remote/${r.slug}`
+        : `https://www.wedefendit.com/services/${r.slug}`,
     })),
   };
 }

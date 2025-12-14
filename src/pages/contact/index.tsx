@@ -11,6 +11,10 @@ This software is provided for use only by authorized employees, contractors, or
 licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
+/*
+Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+*/
+
 import { useEffect, useState } from "react";
 import { localBusinessLd } from "@/lib/json-ld";
 import companyInfo from "../../../data/company-info.json";
@@ -50,7 +54,6 @@ function HeadingSection() {
 function ContactGrid() {
   return (
     <section className="flex flex-wrap flex-col md:flex-row items-center justify-center gap-6 sm:gap-12 max-w-3xl mx-auto">
-      {/* Phone */}
       <div className="flex flex-col items-center text-center space-y-2 mt-4 md:mt-16">
         <Phone className="w-6 h-6 text-blue-500 dark:text-sky-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -64,7 +67,6 @@ function ContactGrid() {
         </a>
       </div>
 
-      {/* Email */}
       <div className="flex flex-col items-center text-center space-y-2 md:mt-16">
         <Mail className="w-6 h-6 text-blue-500 dark:text-sky-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -78,7 +80,6 @@ function ContactGrid() {
         </a>
       </div>
 
-      {/* Email */}
       <div className="flex flex-col items-center text-center space-y-2 md:mt-16">
         <Mail className="w-6 h-6 text-blue-500 dark:text-sky-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -92,7 +93,6 @@ function ContactGrid() {
         </a>
       </div>
 
-      {/* Address */}
       <div className="flex flex-col items-center text-center space-y-2 sm:col-span-2">
         <MapPin className="w-6 h-6 text-blue-500 dark:text-sky-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -127,9 +127,9 @@ function PgpBlock({
       </p>
 
       <button
+        type="button"
         onClick={() => setShowPGP(!showPGP)}
         className="inline-flex items-center gap-2 px-4 py-2 rounded bg-blue-600 dark:bg-sky-500 text-white font-medium shadow hover:bg-blue-700 dark:hover:bg-sky-600 transition"
-        aria-expanded={showPGP}
         aria-controls="pgp-panel"
       >
         <ShieldCheck className="w-5 h-5" />
@@ -196,7 +196,6 @@ function ServiceAreaAndBooking() {
   );
 }
 
-/* ------- page ------- */
 const canonical = "https://www.wedefendit.com/contact";
 
 const breadcrumbLd = {
@@ -212,6 +211,7 @@ const breadcrumbLd = {
     { "@type": "ListItem", position: 2, name: "Contact", item: canonical },
   ],
 };
+
 const contactPageLd = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
@@ -222,30 +222,22 @@ const contactPageLd = {
     url: "https://www.wedefendit.com/og-image.png",
   },
   about: {
-    ...localBusinessLd, // reuse the same LocalBusiness definition
+    ...localBusinessLd,
+    areaServed: [
+      "Ocala FL",
+      "Belleview FL",
+      "The Villages FL",
+      "Central Florida",
+      "Remote",
+    ],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: contact.phone,
       contactType: "Customer Service",
-      areaServed: "US",
       availableLanguage: "English",
       email: contact.email,
       serviceUrl: "https://www.wedefendit.com/services",
       url: canonical,
-      hoursAvailable: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          opens: "09:00",
-          closes: "18:00",
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: "Saturday",
-          opens: "10:00",
-          closes: "16:00",
-        },
-      ],
     },
   },
 };
@@ -253,7 +245,6 @@ const contactPageLd = {
 export default function ContactPage() {
   const [showPGP, setShowPGP] = useState(false);
 
-  // Auto-open PGP when ?secure=1 or #pgp is present
   useEffect(() => {
     if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
@@ -273,9 +264,9 @@ export default function ContactPage() {
         url={canonical}
         canonical={canonical}
         image="https://www.wedefendit.com/og-image.png"
-        title="Contact Defend I.T. Solutions | Ocala & The Villages Cybersecurity"
-        description="Reach out to Defend I.T. Solutions for trusted, local cybersecurity and IT support in Ocala, The Villages, and Central Florida. Secure communication options available."
-        keywords="Contact Defend I.T. Solutions, Ocala IT support, The Villages cybersecurity, secure communication, PGP email, local tech support"
+        title="Contact Defend I.T. Solutions | IT & Cybersecurity Support in Ocala, Belleview & The Villages"
+        description="Contact Defend I.T. Solutions for local, trusted IT and cybersecurity support in Ocala, Belleview, The Villages, and Central Florida, including secure PGP communication options."
+        keywords="contact IT support Ocala FL, cybersecurity contact Belleview FL, IT services The Villages FL, secure contact PGP, local tech support Central Florida"
         structuredData={{ "@graph": [breadcrumbLd, contactPageLd] }}
       />
 

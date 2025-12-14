@@ -80,7 +80,7 @@ export default function RemoteSupportPlanPage() {
               Remote Support Service Plan
             </h1>
             <p className="text-base sm:text-lg w-full text-blue-600 dark:text-sky-400">
-              Secure, private remote support for verified local clients.
+              Secure and private remote support for verified local clients.
             </p>
           </div>
 

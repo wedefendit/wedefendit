@@ -1,45 +1,49 @@
 {
-  "id": "scam-protection-{{city_lower}}",
-  "title": "Scam & Fraud Protection Services in {{city_upper}}, FL",
-  "headline": "Learn to spot scams, stop fraud, and protect yourself before it's too late.",
-  "description": "Protect yourself or your loved ones from scams and online fraud in {{city_upper}}. We teach scam recognition, secure your devices, and help prevent phishing, tech support scams, and social engineering.",
+  "id": "scam-protection",
+  "title": "Scam & Fraud Protection Services",
+  "headline": "Learn to spot scams, stop fraud, and protect yourself before it’s too late.",
+  "description": "Scam and fraud protection services that teach recognition of modern scams, secure devices, and reduce risk from phishing, tech support scams, and social engineering, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
   "keywords": [
-    "Scam protection {{city_upper}}",
-    "Fraud prevention {{city_upper}}",
-    "Elder scam defense {{city_upper}}",
-    "Online scam help {{city_upper}}",
-    "Cybersecurity education {{city_upper}}"
+    "scam protection Ocala FL",
+    "scam protection Belleview FL",
+    "scam protection The Villages FL",
+    "fraud prevention Ocala FL",
+    "elder scam protection Florida",
+    "online scam prevention",
+    "phishing protection",
+    "tech support scam prevention",
+    "cybersecurity education Florida"
   ],
-  "url": "/services/{{city_lower}}/scam-protection",
+  "url": "/services/scam-protection",
   "image": "https://www.wedefendit.com/og-image.png",
   "sections": [
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Scammers now use AI-generated voices, spoofed caller IDs, and fake websites to impersonate family members, banks, and tech support.",
-        "Social engineering works because it targets emotions, not firewalls. You don't need to be hacked to be tricked.",
-        "Many scam attempts bypass antivirus software entirely and rely on human error to succeed."
+        "Modern scams increasingly use AI-generated voices, spoofed caller IDs, and realistic fake websites to impersonate trusted people and organizations.",
+        "Social engineering succeeds by exploiting urgency, fear, and trust rather than technical vulnerabilities.",
+        "Many scam attempts bypass antivirus software entirely and rely on human behavior rather than malware."
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We help individuals and families understand how modern scams work, and how to stop them before they cause harm. This service is especially valuable for seniors, caregivers, and anyone concerned about online or phone-based fraud."
+        "We help individuals and families understand how modern scams operate and how to stop them before financial or personal harm occurs."
       ],
       "items": [
-        "Teach you how to recognize scams by phone, email, and websites using real examples",
-        "Secure computers, tablets, and phones with settings that reduce risk",
-        "Block scam websites, malicious links, and phishing infrastructure",
-        "Set up call screening, email filters, and safe browsing protections",
-        "Assist with responding to suspicious messages or compromised accounts"
+        "Teach recognition of phone, email, and website scams using real-world examples",
+        "Secure computers, phones, and tablets with settings that reduce scam exposure",
+        "Block malicious websites, phishing links, and scam infrastructure",
+        "Configure call screening, email filtering, and safe browsing protections",
+        "Assist with evaluating suspicious messages or recovering from compromised accounts"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We start by reviewing your devices and security settings, then walk through common scam tactics so you can recognize them before they work.",
-        "Next, we configure your devices with tailored protections and give you clear strategies to avoid manipulation.",
-        "Everything is explained step-by-step, with patient support and zero technical pressure."
+        "We begin by reviewing your devices and current security settings.",
+        "Next, we explain common scam tactics so you can recognize them before they succeed.",
+        "We then apply practical protections and provide clear guidance, all explained patiently and without technical pressure."
       ]
     }
   ],
