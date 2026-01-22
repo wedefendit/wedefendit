@@ -34,7 +34,8 @@ We combine enterprise-grade security practices with clear, jargon-free support f
 
 Founder and Lead Engineer: **Anthony Tropeano**  
 
-- Cybersecurity engineering student  
+- **Master of Science in Computer Science (Cyber Operations)** — Student, *Dakota State University (DSU)*  
+- **Bachelor of Applied Science in Cyber Operations (Cyber Engineering Emphasis)** — *Summa Cum Laude*, *University of Arizona*
 - Full-stack web developer  
 - Experienced in **offensive** and **defensive** security operations
 
