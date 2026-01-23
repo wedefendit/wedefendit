@@ -31,9 +31,9 @@ export default function ServicesPage() {
   });
 
   const serviceLd = generateServiceLd({
-    name: "Cybersecurity & Tech Support Services",
+    name: "Cybersecurity, IT Support & Tech Tutoring Services | Defend I.T. Solutions",
     description:
-      "Explore in-person I.T. support, secure home networking, and business cybersecurity services for The Villages, Ocala, and Central Florida.",
+      "Explore in-person I.T. support, secure home networking, tech tutoring, and business cybersecurity services for The Villages, Ocala, and Central Florida.",
     url: canonical,
     image: "https://www.wedefendit.com/og-image.png",
     offers: services.map((s) => ({
@@ -50,9 +50,10 @@ export default function ServicesPage() {
   return (
     <ServicePage
       meta={{
-        title: "Cybersecurity & Tech Support Services | Defend I.T. Solutions",
+        title:
+          "Cybersecurity, IT Support & Tech Tutoring Services | Defend I.T. Solutions",
         description:
-          "Explore in-person I.T. support, secure home networking, and business cybersecurity services for The Villages, Ocala, and Central Florida.",
+          "Explore in-person I.T. support, secure home networking, tech tutoring, and business cybersecurity services for The Villages, Ocala, and Central Florida.",
         image: "https://www.wedefendit.com/og-image.png",
         url: canonical,
         canonical,
@@ -60,7 +61,7 @@ export default function ServicesPage() {
           "IT support, cybersecurity, tech help, The Villages, Ocala, home networking, small business IT, computer repair, local tech services",
         structuredData: { "@graph": [breadcrumbLd, serviceLd] },
       }}
-      h1="Our Services"
+      h1="Cybersecurity, IT Support & Tech Tutoring Services"
       services={services}
     />
   );

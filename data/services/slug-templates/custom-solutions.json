@@ -53,7 +53,11 @@
       "slug": "home-network-security"
     },
     { "label": "Smart Home Setup & Security", "slug": "smart-home-setup" },
-    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" }
+    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
+    {
+      "label": "Remote IT & Cybersecurity Tutoring",
+      "slug": "remote-tech-tutoring"
+    }
   ],
   "cta": {
     "label": "Talk to an Expert",

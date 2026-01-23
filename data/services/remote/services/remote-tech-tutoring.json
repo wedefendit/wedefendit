@@ -1,14 +1,15 @@
 {
   "id": "remote-tech-tutoring",
-  "title": "Remote Tech Tutoring & Mentoring",
-  "headline": "Learn coding, cybersecurity, or IT skills one-on-one.",
-  "description": "We provide personalized, live tutoring over Zoom for students, professionals, and curious learners. Build skills in coding, system administration, or cybersecurity. At your pace and with real answers.",
+  "title": "Remote IT & Cybersecurity Tutoring",
+  "headline": "One-on-one IT and cybersecurity tutoring, online.",
+  "description": "Personalized remote IT and cybersecurity tutoring for students, professionals, and lifelong learners, covering programming, system administration, networking, and practical security skills through live one-on-one sessions.",
   "keywords": [
-    "Remote tech tutoring",
-    "Online coding mentorship",
-    "Cybersecurity tutoring online",
-    "Virtual IT training",
-    "1-on-1 tech mentorship"
+    "IT tutoring",
+    "Cybersecurity tutoring",
+    "Remote IT tutoring",
+    "Online cybersecurity tutoring",
+    "1-on-1 tech tutoring",
+    "Virtual IT mentoring"
   ],
   "url": "/services/remote/remote-tech-tutoring",
   "image": "https://www.wedefendit.com/og-image.png",
@@ -16,36 +17,34 @@
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "One-on-one tech tutoring helps you avoid common mistakes, get real-time feedback, and focus on the exact skills you need to grow.",
-        "Unlike online courses or tutorials, live mentoring adapts to your learning style, experience level, and real-world goals.",
-        "Whether you are preparing for a job, a certification, or a personal project, guided practice is the most efficient way to learn."
+        "One-on-one IT tutoring accelerates learning by focusing on real problems and immediate feedback.",
+        "Cybersecurity skills are best learned hands-on, not through passive videos or generic courses.",
+        "Personalized mentoring helps learners build confidence and practical ability faster than group training."
       ]
     },
     {
       "heading": "Expert Help, Personalized",
       "paragraph": [
-        "Our tutoring sessions are tailored to you. We work with beginners, students, professionals, and hobbyists. No cookie-cutter lessons or generic training paths.",
-        "If you are stuck on a problem, preparing for a job interview, or want structured learning in a specific topic, we build the session around that."
+        "Each tutoring session is tailored to your goals, experience level, and learning style.",
+        "Whether you're preparing for a job, certification, class, or personal project, sessions focus on real-world skills you can apply immediately."
       ]
     },
     {
       "heading": "What We Teach",
       "items": [
-        "Programming in C, Python, JavaScript, and TypeScript",
-        "Web development using HTML, CSS, JavaScript, React, and Node.js",
-        "Linux basics, shell scripting, and system administration",
-        "Virtualization and network design with Proxmox, VMware, pfSense, Hyper-V, and more",
-        "Cybersecurity topics including hardening, threat modeling, and practical tooling",
-        "Digital literacy and safety coaching for beginners, families, or seniors"
+        "IT fundamentals and system administration",
+        "Cybersecurity concepts, hardening, and threat modeling",
+        "Programming with Python, JavaScript, TypeScript, and C",
+        "Linux, networking, virtualization, and homelab design",
+        "Digital literacy, privacy, and online safety"
       ]
     },
     {
       "heading": "How It Works",
       "paragraph": [
-        "We meet over Zoom at a time that works for you. No software installation or support plan required.",
-        "You tell us your goals and current skill level, and we tailor the session accordingly.",
-        "Live screen sharing, walkthroughs, and step-by-step guidance make learning fast and practical.",
-        "We can also provide follow-up material or homework upon request to help you continue growing."
+        "Sessions are conducted remotely over Zoom with live screen sharing.",
+        "No support plan or special software is required.",
+        "You choose the pace, topics, and depth, and we adapt the session to match."
       ]
     }
   ],

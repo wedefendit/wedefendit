@@ -50,7 +50,7 @@
   ],
   "related": [
     { "label": "Smart Home Setup & Security", "slug": "smart-home-setup" },
-    { "label": "Wi-Fi & Network Setup", "lug": "network-setup" },
+    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
     {
       "label": "Password Management & Digital Safety",
       "slug": "password-management"

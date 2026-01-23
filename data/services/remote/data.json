@@ -2,6 +2,14 @@
   "region": "Remote Services",
   "services": [
     {
+      "id": "remote-tech-tutoring",
+      "title": "Remote IT & Cybersecurity Tutoring",
+      "headline": "One-on-one remote IT and cybersecurity tutoring.",
+      "icons": ["graduation-cap", "laptop", "message-circle"],
+      "summary": "One-on-one remote IT and cybersecurity tutoring for students, professionals, and hobbyists covering programming, Linux, networking, virtualization, and digital security.",
+      "cta": "Book a Session"
+    },
+    {
       "id": "remote-support",
       "title": "Remote Tech Support",
       "headline": "Instant help without a house call.",
@@ -44,14 +52,6 @@
       "requiresPlan": true,
       "summary": "We remotely scan for and remove malware, spyware, and other threats using secure tools. Fast, safe, and private.",
       "cta": "Clean My System"
-    },
-    {
-      "id": "remote-tech-tutoring",
-      "title": "Remote Tech Tutoring & Mentoring",
-      "headline": "Learn coding, cybersecurity, or IT skills one-on-one.",
-      "icons": ["graduation-cap", "laptop", "message-circle"],
-      "summary": "We offer personalized tutoring for students, professionals, and hobbyists. Learn programming, virtualization, networking, Linux, cybersecurity, or general tech literacy.",
-      "cta": "Book a Session"
     }
   ]
 }
