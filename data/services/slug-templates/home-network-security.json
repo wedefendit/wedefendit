@@ -49,8 +49,14 @@
     }
   ],
   "related": [
-    { "label": "Smart Home Setup & Security", "slug": "smart-home-setup" },
-    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
+    {
+      "label": "Smart Home Setup & Security",
+      "slug": "smart-home-setup"
+    },
+    {
+      "label": "Wi-Fi & Network Setup",
+      "slug": "network-setup"
+    },
     {
       "label": "Password Management & Digital Safety",
       "slug": "password-management"
@@ -59,5 +65,10 @@
   "cta": {
     "label": "Harden My Network",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "house-wifi",
+    "router",
+    "shield-check"
+  ]
 }

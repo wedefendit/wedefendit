@@ -12,7 +12,7 @@ licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
 
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Calendar } from "lucide-react";
 import data from "../../data/company-info.json";
 import TrustStrip from "./TrustStrip";
 
@@ -26,83 +26,77 @@ export function BookOnline() {
   return (
     <section
       id="schedule-service"
-      className="text-center text-[15px] leading-6 text-gray-700 dark:text-gray-300 border-t border-gray-200 dark:border-gray-700 "
+      className="border-t border-gray-200 dark:border-gray-700"
     >
-      <div className="max-w-xl mx-auto my-12 px-4 rounded-lg border border-gray-200 dark:border-gray-900 bg-gray-50/40 dark:bg-gray-900/40 p-4 sm:p-6 shadow-sm dark:shadow-gray-800 space-y-3 sm:space-y-4 mt-16 ">
-        <header>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Need to Schedule Service?
-          </h2>
-          <p className="-mb-2">
-            Book by phone, email, or use Calendly to pick a time.
-          </p>
-        </header>
+      <div className="max-w-2xl mx-auto my-12 px-4">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-6 shadow-sm space-y-6">
+          {/* Header */}
+          <header className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Schedule Service
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Mon-Fri: 9 AM - 6 PM • Sat: 10 AM - 4 PM
+            </p>
+          </header>
 
-        <TrustStrip />
+          <TrustStrip />
 
-        <div className="mt-1 text-gray-600 dark:text-gray-400 sm:flex sm:justify-center">
-          <ul className="list-none space-y-1">
-            <li>
-              <span className="font-semibold">Mon-Fri:</span> 9:00 AM - 6:00 PM
-            </li>
-            <li>
-              <span className="font-semibold">Sat:</span> 10:00 AM - 4:00 PM
-            </li>
-          </ul>
-        </div>
-
-        <ul role="list" className="mt-3 sm:mt-4 space-y-3 sm:space-y-2">
-          <li className="flex items-center gap-3">
-            <Phone
-              className="w-4 h-4 text-blue-600 dark:text-sky-400"
-              aria-hidden="true"
-            />
+          {/* Primary Actions */}
+          <div className="space-y-3">
+            {/* Call/Text - Primary */}
             <a
               href={`tel:${tel.replace(/[^0-9]/g, "")}`}
-              className="text-blue-600 dark:text-sky-400 hover:underline break-words"
-              aria-label={`Call ${displayPhone}`}
+              className="flex items-center gap-3 p-4 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-medium transition shadow-sm group"
             >
-              {displayPhone}
+              <Phone className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+              <div className="flex-1 text-left">
+                <div className="text-sm opacity-90">Call or Text</div>
+                <div className="text-lg font-bold">{displayPhone}</div>
+              </div>
             </a>
-          </li>
-          <li className="flex items-center gap-3">
-            <Mail
-              className="w-4 h-4 text-blue-600 dark:text-sky-400"
-              aria-hidden="true"
-            />
+
+            {/* Email - Secondary */}
             <a
               href={`mailto:${contact.service_email}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 dark:text-sky-400 hover:underline break-words"
-              aria-label={`Email ${contact.service_email}`}
+              className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-sky-500 hover:bg-blue-50 dark:hover:bg-slate-800 transition group"
             >
-              {contact.service_email}
-            </a>
-          </li>
-        </ul>
-
-        <details className="group mt-2 sm:mt-3">
-          <summary className="cursor-pointer text-blue-600 dark:text-sky-400 hover:underline list-none select-none">
-            Book online with Calendly
-          </summary>
-
-          <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3 space-y-3">
-            <p className="text-gray-600 dark:text-gray-400">
-              You will be redirected to Calendly to choose a time. By
-              continuing, you agree to Calendly&apos;s terms and privacy policy.
-            </p>
-
-            <a
-              href={services_cta.booking_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block w-full sm:w-auto text-center px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium transition dark:bg-sky-500 dark:hover:bg-sky-600"
-            >
-              Continue to Booking
+              <Mail
+                className="w-5 h-5 text-blue-600 dark:text-sky-400 flex-shrink-0"
+                aria-hidden="true"
+              />
+              <div className="flex-1 text-left">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Send Email
+                </div>
+                <div className="text-blue-600 dark:text-sky-400 font-medium break-all">
+                  {contact.service_email}
+                </div>
+              </div>
             </a>
           </div>
-        </details>
+
+          {/* Calendly - Tertiary */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <details className="group">
+              <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-sky-400 list-none flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>Or book online with Calendly</span>
+              </summary>
+
+              <div className="mt-3 pl-6">
+                <a
+                  href={services_cta.booking_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-sm text-blue-600 dark:text-sky-400 hover:underline"
+                >
+                  Continue to Calendly →
+                </a>
+              </div>
+            </details>
+          </div>
+        </div>
       </div>
     </section>
   );

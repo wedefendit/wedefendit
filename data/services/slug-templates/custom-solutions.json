@@ -52,8 +52,14 @@
       "label": "Home Network Security & Wi-Fi Hardening",
       "slug": "home-network-security"
     },
-    { "label": "Smart Home Setup & Security", "slug": "smart-home-setup" },
-    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
+    {
+      "label": "Smart Home Setup & Security",
+      "slug": "smart-home-setup"
+    },
+    {
+      "label": "Wi-Fi & Network Setup",
+      "slug": "network-setup"
+    },
     {
       "label": "Remote IT & Cybersecurity Tutoring",
       "slug": "remote-tech-tutoring"
@@ -62,5 +68,10 @@
   "cta": {
     "label": "Talk to an Expert",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "puzzle",
+    "monitor-cog",
+    "user"
+  ]
 }

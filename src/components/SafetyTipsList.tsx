@@ -36,24 +36,24 @@ export const SafetyTipsList: React.FC = () => {
         </p>
       </header>
 
-      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 ">
+      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2">
         {(top5 as SafetyTip[]).map(({ icon, title, description }, index) => {
           // eslint-disable-next-line
           const IconComponent = (Icons as any)[icon] || Icons.Shield;
           return (
             <div
               key={index}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-md p-6"
+              className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-lg hover:shadow-green-500/20 dark:hover:shadow-emerald-400/20 hover:border-green-500 dark:hover:border-emerald-400 transition-all duration-300 p-6"
             >
-              <div className="flex items-center mb-4">
-                <div className="bg-green-100 dark:bg-emerald-900 text-green-600 dark:text-emerald-300 p-3 rounded-full">
-                  <IconComponent size={24} />
+              <div className="flex flex-col items-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
+                  <IconComponent className="w-8 h-8 text-green-600 dark:text-emerald-400" />
                 </div>
-                <h2 className="ml-4 text-lg font-semibold text-slate-800 dark:text-slate-100">
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 text-center">
                   {title}
                 </h2>
               </div>
-              <p className="text-slate-700 dark:text-slate-300 text-sm text-left">
+              <p className="text-slate-700 dark:text-slate-300 text-sm text-center leading-relaxed">
                 {description}
               </p>
             </div>

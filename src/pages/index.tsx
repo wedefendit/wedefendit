@@ -12,171 +12,224 @@ licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
 import {
-  Network,
-  Laptop2,
-  UserCheck,
-  LucideIcon,
   ShieldCheck,
+  Wrench,
+  GraduationCap,
+  Phone,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { localBusinessLd } from "@/lib/json-ld";
 import companyInfo from "../../data/company-info.json";
 import { Meta, PageContainer } from "@/components";
 
-const { services_cta } = companyInfo;
+const { contact } = companyInfo;
 
-function CallToActionButtons() {
-  const base =
-    "px-6 py-4 rounded-md font-semibold glow-hover transition-colors";
-  const primary =
-    "border border-black bg-blue-400 text-white dark:border-none dark:bg-gray-100 dark:text-black hover:bg-blue-500 hover:border-blue-700 hover:dark:bg-slate-700 hover:text-gray-100";
-  const secondary =
-    "border border-black dark:border-gray-200 text-black dark:text-white hover:bg-blue-500 hover:text-white hover:dark:bg-sky-500/60 hover:border-blue-700 hover:dark:border-sky-600";
-
-  const getButtonConfig = (text: string, fallbackLink: string) => {
-    const isViewServices = text.toLowerCase() === "view services";
-    return {
-      href: isViewServices ? "/services" : fallbackLink,
-      className: `${base} ${isViewServices ? secondary : primary}`,
-      ariaLabel: text,
-    };
-  };
-
-  return (
-    <div className="flex flex-col md:flex-row items-center justify-evenly gap-4 mt-6 w-auto p-3 text-sm md:text-xl break-keep">
-      {services_cta.buttons.map(({ text, link }) => {
-        const { href, className, ariaLabel } = getButtonConfig(text, link);
-        return (
-          <Link
-            key={text}
-            href={href}
-            className={className}
-            aria-label={ariaLabel}
-          >
-            {text}
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-type ServiceLinkProps = {
-  href: string;
-  text: string;
-  Icon: LucideIcon;
+type BenefitCardProps = {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  link: string;
 };
 
-function ServiceLink({ href, text, Icon }: ServiceLinkProps) {
+function BenefitCard({ icon, title, description, link }: BenefitCardProps) {
   return (
     <Link
-      href={href}
-      className="group flex flex-col items-center text-center max-w-[140px] sm:max-w-[200px] w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 dark:focus-visible:ring-sky-400/60"
-      aria-label={text}
+      href={link}
+      className="group flex flex-col items-center text-center p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-sky-500 hover:bg-blue-50 dark:hover:bg-slate-800/50 transition-all"
     >
-      <Icon
-        aria-hidden="true"
-        className="h-10 w-10 mb-2 transition-colors text-gray-900 dark:text-gray-300 group-hover:text-blue-500 dark:group-hover:text-sky-400"
-      />
-      <strong className="text-blue-500 dark:text-sky-400 group-hover:underline underline-offset-4">
-        {text}
-      </strong>
+      <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-sky-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        {icon}
+      </div>
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+        {title}
+      </h3>
+      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+        {description}
+      </p>
+      <span className="mt-4 text-blue-600 dark:text-sky-400 text-sm font-medium group-hover:underline inline-flex items-center gap-1">
+        Learn more <ArrowRight className="w-4 h-4" />
+      </span>
     </Link>
   );
 }
 
+function TrustBar() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-400 py-6 border-y border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-2">
+        <span className="text-green-600 dark:text-green-400">✓</span>
+        <span>Florida LLC & Insured</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-green-600 dark:text-green-400">✓</span>
+        <span>Local to Central Florida</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-green-600 dark:text-green-400">✓</span>
+        <span>Clear Pricing</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-green-600 dark:text-green-400">✓</span>
+        <span>No Pressure Sales</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const serviceLinks = [
+  const benefits = [
     {
-      text: "Cybersecurity",
-      Icon: ShieldCheck,
+      icon: <ShieldCheck className="w-8 h-8 text-blue-600 dark:text-sky-400" />,
+      title: "Protect",
+      description:
+        "Stop scams targeting seniors, secure home networks, remove viruses and malware, and prevent future threats.",
       link: "/services/custom-solutions",
     },
     {
-      text: "Network Support",
-      Icon: Network,
-      link: "/services/network-setup",
+      icon: <Wrench className="w-8 h-8 text-blue-600 dark:text-sky-400" />,
+      title: "Fix",
+      description:
+        "Repair slow computers, troubleshoot software issues, recover lost data, and upgrade aging hardware.",
+      link: "/services/computer-repair",
     },
     {
-      text: "Tech Support",
-      Icon: Laptop2,
-      link: "/services/onsite-tech-support",
-    },
-    {
-      text: "Personalized Service",
-      Icon: UserCheck,
-      link: "/services/custom-solutions",
+      icon: (
+        <GraduationCap className="w-8 h-8 text-blue-600 dark:text-sky-400" />
+      ),
+      title: "Teach",
+      description:
+        "Learn to recognize online threats, use technology safely, and understand your devices without the jargon.",
+      link: "/services/remote/remote-tech-tutoring",
     },
   ];
+
+  const displayPhone = contact.phone.replace("+1", "");
 
   return (
     <>
       <Meta
         title="Defend I.T. Solutions | Cybersecurity & IT Support"
-        description="Defend I.T. Solutions provides professional cybersecurity and I.T. support for homeowners, retirees, and small businesses."
+        description="Professional cybersecurity and IT support for homeowners, retirees, and small businesses in Ocala, The Villages, and Belleview. Clear solutions, no jargon."
         image="https://www.wedefendit.com/og-image.png"
         url="https://www.wedefendit.com/"
         canonical="https://www.wedefendit.com/"
-        keywords="cybersecurity, IT support, small business IT, home tech support, network security, computer repair, online safety"
+        keywords="cybersecurity, IT support, Ocala FL, The Villages, Belleview, small business IT, home tech support, network security, computer repair, online safety"
         structuredData={localBusinessLd}
       />
 
       <PageContainer>
-        <header className="text-center p-2 -mt-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight max-w-4xl mx-auto">
-            Cybersecurity Support You Can Trust
+        {/* Hero Section */}
+        <header className="text-center px-4 py-8 max-w-4xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-gray-900 dark:text-white mb-4">
+            Cybersecurity & IT Support
+            <span className="block text-blue-600 dark:text-sky-400 mt-2">
+              You Can Actually Understand
+            </span>
           </h1>
-          <h2 className="mt-2 text-md sm:text-xl md:text-2xl font-semibold text-blue-500 dark:text-sky-400 max-w-2xl mx-auto">
-            Clear and practical solutions for homes and small businesses
-          </h2>
-        </header>
-
-        <section
-          id="common-services"
-          aria-labelledby="services-heading"
-          className="mt-6"
-        >
-          <h2
-            id="services-heading"
-            className="text-2xl font-bold text-center mb-6"
-          >
-            Our Core Services
-          </h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 justify-items-center mt-10">
-            {serviceLinks.map((service) => (
-              <ServiceLink
-                key={service.text}
-                href={service.link}
-                text={service.text}
-                Icon={service.Icon}
-              />
-            ))}
-          </div>
-
-          <p className="text-base md:text-lg text-gray-800 dark:text-gray-300 leading-normal max-w-3xl mx-auto px-6 text-center mt-8">
-            We help protect devices, secure networks, remove malware, and solve
-            everyday technology problems with transparency and clear
-            communication.
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+            Serving Ocala, The Villages, and Belleview with honest tech support
+            for homes and small businesses.
           </p>
 
-          {/* <p className="text-base md:text-lg text-gray-800 dark:text-gray-300 leading-normal max-w-3xl mx-auto px-6 text-center mt-6">
-            No jargon. No hidden fees. Just reliable support.
-          </p> */}
+          {/* Primary CTA */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+            >
+              <Phone className="w-5 h-5" />
+              Schedule Service
+            </Link>
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-sky-500 text-gray-700 dark:text-gray-300 text-lg font-semibold transition-all"
+            >
+              View Services
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </header>
+
+        <TrustBar />
+
+        {/* What We Do Section */}
+        <section className="py-12 px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
+            What We Do
+          </h2>
+          <p className="text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
+            We keep your technology safe, fix problems when they happen, and
+            help you understand it all along the way.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {benefits.map((benefit) => (
+              <BenefitCard key={benefit.title} {...benefit} />
+            ))}
+          </div>
         </section>
 
-        <section
-          className="flex flex-col items-center justify-center w-full space-y-8"
-          aria-labelledby="cta-heading"
-        >
-          {/* <h2
-            id="cta-heading"
-            className="text-2xl md:text-3xl font-bold text-center"
-          >
-            Need IT Help You Can Trust?
-          </h2> */}
+        {/* Why Choose Us */}
+        <section className="py-12 px-4 bg-gray-50 dark:bg-slate-900/30 rounded-lg max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
+            Why Choose Defend I.T. Solutions?
+          </h2>
+          <div className="space-y-4 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+            <div className="flex items-start gap-3">
+              <span className="text-blue-600 dark:text-sky-400 font-bold text-xl flex-shrink-0">
+                •
+              </span>
+              <p>
+                <strong>No Jargon:</strong> We explain everything in plain
+                English so you actually understand what&apos;s happening.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-blue-600 dark:text-sky-400 font-bold text-xl flex-shrink-0">
+                •
+              </span>
+              <p>
+                <strong>No Upsells:</strong> We only recommend what you actually
+                need. No scare tactics, no hidden fees.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-blue-600 dark:text-sky-400 font-bold text-xl flex-shrink-0">
+                •
+              </span>
+              <p>
+                <strong>Local & Trusted:</strong> We&apos;re based in Central
+                Florida and available for in-person service across Ocala, The
+                Villages, and Belleview.
+              </p>
+            </div>
+          </div>
+        </section>
 
-          <CallToActionButtons />
+        {/* Final CTA */}
+        <section className="text-center py-12 px-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Ready to Get Started?
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Call us today or schedule a convenient time to talk.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href={`tel:${contact.phone.replace(/[^0-9]/g, "")}`}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-sky-600 dark:hover:bg-sky-700 text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+            >
+              <Phone className="w-5 h-5" />
+              {displayPhone}
+            </a>
+            <Link
+              href="/contact"
+              className="text-blue-600 dark:text-sky-400 hover:underline text-lg font-medium"
+            >
+              Or view all contact options →
+            </Link>
+          </div>
         </section>
       </PageContainer>
     </>

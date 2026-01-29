@@ -1,7 +1,7 @@
 {
   "id": "data-recovery",
   "title": "Data Recovery & Encrypted Backup Solutions",
-  "headline": "Recover lost files—or make sure you never lose them again.",
+  "headline": "Recover lost files\u2014or make sure you never lose them again.",
   "description": "Professional data recovery and encrypted backup solutions for individuals and small businesses, helping recover lost files and protect critical data across Ocala, Belleview, The Villages, and surrounding Florida communities.",
   "keywords": [
     "data recovery Ocala FL",
@@ -44,13 +44,19 @@
       "paragraph": [
         "We begin with a no-risk assessment to determine whether recovery is possible without sending your device to a data lab.",
         "If recovery is feasible, we retrieve and verify your data using proven tools and transparent methods.",
-        "Once recovery is complete, we help you implement a secure backup solution to protect your data going forward—without subscriptions or hidden fees."
+        "Once recovery is complete, we help you implement a secure backup solution to protect your data going forward\u2014without subscriptions or hidden fees."
       ]
     }
   ],
   "related": [
-    { "label": "Computer Repair", "slug": "computer-repair" },
-    { "label": "PC & Laptop Upgrades", "slug": "pc-upgrades" },
+    {
+      "label": "Computer Repair",
+      "slug": "computer-repair"
+    },
+    {
+      "label": "PC & Laptop Upgrades",
+      "slug": "pc-upgrades"
+    },
     {
       "label": "Password Management & Digital Safety",
       "slug": "password-management"
@@ -59,5 +65,10 @@
   "cta": {
     "label": "Protect My Data",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "hard-drive",
+    "clock",
+    "file-check"
+  ]
 }

@@ -61,34 +61,35 @@ export const ElderlyScamsList: React.FC<ElderlyScamsListProps> = ({
         </header>
       )}
 
-      <div className={`grid grid-cols-1 gap-8 lg:grid-cols-2 `}>
+      <div className={`grid grid-cols-1 gap-8 lg:grid-cols-2`}>
         {elderly.map(
           ({ icon: iconName, title, description, prevention }, i) => {
             const Icon = getLucideIcon(iconName);
             return (
               <article
                 key={`${iconName}-${i}`}
-                className="flex flex-col bg-gray-100/20 dark:bg-slate-800/30 border border-gray-200 dark:border-gray-900 rounded-md shadow-lg dark:shadow-gray-900 transition p-6"
+                className="flex flex-col bg-white dark:bg-slate-800/50 border border-red-200 dark:border-red-900/50 rounded-lg shadow-sm hover:shadow-lg hover:shadow-red-500/20 dark:hover:shadow-red-400/20 hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 p-6"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900 shadow-md shadow-red-300 dark:shadow-red-700">
+                  <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
                     <Icon
-                      className="w-6 h-6 text-red-600 dark:text-red-400"
+                      className="w-8 h-8 text-red-600 dark:text-red-400"
                       aria-hidden="true"
                     />
                   </div>
-                  <h3 className="flex-grow text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-200 leading-tight m-auto">
+                  <h3 className="flex-grow text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight m-auto">
                     {title}
                   </h3>
                 </div>
 
-                <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base mb-6 flex-grow">
+                <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base mb-6 flex-grow leading-relaxed">
                   {description}
                 </p>
 
-                <div className="mb-2">
-                  <h4 className="text-left text-gray-900 dark:text-gray-200 font-semibold mb-3">
-                    Prevention
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="text-left text-gray-900 dark:text-gray-100 font-semibold mb-3 flex items-center gap-2">
+                    <Icons.ShieldCheck className="w-5 h-5 text-green-600 dark:text-emerald-500" />
+                    How to Protect Yourself
                   </h4>
                   <ul
                     role="list"

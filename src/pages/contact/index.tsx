@@ -43,77 +43,103 @@ const { fingerprint, key_id, key_url, secure_email } = gpg;
 function HeadingSection() {
   return (
     <header className="text-center space-y-2 my-4">
-      <h1 className="text-4xl sm:text-5xl font-bold">Contact Us</h1>
+      <h1 className="text-4xl sm:text-5xl font-bold">
+        Contact Us in Ocala, The Villages & Belleview
+      </h1>
       <h2 className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mt-2 mb-6">
-        {name} provides remote and on-site support.
+        {name} provides remote and on-site support across Central Florida.
       </h2>
     </header>
   );
 }
 
-function ContactGrid() {
+function PrimaryContact() {
   return (
-    <section className="flex flex-wrap flex-col md:flex-row items-center justify-center gap-6 sm:gap-12 max-w-3xl mx-auto">
-      <div className="flex flex-col items-center text-center space-y-2 mt-4 md:mt-16">
-        <Phone className="w-6 h-6 text-blue-500 dark:text-sky-400" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Call or Text
+    <div className="flex flex-col items-center justify-center text-center space-y-6 p-8 bg-blue-50 dark:bg-slate-800/50 rounded-lg border-2 border-blue-200 dark:border-sky-600">
+      <Phone className="w-16 h-16 text-blue-600 dark:text-sky-400" />
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Call or Text Us
         </h2>
         <a
           href={`tel:${phone.replace(/[^0-9]/g, "")}`}
-          className="text-blue-600 dark:text-sky-400 hover:underline text-lg"
+          className="block text-3xl font-bold text-blue-600 dark:text-sky-400 hover:underline"
         >
           {phone.replace("+1", "")}
         </a>
-      </div>
-
-      <div className="flex flex-col items-center text-center space-y-2 md:mt-16">
-        <Mail className="w-6 h-6 text-blue-500 dark:text-sky-400" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Standard Email
-        </h2>
-        <a
-          href={`mailto:${email}`}
-          className="text-blue-600 dark:text-sky-400 hover:underline text-sm"
-        >
-          {email}
-        </a>
-      </div>
-
-      <div className="flex flex-col items-center text-center space-y-2 md:mt-16">
-        <Mail className="w-6 h-6 text-blue-500 dark:text-sky-400" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Service Email
-        </h2>
-        <a
-          href={`mailto:${service_email}`}
-          className="text-blue-600 dark:text-sky-400 hover:underline text-sm"
-        >
-          {service_email}
-        </a>
-      </div>
-
-      <div className="flex flex-col items-center text-center space-y-2 sm:col-span-2">
-        <MapPin className="w-6 h-6 text-blue-500 dark:text-sky-400" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Mailing Address
-        </h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          This is a mailing address only. We operate on-site or remotely.
-        </p>
-        <p className="text-base leading-tight select-all">
-          <strong>{name}</strong>
-          <br />
-          {street}
-          <br />
-          {city}, {state} {zip}
+          Available for calls and text messages
         </p>
       </div>
-    </section>
+    </div>
   );
 }
 
-function PgpBlock({
+function ContactInfoCard() {
+  return (
+    <div className="space-y-6 p-6 bg-gray-50 dark:bg-slate-800/30 rounded-lg border border-gray-200 dark:border-gray-700">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        Other Ways to Reach Us
+      </h3>
+
+      <div className="space-y-4">
+        {/* Standard Email */}
+        <div className="flex items-start gap-3">
+          <Mail className="w-5 h-5 text-blue-500 dark:text-sky-400 mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white">
+              Standard Email
+            </h4>
+            <a
+              href={`mailto:${email}`}
+              className="text-blue-600 dark:text-sky-400 hover:underline text-sm break-all"
+            >
+              {email}
+            </a>
+          </div>
+        </div>
+
+        {/* Service Email */}
+        <div className="flex items-start gap-3">
+          <Mail className="w-5 h-5 text-blue-500 dark:text-sky-400 mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white">
+              Service Requests
+            </h4>
+            <a
+              href={`mailto:${service_email}`}
+              className="text-blue-600 dark:text-sky-400 hover:underline text-sm break-all"
+            >
+              {service_email}
+            </a>
+          </div>
+        </div>
+
+        {/* Address */}
+        <div className="flex items-start gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <MapPin className="w-5 h-5 text-blue-500 dark:text-sky-400 mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+              Mailing Address
+            </h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              Mailing address only • We operate on-site or remotely
+            </p>
+            <address className="text-sm not-italic leading-relaxed text-gray-700 dark:text-gray-300">
+              <strong>{name}</strong>
+              <br />
+              {street}
+              <br />
+              {city}, {state} {zip}
+            </address>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SecureContactCard({
   showPGP,
   setShowPGP,
 }: {
@@ -121,64 +147,79 @@ function PgpBlock({
   setShowPGP: (v: boolean) => void;
 }) {
   return (
-    <section id="pgp" className="text-center space-y-4">
-      <p className="text-md text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-        Reach out securely below.
-      </p>
-
-      <button
-        type="button"
-        onClick={() => setShowPGP(!showPGP)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded bg-blue-600 dark:bg-sky-500 text-white font-medium shadow hover:bg-blue-700 dark:hover:bg-sky-600 transition"
-        aria-controls="pgp-panel"
-      >
-        <ShieldCheck className="w-5 h-5" />
-        Secure Contact (PGP)
-        {showPGP ? (
-          <ChevronUp className="w-4 h-4" />
-        ) : (
-          <ChevronDown className="w-4 h-4" />
-        )}
-      </button>
-
-      {showPGP && (
-        <div
-          id="pgp-panel"
-          className="mt-6 space-y-4 text-sm text-gray-700 dark:text-gray-300 max-w-xl mx-auto border border-gray-300 dark:border-gray-700 rounded-lg p-4"
-        >
-          <p>
-            For sensitive inquiries, you may email us securely at:
-            <br />
-            <a
-              href={`mailto:${secure_email}`}
-              className="text-blue-600 dark:text-sky-400 hover:underline"
-            >
-              {secure_email}
-            </a>
+    <section
+      id="pgp"
+      className="p-6 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-800/50 dark:to-slate-700/30 rounded-lg border border-blue-200 dark:border-sky-700"
+    >
+      <div className="flex items-start gap-4">
+        <ShieldCheck className="w-8 h-8 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-1" />
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            Need Secure Communication?
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            For sensitive inquiries, we support PGP-encrypted email
+            communication.
           </p>
 
-          <a
-            href={key_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
-            className="inline-block px-3 py-1 rounded bg-blue-600 dark:bg-sky-500 text-white font-medium shadow hover:bg-blue-700 dark:hover:bg-sky-600 transition"
+          <button
+            type="button"
+            onClick={() => setShowPGP(!showPGP)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-blue-600 dark:bg-sky-600 text-white text-sm font-medium shadow hover:bg-blue-700 dark:hover:bg-sky-700 transition"
+            aria-controls="pgp-panel"
+            aria-expanded={showPGP}
           >
-            Download Public PGP Key
-          </a>
+            {showPGP ? "Hide" : "Show"} PGP Details
+            {showPGP ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </button>
 
-          <p>
-            <strong>Key ID:</strong> <CopyableCode text={key_id} />
-          </p>
+          {showPGP && (
+            <div
+              id="pgp-panel"
+              className="mt-6 space-y-4 text-sm text-gray-700 dark:text-gray-300 p-4 bg-white dark:bg-slate-800 rounded border border-gray-200 dark:border-gray-700"
+            >
+              <div>
+                <p className="font-semibold mb-1">Secure Email Address:</p>
+                <a
+                  href={`mailto:${secure_email}`}
+                  className="text-blue-600 dark:text-sky-400 hover:underline break-all"
+                >
+                  {secure_email}
+                </a>
+              </div>
 
-          <div className="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <Fingerprint className="w-4 h-4" />
-              <CopyableCode text={fingerprint.replace(/\s+/g, "")} />
+              <div>
+                <a
+                  href={key_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="inline-block px-4 py-2 rounded bg-blue-600 dark:bg-sky-600 text-white font-medium text-sm shadow hover:bg-blue-700 dark:hover:bg-sky-700 transition"
+                >
+                  Download Public PGP Key
+                </a>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <p className="font-semibold mb-1">Key ID:</p>
+                <CopyableCode text={key_id} />
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 mb-2">
+                  <Fingerprint className="w-4 h-4" />
+                  <p className="font-semibold">Fingerprint:</p>
+                </div>
+                <CopyableCode text={fingerprint.replace(/\s+/g, "")} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </section>
   );
 }
@@ -251,21 +292,31 @@ export default function ContactPage() {
         url={canonical}
         canonical={canonical}
         image="https://www.wedefendit.com/og-image.png"
-        title="Contact Defend I.T. Solutions | IT & Cybersecurity Support in Ocala, Belleview & The Villages"
-        description="Contact Defend I.T. Solutions for local, trusted IT and cybersecurity support in Ocala, Belleview, The Villages, and Central Florida, including secure PGP communication options."
-        keywords="contact IT support Ocala FL, cybersecurity contact Belleview FL, IT services The Villages FL, secure contact PGP, local tech support Central Florida"
+        title="Contact Defend I.T. Solutions | Ocala, The Villages & Belleview"
+        description="Contact Defend I.T. Solutions for IT and cybersecurity support in Ocala, The Villages, and Belleview, FL. Phone, email, or secure PGP communication available."
+        keywords="contact IT support Ocala FL, cybersecurity contact The Villages, IT services Belleview FL, secure contact PGP, local tech support Central Florida"
         structuredData={{ "@graph": [breadcrumbLd, contactPageLd] }}
       />
 
       <PageContainer>
-        <div className="max-w-4xl mx-auto px-4 py-10 space-y-12 bg-gray-50/10 dark:bg-slate-950/20 z-0 shadow-md">
+        <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
           <BreadCrumbs
             includeJsonLd={true}
             items={[{ name: "Home", href: "/" }, { name: "Contact" }]}
           />
+
           <HeadingSection />
-          <ContactGrid />
-          <PgpBlock showPGP={showPGP} setShowPGP={setShowPGP} />
+
+          {/* Main Contact Section - Two Column Layout */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <PrimaryContact />
+            <ContactInfoCard />
+          </div>
+
+          {/* Secure Contact Section */}
+          <SecureContactCard showPGP={showPGP} setShowPGP={setShowPGP} />
+
+          {/* Service Area */}
           <ServiceAreaAndBooking />
         </div>
       </PageContainer>

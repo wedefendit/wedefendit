@@ -49,15 +49,26 @@
     }
   ],
   "related": [
-    { "label": "Computer Repair", "slug": "computer-repair" },
+    {
+      "label": "Computer Repair",
+      "slug": "computer-repair"
+    },
     {
       "label": "Data Recovery & Encrypted Backup Solutions",
       "slug": "data-recovery"
     },
-    { "label": "PC & Laptop Upgrades", "slug": "pc-upgrades" }
+    {
+      "label": "PC & Laptop Upgrades",
+      "slug": "pc-upgrades"
+    }
   ],
   "cta": {
     "label": "Fix My Software",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "cpu",
+    "settings",
+    "terminal"
+  ]
 }

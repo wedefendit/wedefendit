@@ -57,10 +57,18 @@
       "label": "Data Recovery & Encrypted Backup Solutions",
       "slug": "data-recovery"
     },
-    { "label": "Computer Repair", "slug": "computer-repair" }
+    {
+      "label": "Computer Repair",
+      "slug": "computer-repair"
+    }
   ],
   "cta": {
     "label": "Upgrade My PC",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "hard-drive",
+    "gauge",
+    "bolt"
+  ]
 }

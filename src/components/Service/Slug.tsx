@@ -15,6 +15,7 @@ party without express written consent.
 import { generateServiceLd, generateBreadCrumbJsonLd } from "@/lib/json-ld";
 import Link from "next/link";
 import { Lightbulb } from "lucide-react";
+import * as Icons from "lucide-react";
 import { PageContainer, Meta, BookOnline, BreadCrumbs } from "@/components";
 
 export type ServiceContent = {
@@ -26,6 +27,7 @@ export type ServiceContent = {
   url: string;
   image: string;
   requiresPlan?: boolean;
+  icons?: string[];
   sections: {
     heading: string;
     paragraph?: string | string[];
@@ -45,7 +47,7 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
 
   const crumbs = [
     { name: "Home", href: "/" },
-    { name: "Services", href: "/services" },
+    { name: "Services", href: !remote ? "/services" : "/services/remote" },
     { name: service.title },
   ];
 
@@ -97,13 +99,39 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
         <div className="max-w-4xl mx-auto py-8 sm:py-10 space-y-6 sm:space-y-7 px-4 sm:px-6 text-left rounded-lg shadow-lg bg-gray-50/10 dark:bg-slate-950/20 z-0">
           <BreadCrumbs items={crumbs} baseUrl="https://www.wedefendit.com" />
 
-          <div className="space-y-1">
-            <h1 className="text-3xl sm:text-4xl font-bold leading-tight mt-4">
-              {service.title}
-            </h1>
-            <p className="text-base sm:text-lg w-full text-blue-600 dark:text-sky-400">
-              {service.headline}
-            </p>
+          {/* Hero Section with Icons */}
+          <div className="flex flex-col sm:flex-row items-start gap-6 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-900 dark:to-slate-800 rounded-lg p-6 border border-blue-200 dark:border-sky-800">
+            {/* Icons */}
+            {service.icons && service.icons.length > 0 && (
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {service.icons.map((iconName, idx) => {
+                  const name = iconName
+                    .split("-")
+                    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+                    .join("");
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const LucideIcon = (Icons as any)[name];
+                  return LucideIcon ? (
+                    <div
+                      key={idx}
+                      className="w-16 h-16 rounded-full bg-blue-100 dark:bg-sky-900/30 flex items-center justify-center"
+                    >
+                      <LucideIcon className="w-8 h-8 text-blue-600 dark:text-sky-400" />
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            )}
+
+            {/* Text Content */}
+            <div className="flex-1 space-y-2">
+              <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
+                {service.title}
+              </h1>
+              <p className="text-base sm:text-lg text-blue-600 dark:text-sky-400">
+                {service.headline}
+              </p>
+            </div>
           </div>
 
           {hasDYK && (
@@ -182,6 +210,51 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
               </Link>
             </div>
           )}
+
+          {/* What to Expect Section */}
+          <section className="bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-900 dark:to-slate-800 rounded-lg p-6 sm:p-8 border border-blue-200 dark:border-sky-800">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
+              What to Expect
+            </h2>
+
+            <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
+              <div className="flex flex-col items-center text-center space-y-3">
+                <div className="w-16 h-16 rounded-full bg-blue-600 dark:bg-sky-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                  1
+                </div>
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                  Contact Us
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Call, text, or book online—we&apos;ll respond quickly
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center space-y-3">
+                <div className="w-16 h-16 rounded-full bg-blue-600 dark:bg-sky-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                  2
+                </div>
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                  We Assess
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Clear diagnosis with upfront pricing, no surprises
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center space-y-3">
+                <div className="w-16 h-16 rounded-full bg-blue-600 dark:bg-sky-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                  3
+                </div>
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                  Get Fixed
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Fast, reliable service with no unnecessary upsells
+                </p>
+              </div>
+            </div>
+          </section>
 
           <div className="mt-10 w-full flex flex-col items-stretch sm:items-center justify-center gap-6 sm:gap-8 text-left sm:text-center">
             <div className="w-full">

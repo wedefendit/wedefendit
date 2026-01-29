@@ -16,6 +16,7 @@
   ],
   "url": "/services/computer-repair",
   "image": "https://www.wedefendit.com/og-image.png",
+  "icons": ["pc-case", "monitor-smartphone", "wrench"],
   "sections": [
     {
       "heading": "Did You Know?",

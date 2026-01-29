@@ -52,11 +52,22 @@
       "label": "Home Network Security & Wi-Fi Hardening",
       "slug": "home-network-security"
     },
-    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
-    { "label": "On-Site Tech Support", "slug": "onsite-tech-support" }
+    {
+      "label": "Wi-Fi & Network Setup",
+      "slug": "network-setup"
+    },
+    {
+      "label": "On-Site Tech Support",
+      "slug": "onsite-tech-support"
+    }
   ],
   "cta": {
     "label": "Set Up My Smart Home",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "house-wifi",
+    "camera",
+    "shield-check"
+  ]
 }

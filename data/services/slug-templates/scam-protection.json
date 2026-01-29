@@ -1,7 +1,7 @@
 {
   "id": "scam-protection",
   "title": "Scam & Fraud Protection Services",
-  "headline": "Learn to spot scams, stop fraud, and protect yourself before it’s too late.",
+  "headline": "Learn to spot scams, stop fraud, and protect yourself before it\u2019s too late.",
   "description": "Scam and fraud protection services that teach recognition of modern scams, secure devices, and reduce risk from phishing, tech support scams, and social engineering, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
   "keywords": [
     "scam protection Ocala FL",
@@ -56,10 +56,18 @@
       "label": "Home Network Security & Wi-Fi Hardening",
       "slug": "home-network-security"
     },
-    { "label": "Virus & Malware Removal", "slug": "virus-removal" }
+    {
+      "label": "Virus & Malware Removal",
+      "slug": "virus-removal"
+    }
   ],
   "cta": {
     "label": "Schedule a Scam Protection Session",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "presentation",
+    "glasses",
+    "shield-alert"
+  ]
 }

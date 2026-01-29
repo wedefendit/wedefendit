@@ -1,7 +1,7 @@
 {
   "id": "onsite-tech-support",
   "title": "On-Site Tech Support Services",
-  "headline": "On-site computer and IT support—we come to you.",
+  "headline": "On-site computer and IT support\u2014we come to you.",
   "description": "Professional in-home tech support for computers, Wi-Fi, printers, and smart devices, serving homeowners and small businesses in Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
   "keywords": [
     "on-site tech support Ocala FL",
@@ -46,8 +46,14 @@
     }
   ],
   "related": [
-    { "label": "Computer Repair", "slug": "computer-repair" },
-    { "label": "Wi-Fi & Network Setup", "slug": "network-setup" },
+    {
+      "label": "Computer Repair",
+      "slug": "computer-repair"
+    },
+    {
+      "label": "Wi-Fi & Network Setup",
+      "slug": "network-setup"
+    },
     {
       "label": "Remote IT & Cybersecurity Tutoring",
       "slug": "remote-tech-tutoring"
@@ -56,5 +62,10 @@
   "cta": {
     "label": "Book Your On-Site Visit",
     "link": "/contact#schedule-service"
-  }
+  },
+  "icons": [
+    "badge-check",
+    "home",
+    "wrench"
+  ]
 }

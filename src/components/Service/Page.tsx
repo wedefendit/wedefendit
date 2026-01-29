@@ -163,9 +163,19 @@ export default function ServicePage(props: ServicesPageProps) {
           />
 
           {/* Header */}
-          <header className="text-center">
-            <h1 className="text-4xl font-bold">{h1}</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">
+          <header className="text-center space-y-4 py-8 px-4 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-900 dark:to-slate-800 rounded-lg border border-blue-200 dark:border-sky-800 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-sky-900/30 rounded-full text-sm font-medium text-blue-700 dark:text-sky-300">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Serving Central Florida
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
+              {h1}
+            </h1>
+            
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Professional cybersecurity and I.T. support for homeowners,
               retirees, and small businesses.
             </p>
