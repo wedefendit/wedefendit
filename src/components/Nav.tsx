@@ -78,7 +78,7 @@ function RenderNavItems({
 
 function DesktopBar({ pathname }: { pathname: string }) {
   return (
-    <ul className="hidden md:flex space-x-24 text-lg w-auto m-0 lg:mr-16 md:mx-auto">
+    <ul className="hidden lg:flex space-x-8 xl:space-x-12 text-lg w-auto m-0 lg:mr-16 md:mx-auto">
       <RenderNavItems navItems={navItems} pathname={pathname} />
     </ul>
   );
@@ -124,7 +124,7 @@ function MobileBar({ pathname }: { pathname: string }) {
   const toggleMenu = () => setMenuOpen((v) => !v);
 
   return (
-    <div className="md:hidden relative">
+    <div className="lg:hidden relative">
       <button
         type="button"
         onClick={toggleMenu}
@@ -171,7 +171,7 @@ export function Navbar() {
   const { pathname } = useRouter();
 
   return (
-    <nav className="py-1 px-5 w-full md:sticky md:top-0 md:z-50 flex justify-between items-center md:border-b md:border-gray-300 md:dark:border-gray-800 md:p-4">
+    <nav className="py-1 px-5 w-full lg:sticky lg:top-0 lg:z-50 flex justify-between items-center lg:border-b lg:border-gray-300 lg:dark:border-gray-800 lg:p-4">
       <Link
         href="/"
         title="Defend I.T. Solutions Home"
