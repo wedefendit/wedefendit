@@ -164,22 +164,22 @@ export default function SigintPage() {
       <PageContainer>
         <div className="w-full max-w-6xl mx-auto px-4 space-y-20 pb-16">
           {/* ── Hero ──────────────────────────────────────────────── */}
-          <header className="text-center pt-4">
+          <header className="text-center pt-4 px-4">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-medium mb-6">
               <Radar className="w-3.5 h-3.5" />
               <span>OSINT LIVE FEED PLATFORM</span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.05] text-gray-900 dark:text-white mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.05] text-gray-900 dark:text-white mb-6">
               <span className="text-blue-600 dark:text-sky-400">
                 SIGINT Dashboard&trade;
               </span>
-              <span className="block text-2xl sm:text-3xl md:text-4xl font-medium text-gray-700 dark:text-gray-300 mt-3">
+              <span className="block text-xl sm:text-2xl md:text-4xl font-medium text-gray-700 dark:text-gray-300 mt-3">
                 Global Intelligence at a Glance
               </span>
             </h1>
 
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
               Real-time situational awareness across multiple live data sources.
               Aircraft, ships, earthquakes, fires, conflict events, weather
               alerts, and world news. Correlated, scored, and rendered on an
@@ -366,8 +366,8 @@ export default function SigintPage() {
 
             <div className="space-y-12">
               {/* Emergency detection */}
-              <div className="grid lg:grid-cols-5 gap-6 items-center">
-                <div className="lg:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl">
+              <div className="grid md:grid-cols-5 gap-6 items-center">
+                <div className="md:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl">
                   <Image
                     src="/sigint-emergency.png"
                     alt="SIGINT detecting a 7700 emergency squawk with trail tracking, dossier, and live video feeds"
@@ -376,7 +376,7 @@ export default function SigintPage() {
                     className="w-full h-auto"
                   />
                 </div>
-                <div className="lg:col-span-2 space-y-3">
+                <div className="md:col-span-2 space-y-3">
                   <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-red-500/15 text-red-400 text-xs font-bold">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     EMERGENCY DETECTION
@@ -395,8 +395,8 @@ export default function SigintPage() {
               </div>
 
               {/* Hijack + trail */}
-              <div className="grid lg:grid-cols-5 gap-6 items-center">
-                <div className="lg:col-span-2 space-y-3 order-2 lg:order-1">
+              <div className="grid md:grid-cols-5 gap-6 items-center">
+                <div className="md:col-span-2 space-y-3 order-2 md:order-1">
                   <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-purple-500/15 text-purple-400 text-xs font-bold">
                     <Plane className="w-3.5 h-3.5" />
                     TRAIL TRACKING
@@ -411,7 +411,7 @@ export default function SigintPage() {
                     and provides LOCATE/FOCUS/SOLO isolation controls.
                   </p>
                 </div>
-                <div className="lg:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl order-1 lg:order-2">
+                <div className="md:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl order-1 md:order-2">
                   <Image
                     src="/sigint-hijack-trail.png"
                     alt="SIGINT tracking a squawk 7500 hijack code with trail rendering and aircraft dossier with photo"
@@ -423,8 +423,8 @@ export default function SigintPage() {
               </div>
 
               {/* GDELT events */}
-              <div className="grid lg:grid-cols-5 gap-6 items-center">
-                <div className="lg:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl">
+              <div className="grid md:grid-cols-5 gap-6 items-center">
+                <div className="md:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl">
                   <Image
                     src="/sigint-gdelt.png"
                     alt="SIGINT showing GDELT crisis event detail with 60K tracks, video feeds, alerts, and intel feed"
@@ -433,7 +433,7 @@ export default function SigintPage() {
                     className="w-full h-auto"
                   />
                 </div>
-                <div className="lg:col-span-2 space-y-3">
+                <div className="md:col-span-2 space-y-3">
                   <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-sky-500/15 text-sky-400 text-xs font-bold">
                     <Globe className="w-3.5 h-3.5" />
                     SITUATIONAL AWARENESS
@@ -451,8 +451,8 @@ export default function SigintPage() {
               </div>
 
               {/* Hijack dossier */}
-              <div className="grid lg:grid-cols-5 gap-6 items-center">
-                <div className="lg:col-span-2 space-y-3 order-2 lg:order-1">
+              <div className="grid md:grid-cols-5 gap-6 items-center">
+                <div className="md:col-span-2 space-y-3 order-2 md:order-1">
                   <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-amber-500/15 text-amber-400 text-xs font-bold">
                     <Eye className="w-3.5 h-3.5" />
                     ENTITY DOSSIER
@@ -468,7 +468,7 @@ export default function SigintPage() {
                     FR24, and ADS-B Exchange.
                   </p>
                 </div>
-                <div className="lg:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl order-1 lg:order-2">
+                <div className="md:col-span-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-xl order-1 md:order-2">
                   <Image
                     src="/sigint-hijack-dossier.png"
                     alt="SIGINT aircraft dossier showing full identity, telemetry, route details for a squawk 7500 aircraft"

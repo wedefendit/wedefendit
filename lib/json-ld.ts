@@ -174,7 +174,7 @@ export const sigintProductLd = {
   applicationSubCategory: "OSINT Intelligence Platform",
   operatingSystem: "Web, Windows, macOS, Linux",
   url: "https://www.wedefendit.com/sigint",
-  image: "https://www.wedefendit.com/sigint-og.png",
+  image: "https://www.wedefendit.com/sigint-hijack-dossier.png",
   screenshot: "https://www.wedefendit.com/sigint-hero.png",
   description:
     "Real-time OSINT dashboard with live aircraft, vessel, seismic, fire, weather, and conflict event tracking on an interactive globe. Correlation engine, anomaly detection, and multi-source intelligence analysis.",

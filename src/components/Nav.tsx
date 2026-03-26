@@ -129,7 +129,7 @@ function MobileBar({ pathname }: { pathname: string }) {
       <button
         type="button"
         onClick={toggleMenu}
-        className="text-black dark:text-gray-300 hover:text-blue-500 text-2xl"
+        className="text-black dark:text-gray-300 dark:hover:text-sky-500 text-2xl"
         aria-controls="mobile-drawer"
       >
         &#9776;
@@ -137,25 +137,25 @@ function MobileBar({ pathname }: { pathname: string }) {
 
       <div
         onClick={toggleMenu}
-        className={`fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300 ${
+        className={`fixed inset-0 transition-opacity duration-300 ${
           menuOpen ? "opacity-100 z-50" : "opacity-0 pointer-events-none"
         }`}
       >
         <div
           id="mobile-drawer"
           onClick={(e) => e.stopPropagation()}
-          className={`bg-gray-900/80 backdrop-blur-md w-2/3 max-w-xs h-full absolute left-0 top-0 transition-transform duration-300 ${
+          className={` dark:bg-gray-900/95 backdrop-blur-md w-2/3 max-w-xs h-full absolute left-0 top-0 transition-transform duration-300 ${
             menuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <button
             onClick={toggleMenu}
-            className="absolute top-4 right-4 text-white text-3xl hover:text-blue-500"
+            className="absolute top-4 right-4 text-white text-3xl dark:hover:text-blue-500"
           >
             &times;
           </button>
 
-          <ul className="flex flex-col space-y-6 p-4">
+          <ul className="flex flex-col space-y-6 p-4 bg-black/90 dark:bg-gray-900/95">
             <RenderNavItems
               navItems={navItems}
               pathname={pathname}

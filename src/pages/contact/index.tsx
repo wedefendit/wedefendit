@@ -319,20 +319,20 @@ export default function ContactPage() {
           <SecureContactCard showPGP={showPGP} setShowPGP={setShowPGP} />
 
           {/* Contact Form */}
-          <section className="p-6 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-800/50 dark:to-slate-700/30 rounded-lg border border-blue-200 dark:border-sky-700">
-            <div className="flex items-start gap-4">
-              <MessageSquare className="w-8 h-8 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <section className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-800/50 dark:to-slate-700/30 rounded-lg border border-blue-200 dark:border-sky-700">
+            <div className="flex items-center gap-3 mb-4">
+              <MessageSquare className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-sky-400 flex-shrink-0" />
+              <div>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   Send Us a Message
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                  Have a question about our services, SIGINT, or anything else?
-                  Fill out the form below and we&apos;ll get back to you.
-                </p>
-                <ContactForm className="max-w-xl mx-auto" />
               </div>
             </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Have a question about our services, SIGINT, or anything else? Fill
+              out the form below and we&apos;ll get back to you.
+            </p>
+            <ContactForm className="max-w-xl mx-auto" />
           </section>
 
           {/* Service Area */}
