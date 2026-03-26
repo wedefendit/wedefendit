@@ -1,10 +1,13 @@
-// next.config.js
+// next.config.ts
 
 /** @type {import('next').NextConfig} */
 
+const tileOrigins =
+  "https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org";
+
 const baseCsp = [
   "default-src 'self'",
-  "img-src 'self' data: blob: https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
+  `img-src 'self' data: blob: ${tileOrigins} https://unpkg.com`,
   "script-src 'self' https://www.google.com https://www.gstatic.com",
   "script-src-elem 'self' https://www.google.com https://www.gstatic.com",
   "style-src 'self'",
@@ -13,13 +16,13 @@ const baseCsp = [
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "connect-src 'self' https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://www.google.com",
+  `connect-src 'self' ${tileOrigins} https://www.google.com`,
   "frame-ancestors 'self'",
 ].join("; ");
 
 const captchaCsp = [
   "default-src 'self'",
-  "img-src 'self' data: blob: https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
+  `img-src 'self' data: blob: ${tileOrigins} https://unpkg.com https://www.gstatic.com`,
   "script-src 'self' https://www.google.com https://www.gstatic.com",
   "script-src-elem 'self' https://www.google.com https://www.gstatic.com",
   "style-src 'self' 'unsafe-inline'",
@@ -28,7 +31,7 @@ const captchaCsp = [
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "connect-src 'self' https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://www.google.com",
+  `connect-src 'self' ${tileOrigins} https://www.google.com`,
   "frame-ancestors 'self'",
 ].join("; ");
 
@@ -42,16 +45,16 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*",
-        headers: securityHeaders(baseCsp),
-      },
-      {
         source: "/contact",
         headers: securityHeaders(captchaCsp),
       },
       {
         source: "/sigint",
         headers: securityHeaders(captchaCsp),
+      },
+      {
+        source: "/((?!contact|sigint).*)",
+        headers: securityHeaders(baseCsp),
       },
     ];
   },

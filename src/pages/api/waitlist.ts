@@ -11,6 +11,8 @@ type Body = {
   captchaToken?: string;
 };
 
+type BrevoResult = "ok" | "rate_limited" | "failed";
+
 async function verifyCaptcha(token: string): Promise<boolean> {
   const res = await fetch(
     `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${token}`,
@@ -20,7 +22,7 @@ async function verifyCaptcha(token: string): Promise<boolean> {
   return data.success === true && (data.score ?? 1) >= 0.5;
 }
 
-async function addToBrevo(email: string, listId: number): Promise<boolean> {
+async function addToBrevo(email: string, listId: number): Promise<BrevoResult> {
   // Try to create the contact
   const createRes = await fetch("https://api.brevo.com/v3/contacts", {
     method: "POST",
@@ -36,7 +38,9 @@ async function addToBrevo(email: string, listId: number): Promise<boolean> {
   });
 
   // 201 = created, 204 = updated (updateEnabled), 400 = already exists
-  if (createRes.ok) return true;
+  if (createRes.ok) return "ok";
+
+  if (createRes.status === 429) return "rate_limited";
 
   // If contact already exists, update their lists
   if (createRes.status === 400) {
@@ -53,10 +57,13 @@ async function addToBrevo(email: string, listId: number): Promise<boolean> {
         }),
       },
     );
-    return updateRes.ok;
+
+    if (updateRes.ok) return "ok";
+    if (updateRes.status === 429) return "rate_limited";
+    return "failed";
   }
 
-  return false;
+  return "failed";
 }
 
 export default async function handler(
@@ -83,9 +90,15 @@ export default async function handler(
   }
 
   const listId = tier === "enterprise" ? ENTERPRISE_LIST_ID : PRO_LIST_ID;
-  const added = await addToBrevo(email, listId);
+  const result = await addToBrevo(email, listId);
 
-  if (!added) {
+  if (result === "rate_limited") {
+    return res
+      .status(429)
+      .json({ error: "Too many requests. Please try again in a minute." });
+  }
+
+  if (result === "failed") {
     return res.status(500).json({ error: "Failed to add to waitlist" });
   }
 

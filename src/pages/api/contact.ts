@@ -123,6 +123,12 @@ export default async function handler(
       }),
     });
 
+    if (brevoRes.status === 429) {
+      return res
+        .status(429)
+        .json({ error: "Too many requests. Please try again in a minute." });
+    }
+
     if (!brevoRes.ok) {
       const err = await brevoRes.text();
       console.error("Brevo SMTP error:", err);
