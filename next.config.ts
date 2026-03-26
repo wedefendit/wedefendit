@@ -22,8 +22,7 @@ const captchaCsp = [
   "img-src 'self' data: blob: https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
   "script-src 'self' https://www.google.com https://www.gstatic.com",
   "script-src-elem 'self' https://www.google.com https://www.gstatic.com",
-  "style-src 'self'",
-  "style-src-attr 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   "frame-src 'self' https://www.google.com",
   "object-src 'none'",
@@ -43,16 +42,16 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: "/:path*",
+        headers: securityHeaders(baseCsp),
+      },
+      {
         source: "/contact",
         headers: securityHeaders(captchaCsp),
       },
       {
         source: "/sigint",
         headers: securityHeaders(captchaCsp),
-      },
-      {
-        source: "/:path*",
-        headers: securityHeaders(baseCsp),
       },
     ];
   },
