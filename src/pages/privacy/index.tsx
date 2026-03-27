@@ -1,19 +1,3 @@
-/*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-// app/privacy/page.tsx
-
 import { LegalPage } from "@/components";
 import companyInfo from "../../../data/company-info.json";
 
@@ -30,11 +14,11 @@ export default function Privacy() {
 
       <p className="text-center mb-4">
         <strong>Type of website:</strong> Service-based business website
-        offering IT support, cybersecurity services, and a security appliance
-        for residential and small business clients.
+        offering IT support, cybersecurity services, and technology consulting
+        for residential and small business clients
         <br />
         <br />
-        <strong>Effective date:</strong> 13th day of May, 2025
+        <strong>Effective date:</strong> 26th day of March, 2026
       </p>
 
       <p className="mb-6">
@@ -82,27 +66,37 @@ export default function Privacy() {
       </h2>
       <p>
         We only collect data that helps us achieve the purpose set out in this
-        Privacy Policy.
+        Privacy Policy. We will not collect any additional data beyond the data
+        listed below without notifying you first.
       </p>
+
+      <h3 className="font-semibold mt-4 mb-1 underline">
+        Data Collected Automatically
+      </h3>
+      <p>
+        When you visit and use our Site, we may automatically collect and store
+        the following information:
+      </p>
+      <ul className="list-disc ml-6 my-2">
+        <li>IP address</li>
+        <li>Hardware and software details</li>
+        <li>Clicked links</li>
+      </ul>
 
       <h3 className="font-semibold mt-4 mb-1 underline">
         Data Collected in a Non-Automatic Way
       </h3>
-      <p>We may collect the following data:</p>
+      <p>
+        We may also collect the following data when you perform certain
+        functions on our Site:
+      </p>
       <ul className="list-disc ml-6 my-2">
         <li>First and last name</li>
         <li>Email address</li>
-        <li>Phone number</li>
-        <li>Address</li>
-        <li>Payment information</li>
-        <li>Auto fill data</li>
       </ul>
       <p>This data may be collected using the following methods:</p>
       <ul className="list-disc ml-6 my-2">
         <li>Contact form submissions</li>
-        <li>Service request forms</li>
-        <li>Phone/email communications</li>
-        <li>Invoicing and payment processing</li>
       </ul>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">
@@ -110,64 +104,137 @@ export default function Privacy() {
       </h2>
       <p>
         Data collected on our Site will only be used for the purposes specified
-        in this Privacy Policy.
+        in this Privacy Policy or indicated on the relevant pages of our Site.
+        We will not use your data beyond what we disclose in this Privacy
+        Policy.
+      </p>
+      <p className="mt-2">
+        The data we collect automatically is used for the following purposes:
       </p>
       <ul className="list-disc ml-6 my-2">
-        <li>To communicate with clients</li>
-        <li>To schedule and deliver services</li>
-        <li>To send invoices and process payments</li>
-        <li>To maintain client service history</li>
-        <li>
-          To improve service offerings based on feedback or support trends
-        </li>
+        <li>Spam prevention and bot detection (Google reCAPTCHA)</li>
+        <li>Email delivery confirmation tracking (Brevo)</li>
+      </ul>
+      <p>
+        The data we collect when the user performs certain functions may be used
+        for the following purposes:
+      </p>
+      <ul className="list-disc ml-6 my-2">
+        <li>To respond to inquiries and communicate with potential clients</li>
       </ul>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">
         Who We Share Personal Data With
       </h2>
       <h3 className="font-semibold mt-4 mb-1 underline">Employees</h3>
-      <p>Data may be disclosed to staff who need access to fulfill services.</p>
+      <p>
+        We may disclose user data to any member of our organization who
+        reasonably needs access to user data to achieve the purposes set out in
+        this Privacy Policy.
+      </p>
+
+      <h3 className="font-semibold mt-4 mb-1 underline">Third Parties</h3>
+      <p>We may share user data with the following third parties:</p>
+      <ol className="list-decimal ml-6 my-2">
+        <li>
+          <strong>Google LLC (reCAPTCHA)</strong> &mdash; IP address, browser
+          and device fingerprint data &mdash; for spam prevention and bot
+          detection
+        </li>
+        <li>
+          <strong>Brevo (Sendinblue)</strong> &mdash; Email address, email
+          interaction data (link clicks, opens) &mdash; for email delivery and
+          contact form management
+        </li>
+      </ol>
+      <p>
+        Third parties will not be able to access user data beyond what is
+        reasonably necessary to achieve the given purpose.
+      </p>
 
       <h3 className="font-semibold mt-4 mb-1 underline">Other Disclosures</h3>
-      <p>We may disclose data:</p>
+      <p>
+        We will not sell or share your data with other third parties, except in
+        the following cases:
+      </p>
       <ul className="list-disc ml-6 my-2">
-        <li>If required by law</li>
-        <li>For legal proceedings</li>
-        <li>To protect legal rights</li>
-        <li>To potential buyers in the event of a sale</li>
+        <li>If the law requires it</li>
+        <li>If it is required for any legal proceeding</li>
+        <li>To prove or protect our legal rights</li>
+        <li>
+          To buyers or potential buyers of this company in the event that we
+          seek to sell the company
+        </li>
       </ul>
-
-      <h2 className="text-xl font-bold uppercase border-b my-4">
-        Data Storage Duration
-      </h2>
       <p>
-        Customer data is stored for seven years. You will be notified if stored
-        longer.
+        If you follow hyperlinks from our Site to another Site, please note that
+        we are not responsible for and have no control over their privacy
+        policies and practices.
       </p>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">
-        Data Protection
+        How Long We Store Personal Data
       </h2>
       <p>
-        Data is encrypted at rest (AES-256) and in transit (HTTPS, SSH, etc.).
-        <br />
-        Optional PGP email is offered. Access is controlled via strong
-        authentication.
+        User data will be stored until the purpose the data was collected for
+        has been achieved.
       </p>
       <p>
-        We cannot guarantee absolute security due to the inherent nature of the
-        internet.
+        You will be notified if your data is kept for longer than this period.
+      </p>
+
+      <h2 className="text-xl font-bold uppercase border-b my-4">
+        How We Protect Your Personal Data
+      </h2>
+      <p>
+        All data is transmitted over HTTPS. Email addresses are securely stored
+        by our email service provider (Brevo) using industry-standard
+        encryption. Access is restricted to authorized personnel. We do not sell
+        or share personal information with third parties for marketing purposes.
+      </p>
+      <p className="mt-2">
+        While we take all reasonable precautions to ensure that user data is
+        secure and that users are protected, there always remains the risk of
+        harm. The Internet as a whole can be insecure at times and therefore we
+        are unable to guarantee the security of user data beyond what is
+        reasonably practical.
+      </p>
+
+      <h2 className="text-xl font-bold uppercase border-b my-4">
+        International Data Transfers
+      </h2>
+      <p>We transfer user personal data to the following countries:</p>
+      <ol className="list-decimal ml-6 my-2">
+        <li>United States</li>
+        <li>France</li>
+      </ol>
+      <p>
+        When we transfer user personal data we will protect that data as
+        described in this Privacy Policy and comply with applicable legal
+        requirements for transferring personal data internationally.
       </p>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">Children</h2>
       <p>
-        Minimum age: 18. We do not knowingly collect data from children under
-        13. If discovered, it will be deleted.
+        The minimum age to use our website is 13 years of age. We do not
+        knowingly collect or use personal data from children under 13 years of
+        age. If we learn that we have collected personal data from a child under
+        13 years of age, the personal data will be deleted as soon as possible.
+        If a child under 13 years of age has provided us with personal data
+        their parent or guardian may contact our privacy officer.
       </p>
 
-      <h2 className="text-xl font-bold uppercase border-b my-4">Your Rights</h2>
-      <p>If you wish to view, modify, or delete your data, contact:</p>
+      <h2 className="text-xl font-bold uppercase border-b my-4">
+        How to Access, Modify, Delete, or Challenge the Data Collected
+      </h2>
       <p>
+        If you would like to know if we have collected your personal data, how
+        we have used your personal data, if we have disclosed your personal data
+        and to who we disclosed your personal data, or if you would like your
+        data to be deleted or modified in any way, please contact our privacy
+        officer here:
+      </p>
+      <p className="my-2">
         Anthony Tropeano
         <br />
         <a href={`mailto:${privacy_email}`} className="text-blue-600 underline">
@@ -178,48 +245,100 @@ export default function Privacy() {
       </p>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">
+        Do Not Track Notice
+      </h2>
+      <p>
+        Do Not Track (&quot;DNT&quot;) is a privacy preference that you can set
+        in certain web browsers. We do not track the users of our Site over time
+        and across third party websites and therefore do not respond to
+        browser-initiated DNT signals. We are not responsible for and cannot
+        guarantee how any third parties who interact with our Site and your data
+        will respond to DNT signals.
+      </p>
+
+      <h2 className="text-xl font-bold uppercase border-b my-4">
+        How to Opt-Out of Data Collection, Use or Disclosure
+      </h2>
+      <p>
+        In addition to the method(s) described in the &quot;How to Access,
+        Modify, Delete, or Challenge the Data Collected&quot; section, we
+        provide the following specific opt-out methods:
+      </p>
+      <ol className="list-decimal ml-6 my-2">
+        <li>
+          Receiving waiting list and product launch notification emails. You can
+          opt-out by clicking the unsubscribe link at the bottom of any email or
+          by emailing{" "}
+          <a
+            href={`mailto:${privacy_email}`}
+            className="text-blue-600 underline"
+          >
+            {privacy_email}
+          </a>
+          .
+        </li>
+      </ol>
+
+      <h2 className="text-xl font-bold uppercase border-b my-4">
         Cookie Policy
       </h2>
       <p>
-        We do not set cookies for analytics, advertising, or user tracking. Our
-        hosting provider (Vercel) may set strictly necessary cookies, for
-        example, _vcrcs, to help route requests securely and maintain site
-        performance. These cookies do not store personal information beyond what
-        is required to operate the site and are automatically removed after a
-        short period. You can configure your browser to block cookies, but doing
-        so may affect site functionality.
+        A cookie is a small file, stored on a user&apos;s hard drive by a
+        website. Its purpose is to collect data relating to the user&apos;s
+        browsing habits. You can choose to be notified each time a cookie is
+        transmitted. You can also choose to disable cookies entirely in your
+        internet browser, but this may decrease the quality of your user
+        experience.
       </p>
+      <p className="mt-2">We use the following types of cookies on our Site:</p>
+      <ol className="list-decimal ml-6 my-2">
+        <li>
+          <strong>Third-Party Cookies</strong> &mdash; Third-party cookies are
+          created by a website other than ours. We may use third-party cookies
+          to achieve the following purposes:
+          <ul className="list-disc ml-6 mt-1">
+            <li>Spam prevention and bot detection (Google reCAPTCHA)</li>
+          </ul>
+        </li>
+      </ol>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">
         Additional Clauses
       </h2>
       <p>
-        <strong>Service Scope:</strong> IT support, consulting, installation
-        only as per agreement.
+        We do not sell, trade, or otherwise transfer your personal information
+        to outside parties. Data collected through our contact form is used
+        solely to respond to your inquiry and will not be used for marketing
+        without your explicit consent.
       </p>
-      <p>
-        <strong>Client Data:</strong> Stored securely, not shared or sold.
-        Retained 7 years.
-      </p>
-      <p>
-        <strong>Secure Communication:</strong> PGP or HTTPS-based as needed.
-      </p>
-      <p>
-        <strong>Limitation of Liability:</strong> No responsibility for indirect
-        damages. Liability limited to previous 30 days of service cost.
+      <p className="mt-2">
+        <strong>Limitation of Liability:</strong> The company is not liable for
+        indirect or consequential damages, including data loss, downtime, or
+        third-party service issues. Liability is limited to the amount paid for
+        services within the previous 30 days.
       </p>
 
       <h2 className="text-xl font-bold uppercase border-b my-4">
         Modifications
       </h2>
       <p>
-        This Privacy Policy may change. Updates will be noted by updating the
-        &quot;Effective Date.&quot; Users should review it periodically.
+        This Privacy Policy may be amended from time to time in order to
+        maintain compliance with the law and to reflect any changes to our data
+        collection process. When we amend this Privacy Policy we will update the
+        &quot;Effective Date&quot; at the top of this Privacy Policy. We
+        recommend that our users periodically review our Privacy Policy to
+        ensure that they are notified of any updates. If necessary, we may
+        notify users by email of changes to this Privacy Policy.
       </p>
 
-      <h2 className="text-xl font-bold uppercase border-b my-4">Contact</h2>
-      <p>For questions or concerns, contact:</p>
+      <h2 className="text-xl font-bold uppercase border-b my-4">
+        Contact Information
+      </h2>
       <p>
+        If you have any questions, concerns, or complaints, you can contact our
+        privacy officer:
+      </p>
+      <p className="my-2">
         Anthony Tropeano
         <br />
         <a href={`mailto:${privacy_email}`} className="text-blue-600 underline">

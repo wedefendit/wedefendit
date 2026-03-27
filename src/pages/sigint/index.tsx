@@ -187,7 +187,7 @@ export default function SigintPage() {
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4 mb-4">
-              <WaitlistForm tier="pro" className="w-full max-w-lg" />
+              <WaitlistForm tier="individual" className="w-full max-w-lg" />
               <a
                 href="https://sigint-5154d935429b.herokuapp.com"
                 target="_blank"
@@ -671,7 +671,7 @@ export default function SigintPage() {
                   </li>
                 </ul>
                 <div className="mt-6">
-                  <WaitlistForm tier="pro" stacked />
+                  <WaitlistForm tier="individual" stacked />
                 </div>
               </div>
 
@@ -732,7 +732,7 @@ export default function SigintPage() {
                   </li>
                 </ul>
                 <div className="mt-6">
-                  <WaitlistForm tier="pro" stacked />
+                  <WaitlistForm tier="team" stacked />
                 </div>
               </div>
 
@@ -889,7 +889,7 @@ export default function SigintPage() {
               early access or try the live demo now.
             </p>
             <div className="max-w-lg mx-auto mb-6">
-              <WaitlistForm tier="pro" />
+              <WaitlistForm tier="individual" />
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a

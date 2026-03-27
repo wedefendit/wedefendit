@@ -3,13 +3,13 @@ import { Zap, Check, Loader2, Mail } from "lucide-react";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 type WaitlistFormProps = {
-  tier?: "pro" | "enterprise";
+  tier?: "individual" | "team" | "enterprise";
   className?: string;
   stacked?: boolean;
 };
 
 export function WaitlistForm({
-  tier = "pro",
+  tier = "individual",
   className = "",
   stacked = false,
 }: WaitlistFormProps) {

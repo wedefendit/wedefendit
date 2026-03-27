@@ -42,6 +42,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     { path: "about", priority: "0.70" },
     { path: "terms", priority: "0.30" },
     { path: "privacy", priority: "0.30" },
+    { path: "sigint/privacy", priority: "0.25" },
     { path: "thank-you", priority: "0.10" },
   ];
 
