@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Zap, Check, Loader2, Mail } from "lucide-react";
+import { Zap, Loader2, Mail } from "lucide-react";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 type WaitlistFormProps = {
@@ -53,10 +53,15 @@ export function WaitlistForm({
   if (status === "success") {
     return (
       <div
-        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-medium text-center ${className}`}
+        className={`flex flex-col items-center justify-center gap-1.5 py-3 px-4 rounded-lg bg-green-500/10 border border-green-500/30 text-center ${className}`}
       >
-        <Check className="w-4 h-4" />
-        You&apos;re on the list. We&apos;ll be in touch.
+        <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
+          <Mail className="w-4 h-4" />
+          Check your email to confirm your spot.
+        </div>
+        <p className="text-[11px] text-gray-500 dark:text-gray-500">
+          Don&apos;t see it? Check your junk or spam folder.
+        </p>
       </div>
     );
   }
@@ -91,7 +96,7 @@ export function WaitlistForm({
           ) : (
             <Zap className="w-4 h-4" />
           )}
-          Join Waitlist
+          Join Waiting List
         </button>
       </form>
       {status === "error" && (
