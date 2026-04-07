@@ -109,10 +109,6 @@ export default function About() {
     },
     about: {
       ...localBusinessLd,
-      sameAs: [
-        "https://www.google.com/search?q=Defend+I.T.+Solutions+Ocala",
-        "https://www.facebook.com/",
-      ],
       hasMap:
         "https://www.google.com/maps/search/?api=1&query=Defend+I.T.+Solutions+Ocala+FL",
     },
@@ -257,14 +253,15 @@ export default function About() {
               Explore Our Services
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-              From computer repair to network security, we offer comprehensive
-              IT solutions tailored to your needs.
+              From computer repair and virus removal to scam protection and
+              Wi-Fi help, explore the local services we offer across Central
+              Florida.
             </p>
             <Link
               href="/services"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] text-white font-semibold transition-all shadow-lg hover:shadow-xl"
             >
-              View All Services
+              View Local Services
               <svg
                 className="w-5 h-5"
                 fill="none"

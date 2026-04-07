@@ -17,12 +17,12 @@
       "cta": "Remove Malware"
     },
     {
-      "id": "home-network-security",
-      "title": "Home Network Security & Wi-Fi Hardening",
-      "headline": "Protect your Wi-Fi and connected devices.",
-      "icons": ["house-wifi", "router", "shield-check"],
-      "summary": "Router, Wi-Fi, and device hardening to reduce risk from weak defaults, insecure smart devices, poor segmentation, and unsafe browsing.",
-      "cta": "Secure My Network"
+      "id": "scam-protection",
+      "title": "Scam & Fraud Protection",
+      "headline": "Avoid scams before they cause damage.",
+      "icons": ["presentation", "glasses", "shield-alert"],
+      "summary": "Practical scam prevention for households and retirees, including phishing awareness, safer device settings, and help evaluating suspicious calls, texts, and emails.",
+      "cta": "Get Scam Protection"
     },
     {
       "id": "network-setup",
@@ -33,20 +33,20 @@
       "cta": "Set Up My Network"
     },
     {
+      "id": "home-network-security",
+      "title": "Home Network Security & Wi-Fi Hardening",
+      "headline": "Protect your Wi-Fi and connected devices.",
+      "icons": ["house-wifi", "router", "shield-check"],
+      "summary": "Router, Wi-Fi, and device hardening to reduce risk from weak defaults, insecure smart devices, poor segmentation, and unsafe browsing.",
+      "cta": "Secure My Network"
+    },
+    {
       "id": "onsite-tech-support",
       "title": "On-Site Tech Support",
       "headline": "In-home help when you need it.",
       "icons": ["badge-check", "home", "wrench"],
       "summary": "House-call tech help when the issue spans computers, Wi-Fi, printers, or new devices and you want one visit to sort it out.",
       "cta": "Book On-Site Support"
-    },
-    {
-      "id": "scam-protection",
-      "title": "Scam & Fraud Protection",
-      "headline": "Avoid scams before they cause damage.",
-      "icons": ["presentation", "glasses", "shield-alert"],
-      "summary": "Practical scam prevention for households and retirees, including phishing awareness, safer device settings, and help evaluating suspicious calls, texts, and emails.",
-      "cta": "Get Scam Protection"
     },
     {
       "id": "password-management",
@@ -65,20 +65,20 @@
       "cta": "Protect My Data"
     },
     {
-      "id": "software-troubleshooting",
-      "title": "Software Installation & Troubleshooting",
-      "headline": "Fix update failures, driver conflicts, and unstable apps.",
-      "icons": ["cpu", "settings", "terminal"],
-      "summary": "Help with Windows and macOS update failures, driver problems, app crashes, login issues, and clean installs without defaulting to a full wipe.",
-      "cta": "Fix Software Issues"
-    },
-    {
       "id": "pc-upgrades",
       "title": "PC & Laptop Upgrades",
       "headline": "Speed up an aging computer before replacing it.",
       "icons": ["hard-drive", "gauge", "bolt"],
       "summary": "SSD, RAM, battery, and thermal-service upgrades that improve speed, stability, and lifespan when the computer is worth keeping.",
       "cta": "Upgrade My Computer"
+    },
+    {
+      "id": "software-troubleshooting",
+      "title": "Software Installation & Troubleshooting",
+      "headline": "Fix update failures, driver conflicts, and unstable apps.",
+      "icons": ["cpu", "settings", "terminal"],
+      "summary": "Help with Windows and macOS update failures, driver problems, app crashes, login issues, and clean installs without defaulting to a full wipe.",
+      "cta": "Fix Software Issues"
     },
     {
       "id": "smart-home-setup",

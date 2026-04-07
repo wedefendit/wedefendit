@@ -11,10 +11,6 @@ This software is provided for use only by authorized employees, contractors, or
 licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
-/*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 import { useEffect, useState } from "react";
 import { localBusinessLd } from "@/lib/json-ld";
 import companyInfo from "../../../data/company-info.json";
@@ -37,7 +33,7 @@ import {
 } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 
-const { contact, name } = companyInfo;
+const { contact, name, service_areas } = companyInfo;
 const { phone, email, address, gpg, service_email } = contact;
 const { street, city, state, zip } = address;
 const { fingerprint, key_id, key_url, secure_email } = gpg;
@@ -253,13 +249,7 @@ const contactPageLd = {
   },
   about: {
     ...localBusinessLd,
-    areaServed: [
-      "Ocala FL",
-      "Belleview FL",
-      "The Villages FL",
-      "Central Florida",
-      "Remote",
-    ],
+    areaServed: service_areas,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: contact.phone,
@@ -268,6 +258,7 @@ const contactPageLd = {
       email: contact.email,
       serviceUrl: "https://www.wedefendit.com/services",
       url: canonical,
+      areaServed: service_areas,
     },
   },
 };
@@ -329,8 +320,9 @@ export default function ContactPage() {
               </div>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              Have a question about our services, SIGINT, or anything else? Fill
-              out the form below and we&apos;ll get back to you.
+              Have a question about computer repair, scam protection, Wi-Fi
+              help, or another local service? Fill out the form below and
+              we&apos;ll get back to you.
             </p>
             <ContactForm className="max-w-xl mx-auto" />
           </section>

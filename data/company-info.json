@@ -3,6 +3,12 @@
   "tagline": "Local Cybersecurity & I.T. Support You Can Trust",
   "slogan": "Love I.T. — Defend I.T.™",
   "description": "Whether you're a homeowner, retiree, or small business owner, we deliver on-site cybersecurity and tech support that's tailored to you. No tech jargon. No surprise fees. Just real help from someone who understands your needs.",
+  "service_areas": [
+    "Ocala FL",
+    "Belleview FL",
+    "The Villages FL",
+    "Central Florida"
+  ],
 
   "contact": {
     "email": "contact@wedefendit.com",

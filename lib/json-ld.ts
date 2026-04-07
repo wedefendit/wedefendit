@@ -14,7 +14,7 @@ party without express written consent.
 
 import companyInfo from "@/data/company-info.json";
 
-const { name, contact } = companyInfo;
+const { name, contact, service_areas } = companyInfo;
 const { phone, email, address } = contact;
 const { street, city, state, zip } = address;
 
@@ -27,27 +27,25 @@ export const localBusinessLd = {
   logo: "https://www.wedefendit.com/logo.svg",
   url: "https://www.wedefendit.com/",
   telephone: phone,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: street,
-    addressLocality: city,
-    addressRegion: state,
-    postalCode: zip,
-    addressCountry: "US",
-  },
-  areaServed: [
-    "Ocala",
-    "Belleview",
-    "The Villages",
-    "Central Florida",
-    "Remote",
-  ],
+  ...(address.type !== "mailing"
+    ? {
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: street,
+          addressLocality: city,
+          addressRegion: state,
+          postalCode: zip,
+          addressCountry: "US",
+        },
+      }
+    : {}),
+  areaServed: service_areas,
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "Customer Service",
     telephone: phone,
     email: email,
-    areaServed: "US",
+    areaServed: service_areas,
     availableLanguage: "English",
   },
 };

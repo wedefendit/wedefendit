@@ -1,10 +1,10 @@
 {
   "id": "software-troubleshooting",
-  "title": "Software Installation & Troubleshooting",
-  "headline": "Fix update failures, driver conflicts, and unstable apps without unnecessary reinstalls.",
+  "title": "Software Troubleshooting & Installs",
+  "headline": "Fix Windows and Mac software problems without jumping straight to a full wipe.",
   "description": "Professional software installation and troubleshooting for Windows and macOS systems, including clean installs, driver fixes, update recovery, login issues, and application repair for homeowners and small businesses in Ocala, Belleview, The Villages, and surrounding Central Florida areas.",
   "metaTitle": "Software Troubleshooting in Ocala & The Villages | Defend I.T. Solutions",
-  "metaDescription": "Help with Windows and macOS update failures, driver problems, application errors, and clean installs in Central Florida without defaulting to a full wipe.",
+  "metaDescription": "Fix Windows and macOS update failures, driver problems, broken apps, login issues, and unstable software in Central Florida without defaulting to a full wipe.",
   "keywords": [
     "software troubleshooting Ocala FL",
     "software troubleshooting Belleview FL",
@@ -41,12 +41,12 @@
     {
       "heading": "Who This Helps",
       "paragraph": [
-        "This service is for homeowners and small business users dealing with update failures, broken applications, driver issues, or operating systems that no longer behave the way they should.",
-        "It is a good fit when the device still powers on but normal use is blocked by software errors, crashes, loops, or failed installs."
+        "This service is for homeowners, remote workers, and small business users dealing with update failures, broken applications, driver issues, or operating systems that no longer behave the way they should.",
+        "It is a good fit when the device still powers on but normal use is blocked by software errors, crashes, loops, failed installs, or persistent login problems."
       ]
     },
     {
-      "heading": "Signs You Need Software Troubleshooting",
+      "heading": "Signs You Need Software Troubleshooting Help",
       "items": [
         "Windows or macOS updates fail repeatedly or leave the system unstable",
         "Applications crash, refuse to open, or behave unpredictably after an install or update",
@@ -58,20 +58,21 @@
     {
       "heading": "What We Do",
       "paragraph": [
-        "We diagnose and correct software-side problems so the system becomes stable, usable, and easier to maintain."
+        "We diagnose software-side problems, stabilize the system, and explain what changed so it is easier to keep running."
       ],
       "items": [
         "Repair Windows and macOS install issues without defaulting to a full wipe when avoidable",
         "Fix driver conflicts, missing drivers, and update-related instability",
         "Recover from failed updates, rollback loops, and broken boot states",
         "Install, repair, remove, or reconfigure misbehaving applications",
-        "Clean up startup clutter, leftover software, and conflicting utilities"
+        "Clean up startup clutter, leftover software, and conflicting utilities",
+        "Use clean installs or reset paths only when they are truly the safer option"
       ]
     },
     {
-      "heading": "When This Is the Right Fit",
+      "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
-        "Choose Software Installation & Troubleshooting when the main issue is updates, apps, drivers, or system configuration. If the problem points to failing hardware, Computer Repair is usually the better starting point. If you suspect an active infection, Virus & Malware Removal should usually come first. If you mainly want faster performance from aging hardware, PC & Laptop Upgrades may be the better fit."
+        "Choose Software Troubleshooting & Installs when the main issue is updates, apps, drivers, logins, or system configuration. If the problem points to failing hardware, Computer Repair is usually the better starting point. If you suspect an active infection, Virus & Malware Removal should usually come first. If you are trying to protect important files before a major reinstall, Data Recovery & Backup Help may also be relevant."
       ]
     },
     {
@@ -91,8 +92,8 @@
       "slug": "virus-removal"
     },
     {
-      "label": "PC & Laptop Upgrades",
-      "slug": "pc-upgrades"
+      "label": "Data Recovery & Backup Help",
+      "slug": "data-recovery"
     }
   ],
   "faq": [
@@ -115,12 +116,12 @@
       "slug": "computer-repair"
     },
     {
-      "label": "Data Recovery & Encrypted Backup Solutions",
+      "label": "Data Recovery & Backup Help",
       "slug": "data-recovery"
     },
     {
-      "label": "PC & Laptop Upgrades",
-      "slug": "pc-upgrades"
+      "label": "Virus & Malware Removal",
+      "slug": "virus-removal"
     }
   ],
   "cta": {

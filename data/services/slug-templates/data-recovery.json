@@ -1,8 +1,8 @@
 {
   "id": "data-recovery",
-  "title": "Backup & Data Recovery",
-  "headline": "Recover important files when possible, then put a real backup plan in place.",
-  "description": "Professional backup and data recovery services for households and small businesses, helping recover deleted or inaccessible files when possible and protect important data across Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
+  "title": "Data Recovery & Backup Help",
+  "headline": "Recover important files when possible, then set up backups you can trust.",
+  "description": "Data recovery and backup help for deleted files, failing drives, non-booting computers, and fragile backup setups in Ocala, Belleview, The Villages, and nearby Central Florida communities.",
   "metaTitle": "Backup & Data Recovery in Ocala & The Villages | Defend I.T. Solutions",
   "metaDescription": "Help with deleted files, failing drives, non-booting computers, and encrypted backup setup in Central Florida, with clear guidance on what can and cannot be recovered.",
   "keywords": [
@@ -42,11 +42,11 @@
       "heading": "Who This Helps",
       "paragraph": [
         "This service is for homeowners and small business owners who have lost files, cannot access important data, or want to stop living one hardware failure away from a major headache.",
-        "It is also a good fit if a computer still works today but stores irreplaceable photos, tax records, business files, or family documents without a reliable backup."
+        "It is also a good fit if a computer still works today but stores irreplaceable photos, tax records, bookkeeping files, or family documents without a reliable backup."
       ]
     },
     {
-      "heading": "Signs You May Need Backup & Data Recovery",
+      "heading": "Signs You May Need Data Recovery or Backup Help",
       "items": [
         "Important files were deleted, overwritten, or suddenly cannot be opened",
         "A computer will not boot, but the files on it still matter",
@@ -58,10 +58,11 @@
     {
       "heading": "What We Do",
       "paragraph": [
-        "We help recover accessible data when possible and build a safer backup plan so future hardware problems are less disruptive."
+        "We help recover accessible data when possible, move it safely, and build a cleaner backup plan so future hardware problems are less disruptive."
       ],
       "items": [
         "Assess drives and systems to determine whether recovery is realistically possible",
+        "Advise when a failing drive should be powered down and handled more carefully before more damage is done",
         "Recover deleted, corrupted, or inaccessible files from supported devices when the damage is within reach of software-based recovery",
         "Safely transfer data to a replacement computer or storage device",
         "Set up encrypted, automated backups for documents, photos, and critical files",
@@ -70,15 +71,15 @@
       ]
     },
     {
-      "heading": "When This Is the Right Fit",
+      "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
-        "Choose Backup & Data Recovery when your top priority is saving files, moving data safely, or putting dependable backups in place. If the computer itself is also slow, damaged, or unstable, Computer Repair may be the better starting point. If you mainly want the system to feel faster rather than recover files, PC & Laptop Upgrades may be the better match."
+        "Choose Data Recovery & Backup Help when your top priority is saving files, moving data safely, or putting dependable backups in place. If the computer itself is also slow, damaged, or unstable, Computer Repair may be the better starting point. If you mainly want the system to feel faster rather than recover files, PC & Laptop Upgrades may be the better match."
       ]
     },
     {
       "heading": "Local Availability",
       "paragraph": [
-        "Backup and data recovery help is available in Ocala, Belleview, The Villages, and nearby Central Florida communities. We stay honest about what can be recovered, what cannot, and when the safest next step is prevention through better backups."
+        "Data recovery and backup help is available in Ocala, Belleview, The Villages, and nearby Central Florida communities. We stay honest about what can be recovered, what cannot, and when the safest next step is prevention through better backups."
       ]
     }
   ],
@@ -88,12 +89,12 @@
       "slug": "computer-repair"
     },
     {
-      "label": "PC & Laptop Upgrades",
-      "slug": "pc-upgrades"
-    },
-    {
       "label": "Virus & Malware Removal",
       "slug": "virus-removal"
+    },
+    {
+      "label": "PC & Laptop Upgrades",
+      "slug": "pc-upgrades"
     }
   ],
   "faq": [
@@ -102,8 +103,8 @@
       "answer": "Often, yes. A system that will not start can still have recoverable data if the storage device is readable. We assess the situation first and explain the realistic recovery path before moving forward."
     },
     {
-      "question": "Do you guarantee data recovery?",
-      "answer": "No honest provider should guarantee recovery in every case. We can often recover files when the device and damage type allow it, but the outcome depends on the condition of the drive and how severe the failure is."
+      "question": "Should I keep using a drive that is clicking or disappearing?",
+      "answer": "Usually no. Repeated use of a failing drive can make recovery harder. If the files matter, it is safer to stop using it and have the situation assessed before more damage is done."
     },
     {
       "question": "Can you set up backups after recovery?",
@@ -116,12 +117,12 @@
       "slug": "computer-repair"
     },
     {
-      "label": "PC & Laptop Upgrades",
-      "slug": "pc-upgrades"
+      "label": "Virus & Malware Removal",
+      "slug": "virus-removal"
     },
     {
-      "label": "Password Management & Digital Safety",
-      "slug": "password-management"
+      "label": "PC & Laptop Upgrades",
+      "slug": "pc-upgrades"
     }
   ],
   "cta": {

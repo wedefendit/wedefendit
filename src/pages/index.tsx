@@ -14,7 +14,7 @@ party without express written consent.
 import {
   ShieldCheck,
   Wrench,
-  GraduationCap,
+  House,
   Phone,
   ArrowRight,
 } from "lucide-react";
@@ -83,8 +83,8 @@ export default function Home() {
       icon: <ShieldCheck className="w-8 h-8 text-blue-600 dark:text-sky-400" />,
       title: "Protect",
       description:
-        "Stop scams targeting seniors, secure home networks, remove viruses and malware, and prevent future threats.",
-      link: "/services/custom-solutions",
+        "Stop scams, improve account safety, and reduce everyday online risk for your home or family with practical local help.",
+      link: "/services/scam-protection",
     },
     {
       icon: <Wrench className="w-8 h-8 text-blue-600 dark:text-sky-400" />,
@@ -94,13 +94,11 @@ export default function Home() {
       link: "/services/computer-repair",
     },
     {
-      icon: (
-        <GraduationCap className="w-8 h-8 text-blue-600 dark:text-sky-400" />
-      ),
-      title: "Teach",
+      icon: <House className="w-8 h-8 text-blue-600 dark:text-sky-400" />,
+      title: "Support",
       description:
-        "Learn to recognize online threats, use technology safely, and understand your devices without the jargon.",
-      link: "/services/remote/remote-tech-tutoring",
+        "Get in-home help with Wi-Fi, printers, new devices, and everyday tech problems when you want one visit to sort it out.",
+      link: "/services/onsite-tech-support",
     },
   ];
 
@@ -145,7 +143,7 @@ export default function Home() {
               href="/services"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-sky-500 text-gray-700 dark:text-gray-300 text-lg font-semibold transition-all"
             >
-              View Services
+              View Local Services
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -227,7 +225,7 @@ export default function Home() {
               href="/contact"
               className="text-blue-600 dark:text-sky-400 hover:underline text-lg font-medium"
             >
-              Or view all contact options →
+              View contact and scheduling options →
             </Link>
           </div>
         </section>

@@ -1,8 +1,8 @@
 {
   "id": "virus-removal",
   "title": "Virus & Malware Removal",
-  "headline": "Clean infections, restore trust, and lock down your devices professionally.",
-  "description": "Professional virus and malware removal for laptops and desktops, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities, including threat removal, system recovery, and post-cleanup hardening to prevent reinfection.",
+  "headline": "Remove malware, restore trust, and reduce the chance it happens again.",
+  "description": "Local virus and malware removal for laptops and desktops in Ocala, Belleview, The Villages, and nearby Central Florida communities, including threat cleanup, system repair, and post-remediation hardening to reduce reinfection.",
   "metaTitle": "Virus & Malware Removal in Ocala & The Villages | Defend I.T. Solutions",
   "metaDescription": "Malware cleanup for infected computers in Central Florida, including pop-ups, browser hijacks, spyware removal, and post-cleanup hardening to reduce reinfection.",
   "keywords": [
@@ -37,6 +37,7 @@
       "heading": "Who This Helps",
       "paragraph": [
         "This service is for people dealing with clear signs of infection, such as fake virus alerts, browser redirects, suspicious pop-ups, blocked security tools, unexpected account warnings, or a computer that became unsafe to use.",
+        "It is also the right fit after clicking a suspicious link, opening a risky attachment, installing the wrong thing, or giving remote access to someone you should not have trusted.",
         "If the main problem is compromise rather than general slowness or hardware failure, Virus & Malware Removal is the right starting point."
       ]
     },
@@ -53,26 +54,27 @@
     {
       "heading": "What We Do",
       "paragraph": [
-        "We remove active malware, repair system damage, and secure your computer against future attacks using proven, security-first methods."
+        "We remove active malware, repair common system damage, and harden the device enough for safer everyday use using proven, security-first methods."
       ],
       "items": [
         "Non-destructive malware and spyware removal",
         "System integrity checks and repair",
         "Browser, startup, and persistence cleanup",
         "Security hardening after removal",
-        "Full wipe-and-rebuild option for deeply compromised systems"
+        "Full wipe-and-rebuild option for deeply compromised systems",
+        "Clear guidance on password resets, account follow-up, and safer next steps when the incident went beyond the computer"
       ]
     },
     {
       "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
-        "If the computer is slow but there are no signs of compromise, Computer Repair or Software Installation & Troubleshooting may be the better fit. If you need help recovering after a phishing or impersonation attempt, Scam & Fraud Protection or Password Management & Digital Safety may also be part of the right next step."
+        "Choose Virus & Malware Removal when the main problem is compromise, suspicious behavior, or a computer that no longer feels safe to use. If the computer is slow but there are no signs of infection, Computer Repair or Software Installation & Troubleshooting may be the better fit. If you mainly need help securing accounts after phishing, impersonation, or fraud, Scam & Fraud Protection or Password Management & Digital Safety may also be part of the right next step."
       ]
     },
     {
       "heading": "Local Availability",
       "paragraph": [
-        "Virus and malware removal is available for customers in Ocala, Belleview, The Villages, and nearby Central Florida communities. We explain the cleanup path clearly, tell you when a rebuild is safer, and avoid vague scare tactics."
+        "Virus and malware removal is available for customers in Ocala, Belleview, The Villages, and nearby Central Florida communities. We explain the cleanup path clearly, tell you when a rebuild is safer, and avoid the vague scare tactics that often come with generic virus-removal marketing."
       ]
     }
   ],

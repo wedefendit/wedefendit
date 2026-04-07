@@ -1,8 +1,8 @@
 {
   "id": "computer-repair",
   "title": "Computer Repair",
-  "headline": "Fix slow or broken devices with fast, local help. No waiting, no surprises.",
-  "description": "Professional computer repair for laptops and desktops, including diagnostics, hardware replacement, data recovery, and performance optimization, serving Ocala, Belleview, The Villages, and surrounding Florida communities with transparent pricing and no unnecessary upsells.",
+  "headline": "Local laptop and desktop repair for slow, unstable, overheating, or non-booting computers.",
+  "description": "Local computer repair for laptops and desktops in Ocala, Belleview, The Villages, and nearby Central Florida communities, including diagnostics, hardware repair, data-safe troubleshooting, and upgrade guidance when repair is still worth it.",
   "metaTitle": "Computer Repair in Ocala, Belleview & The Villages | Defend I.T. Solutions",
   "metaDescription": "Local laptop and desktop repair for slow, crashing, overheating, or non-booting computers. Clear diagnostics, honest repair guidance, and data-safe troubleshooting in Central Florida.",
   "keywords": [
@@ -38,7 +38,8 @@
       "heading": "Who This Helps",
       "paragraph": [
         "This service is for homeowners, retirees, and small business owners dealing with a laptop or desktop that is slow, unstable, overheating, physically damaged, or refusing to boot.",
-        "If you are not sure whether the problem is hardware, software, or both, computer repair is the right starting point because we diagnose the root cause before recommending a fix."
+        "If you are not sure whether the problem is hardware, software, or both, Computer Repair is the right starting point because we diagnose the root cause before recommending a fix.",
+        "It is also a good fit when you are trying to figure out whether the computer can be repaired, upgraded, or recovered before spending money on a replacement."
       ]
     },
     {
@@ -62,19 +63,20 @@
         "Replace failed drives, memory, or cooling components",
         "Improve startup time and responsiveness through system optimization",
         "Recover data from non-booting or partially damaged systems",
-        "Upgrade hardware like SSDs and RAM to extend system lifespan"
+        "Upgrade hardware like SSDs and RAM to extend system lifespan",
+        "Explain when repair is the better value and when replacement makes more sense"
       ]
     },
     {
       "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
-        "If the main problem is an active infection, Virus & Malware Removal is usually the better starting point. If the computer works but you mainly want better speed or battery life, PC & Laptop Upgrades may be more cost-effective. If your highest priority is retrieving important files, Backup & Data Recovery may be the better match."
+        "Choose Computer Repair when the main question is whether the machine can be diagnosed, repaired, stabilized, or brought back to usable condition. If the main problem is an active infection, Virus & Malware Removal is usually the better starting point. If the computer works but you mainly want better speed or battery life, PC & Laptop Upgrades may be more cost-effective. If your highest priority is retrieving important files, Backup & Data Recovery may be the better match."
       ]
     },
     {
       "heading": "Local Availability",
       "paragraph": [
-        "Computer repair is available for customers in Ocala, Belleview, The Villages, and nearby Central Florida communities. We explain findings in plain English, quote the work clearly, and avoid pushing unnecessary replacements."
+        "Computer repair is available for customers in Ocala, Belleview, The Villages, and nearby Central Florida communities. We explain findings in plain English, quote the work clearly, and avoid pushing unnecessary replacements or upgrade recommendations that do not actually solve the problem."
       ]
     }
   ],

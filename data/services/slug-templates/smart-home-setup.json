@@ -2,7 +2,7 @@
   "id": "smart-home-setup",
   "title": "Smart Home Setup & Security",
   "headline": "Set up cameras, doorbells, assistants, and automations without turning your home into a privacy mess.",
-  "description": "Professional smart home setup and security services for cameras, assistants, sensors, and home automation systems, configured with privacy-first settings and practical access control for homeowners in Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
+  "description": "Smart home setup and privacy-minded help for cameras, doorbells, speakers, hubs, thermostats, and routines in Ocala, Belleview, The Villages, and nearby Central Florida communities.",
   "metaTitle": "Smart Home Setup in Ocala & The Villages | Defend I.T. Solutions",
   "metaDescription": "Set up smart cameras, doorbells, speakers, hubs, and routines with privacy-first settings and cleaner network placement in Central Florida.",
   "keywords": [
@@ -42,7 +42,7 @@
       "heading": "Who This Helps",
       "paragraph": [
         "This service is for homeowners who want cameras, doorbells, speakers, hubs, sensors, thermostats, or routines set up correctly without spending hours fighting with apps and vague instructions.",
-        "It is also helpful when a smart home already exists but feels disorganized, unreliable, or less private than you are comfortable with."
+        "It is also helpful when a smart home already exists but feels disorganized, unreliable, confusing for family members, or less private than you are comfortable with."
       ]
     },
     {
@@ -65,11 +65,12 @@
         "Set up voice assistants, dashboards, and household-friendly control workflows",
         "Create practical automations and routines with clear naming and organization",
         "Review account access, roles, and sharing so the right people have the right level of control",
-        "Apply privacy-conscious settings and cleaner network placement for connected devices"
+        "Apply privacy-conscious settings and cleaner network placement for connected devices",
+        "Document which apps, accounts, and automations control what so the setup stays understandable"
       ]
     },
     {
-      "heading": "When This Is the Right Fit",
+      "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
         "Choose Smart Home Setup & Security when the project centers on connected devices, automations, cameras, or home-control apps. If your main issue is Wi-Fi coverage or router installation, Wi-Fi & Network Setup is usually the better place to start. If your priority is hardening an existing network against risk, Home Network Security & Wi-Fi Hardening is usually the better fit."
       ]
