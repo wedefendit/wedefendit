@@ -81,7 +81,7 @@ export function BookOnline() {
             <details className="group">
               <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-sky-400 list-none flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                <span>Or book online with Calendly</span>
+                <span>Prefer to choose a time online? Use Calendly.</span>
               </summary>
 
               <div className="mt-3 pl-6">

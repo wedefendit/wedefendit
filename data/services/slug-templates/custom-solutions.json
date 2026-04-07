@@ -1,8 +1,8 @@
 {
   "id": "custom-solutions",
   "title": "Custom Technology Project Planning",
-  "headline": "Start with a consultation for privacy-focused projects that do not fit standard repair or support.",
-  "description": "Custom technology project planning for homeowners and small businesses in Ocala, Belleview, The Villages, and nearby Central Florida communities. This page is for privacy-focused, networking, self-hosted, and multi-device projects that need consultation before implementation.",
+  "headline": "Start with a consultation when the job does not fit a standard service page.",
+  "description": "Custom technology project planning for homeowners and small businesses in Ocala, Belleview, The Villages, and nearby Central Florida communities. This page is for projects that need planning before implementation, especially when privacy, networking, storage, access, or multiple devices are involved.",
   "metaTitle": "Custom Technology Project Planning in Ocala, Belleview & The Villages | Defend I.T. Solutions",
   "metaDescription": "Consultation and implementation planning for privacy-focused networking, self-hosted, and specialized home or small-business technology projects in Central Florida.",
   "keywords": [
@@ -32,8 +32,8 @@
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Many technology problems do not fit neatly into a repair category because the real need is planning, architecture, and implementation rather than a one-off fix.",
-        "Privacy-focused setups often require more intentional design than off-the-shelf consumer defaults provide.",
+        "Some technology problems are not really repair jobs - they are planning jobs.",
+        "The right answer is not always \"buy new hardware\" or \"use the default setup.\"",
         "A clear plan can save money and frustration when a project involves multiple devices, services, accounts, or security concerns."
       ]
     },
@@ -47,25 +47,24 @@
     {
       "heading": "What This Usually Covers",
       "items": [
-        "Privacy-focused home networking or advanced router and segmentation planning",
-        "Self-hosted storage, file sharing, or service setup for people who want more control",
-        "Smarter home or office technology projects that involve multiple systems working together",
-        "Secure access planning for remote use, shared devices, or mixed household and work needs",
-        "Projects that need consultation first because the right solution is not obvious yet"
+        "Planning a home or small-business setup that involves multiple devices, accounts, or locations",
+        "Projects where privacy, reliability, or cleaner organization matter more than a quick one-off fix",
+        "Technology changes that need a plan before equipment is purchased or installed",
+        "Mixed home and work setups that need clearer separation or safer access",
+        "Situations where the goal is clear but the right approach is not yet"
       ]
     },
     {
       "heading": "What We Do",
       "paragraph": [
-        "We help scope, design, and implement specialized technology projects with an emphasis on privacy, security, reliability, and long-term maintainability."
+        "We start with a consultation, define the real need, and recommend a practical path forward. Some jobs turn into a normal service visit. Others need staged planning, implementation, or follow-up work."
       ],
       "items": [
-        "Start with consultation and planning when the right solution is not obvious yet",
-        "Plan and implement secure networking for more advanced home or small business environments",
-        "Set up private storage, backup, or file-sharing workflows with clearer control",
-        "Help organize self-hosted or locally controlled services when cloud dependence is not ideal",
-        "Harden specialized smart home or mixed-device environments that need more than default settings",
-        "Work through scope, options, constraints, and tradeoffs before hands-on implementation begins"
+        "Clarify the goal, constraints, and budget before recommending a solution",
+        "Recommend the simplest workable approach instead of overbuilding",
+        "Plan safer networking, storage, backup, access, or device organization when the job needs it",
+        "Help untangle multi-device or multi-account problems that do not fit a normal repair visit",
+        "Document next steps so you know what happens first, what can wait, and what is optional"
       ]
     },
     {

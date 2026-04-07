@@ -324,10 +324,11 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                   1
                 </div>
                 <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-                  Contact Us
+                  Tell Us What&apos;s Going On
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Call, text, or book online—we&apos;ll respond quickly
+                  Call, text, or send a message with the problem you need help
+                  with.
                 </p>
               </div>
 
@@ -336,10 +337,11 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                   2
                 </div>
                 <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-                  We Assess
+                  We Review the Need
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Clear diagnosis with upfront pricing, no surprises
+                  We talk through the issue, recommend the right service, and
+                  give a clear quote before work begins when scope is clear.
                 </p>
               </div>
 
@@ -348,10 +350,11 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                   3
                 </div>
                 <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-                  Get Fixed
+                  Choose the Next Step
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Fast, reliable service with no unnecessary upsells
+                  Book the visit, remote session, or follow-up that makes sense
+                  for your situation.
                 </p>
               </div>
             </div>

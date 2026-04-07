@@ -27,7 +27,6 @@ import {
   Plane,
   Activity,
   Zap,
-  ArrowRight,
   Monitor,
   Lock,
   Check,
@@ -167,7 +166,7 @@ export default function SigintPage() {
           <header className="text-center pt-4 px-4">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-medium mb-6">
               <Radar className="w-3.5 h-3.5" />
-              <span>OSINT LIVE FEED PLATFORM</span>
+              <span>OSINT dashboard project by Defend I.T. Solutions</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.05] text-gray-900 dark:text-white mb-6">
@@ -175,19 +174,18 @@ export default function SigintPage() {
                 SIGINT Dashboard&trade;
               </span>
               <span className="block text-xl sm:text-2xl md:text-4xl font-medium text-gray-700 dark:text-gray-300 mt-3">
-                Global Intelligence at a Glance
+                Real-Time Intelligence, Correlated
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-              Real-time situational awareness across multiple live data sources.
-              Aircraft, ships, earthquakes, fires, conflict events, weather
-              alerts, and world news. Correlated, scored, and rendered on an
-              interactive globe.
+              Live aircraft, vessels, weather alerts, earthquakes, fires,
+              conflict events, and news in one interface. Self-host the
+              community build today, or follow the roadmap for hosted
+              Individual, Team, and Enterprise tiers.
             </p>
 
-            <div className="flex flex-col items-center justify-center gap-4 mb-4">
-              <WaitlistForm tier="individual" className="w-full max-w-lg" />
+            <div className="flex flex-col items-center justify-center gap-4 mb-12 sm:flex-row sm:flex-wrap">
               <a
                 href="https://sigint-5154d935429b.herokuapp.com"
                 target="_blank"
@@ -197,14 +195,22 @@ export default function SigintPage() {
                 <Globe className="w-5 h-5" />
                 Live Demo
               </a>
+              <a
+                href="#pricing"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white/80 px-8 py-4 text-lg font-medium text-slate-800 shadow-[0_8px_18px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-white hover:text-sky-800 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] dark:border-slate-600 dark:bg-slate-950/78 dark:text-slate-200 dark:shadow-[0_14px_28px_rgba(2,6,23,0.22)] dark:hover:border-sky-400/28 dark:hover:bg-slate-900 dark:hover:text-sky-200"
+              >
+                View Pricing
+              </a>
+              <a
+                href="https://github.com/wedefendit/sigint"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white/80 px-8 py-4 text-lg font-medium text-slate-800 shadow-[0_8px_18px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-white hover:text-sky-800 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] dark:border-slate-600 dark:bg-slate-950/78 dark:text-slate-200 dark:shadow-[0_14px_28px_rgba(2,6,23,0.22)] dark:hover:border-sky-400/28 dark:hover:bg-slate-900 dark:hover:text-sky-200"
+              >
+                <Github className="w-5 h-5" />
+                View on GitHub
+              </a>
             </div>
-            <a
-              href="#capabilities"
-              className="inline-flex items-center gap-2 text-blue-600 dark:text-sky-400 hover:text-blue-500 dark:hover:text-sky-300 text-sm font-medium transition-colors mb-12"
-            >
-              Learn More
-              <ArrowRight className="w-4 h-4" />
-            </a>
 
             {/* Hero screenshot */}
             <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-2xl shadow-black/50">
@@ -243,8 +249,9 @@ export default function SigintPage() {
               <SectionTitle>Live Data Feeds. One Dashboard.</SectionTitle>
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                 Every source is fetched, parsed, cached, and rendered
-                automatically. No manual imports. Open the dashboard and watch
-                the world.
+                automatically. Open the dashboard and see aircraft, vessels,
+                crisis events, weather alerts, fires, quakes, and news in one
+                place instead of chasing half a dozen tabs.
               </p>
             </div>
 
@@ -299,8 +306,10 @@ export default function SigintPage() {
                 More Than a Map. An Intelligence Workstation.
               </SectionTitle>
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                SIGINT correlates, scores, and surfaces what matters. Less
-                noise, faster understanding.
+                SIGINT is built to reduce context switching and surface what
+                matters faster. The point is not just to show a map. It is to
+                help one person or a small team move from raw feeds to usable
+                awareness.
               </p>
             </div>
 
@@ -484,8 +493,8 @@ export default function SigintPage() {
           {/* ── Tech Stack ────────────────────────────────────────── */}
           <section className="rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_60%)] px-6 py-10 shadow-[0_16px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.08),transparent_62%)] dark:shadow-[0_20px_40px_rgba(2,6,23,0.32)] dark:ring-white/5">
             <div className="text-center mb-8">
-              <SectionTag>Under the Hood</SectionTag>
-              <SectionTitle>Built for Performance</SectionTitle>
+              <SectionTag>Architecture</SectionTag>
+              <SectionTitle>Built as a Real Product, Not a Mockup</SectionTitle>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
@@ -494,8 +503,8 @@ export default function SigintPage() {
                   60K+
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Simultaneous tracks rendered smoothly. Rendering runs on a
-                  separate thread so the UI stays smooth.
+                  Tracks rendered smoothly in live sessions, with the UI staying
+                  responsive under load.
                 </p>
               </div>
               <div>
@@ -503,8 +512,8 @@ export default function SigintPage() {
                   Single Deploy
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  One process serves everything. No microservices, no build
-                  pipeline, no infrastructure sprawl.
+                  Community stays simple to self-host. Hosted tiers add the
+                  backend features that do not belong in a browser-only setup.
                 </p>
               </div>
               <div>
@@ -512,8 +521,8 @@ export default function SigintPage() {
                   Offline Ready
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Installable as a PWA. Cached data loads instantly on revisit,
-                  even without a connection.
+                  Installable as a PWA, with fast reloads and cached state for
+                  repeat use.
                 </p>
               </div>
               <div>
@@ -521,10 +530,27 @@ export default function SigintPage() {
                   Open Stack
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Bun, React 19, Tailwind 4, Canvas 2D. No proprietary
-                  dependencies. Self-host on anything.
+                  Community is self-hostable. Hosted tiers build on that
+                  foundation with persistence, alerts, sync, and paid
+                  infrastructure.
                 </p>
               </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_60%)] px-6 py-10 shadow-[0_16px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.08),transparent_62%)] dark:shadow-[0_20px_40px_rgba(2,6,23,0.32)] dark:ring-white/5">
+            <div className="text-center">
+              <SectionTag>Product Direction</SectionTag>
+              <SectionTitle>
+                Community Today. Hosted Platform Roadmap.
+              </SectionTitle>
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                SIGINT Dashboard is already a real working project, not a
+                landing-page concept. The community build proves the core
+                platform today. The hosted tiers are where persistent backend
+                features, alerting, sync, team workflows, and commercial support
+                come in.
+              </p>
             </div>
           </section>
 
@@ -536,9 +562,10 @@ export default function SigintPage() {
                 Run It Yourself. Or Let Us Run It For You.
               </SectionTitle>
               <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                The full dashboard is free to self-host. Paid tiers add
-                persistent infrastructure, geofenced alerts, and features that
-                require a backend you don&apos;t have to maintain.
+                Community is available now for self-hosting. Paid tiers are the
+                product roadmap for users who want hosted infrastructure, longer
+                retention, alerts, sync, collaboration, and features that do not
+                make sense to bolt onto a browser-only build.
               </p>
             </div>
 
@@ -558,7 +585,7 @@ export default function SigintPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Self-hosted. Your server, your API keys.
+                    Self-hosted. Your server, your API keys, your environment.
                   </p>
                 </div>
                 <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300 flex-1">
@@ -597,7 +624,7 @@ export default function SigintPage() {
                 </ul>
                 <div className="mt-6">
                   <a
-                    href="https://github.com/iiTONELOC/sigint"
+                    href="https://github.com/wedefendit/sigint"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full text-center px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-sky-500 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-all"
@@ -631,7 +658,9 @@ export default function SigintPage() {
                     or $249/yr (save 28%)
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Solo analyst. 5 devices. We handle the infrastructure.
+                    Built for solo users who want hosted infrastructure,
+                    persistent history, alerts, and cross-device access without
+                    running the backend themselves.
                   </p>
                 </div>
                 <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300 flex-1">
@@ -702,7 +731,9 @@ export default function SigintPage() {
                     or $299/seat/yr (save 27%)
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Small groups. Shared intelligence. 5 devices per seat.
+                    Built for small teams that need shared workspaces, shared
+                    alerts, role-based access, and collaboration on top of the
+                    hosted platform.
                   </p>
                 </div>
                 <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300 flex-1">
@@ -751,7 +782,9 @@ export default function SigintPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Dedicated instance. Your data, your rules.
+                    For organizations that need dedicated deployment, deeper
+                    integrations, stronger controls, and a more formal support
+                    model.
                   </p>
                 </div>
                 <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300 flex-1">

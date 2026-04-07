@@ -1,8 +1,8 @@
 {
   "id": "scam-protection",
   "title": "Scam & Fraud Protection",
-  "headline": "Learn to spot scams, stop fraud, and protect yourself before it's too late.",
-  "description": "Scam and fraud protection services that teach recognition of modern scams, secure devices, and reduce risk from phishing, tech support scams, and social engineering, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
+  "headline": "Practical help spotting scams and protecting yourself online.",
+  "description": "Scam and fraud protection help for households, retirees, caregivers, and small businesses in Ocala, Belleview, The Villages, and nearby Central Florida, with practical guidance on suspicious calls, texts, emails, websites, and payment requests.",
   "metaTitle": "Scam Protection for Seniors & Families in Central Florida | Defend I.T. Solutions",
   "metaDescription": "Scam protection and fraud-prevention help for seniors, families, and caregivers in Central Florida. Learn to spot phishing, fake tech support, impersonation, and other common scams.",
   "keywords": [
@@ -28,9 +28,9 @@
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Modern scams increasingly use AI-generated voices, spoofed caller IDs, and realistic fake websites to impersonate trusted people and organizations.",
-        "Social engineering succeeds by exploiting urgency, fear, and trust rather than technical vulnerabilities.",
-        "Many scam attempts bypass antivirus software entirely and rely on human behavior rather than malware."
+        "Scams rarely look like obvious scams anymore. They often show up as account warnings, delivery problems, tech support messages, family emergencies, or payment requests.",
+        "A lot of fraud succeeds because people are rushed, pressured, or embarrassed - not because they are careless.",
+        "A calm second look, safer account habits, and a few device and browser changes can prevent a lot of avoidable losses."
       ]
     },
     {
@@ -53,20 +53,22 @@
     {
       "heading": "What We Do",
       "paragraph": [
-        "We help individuals and families understand how modern scams operate and how to stop them before financial or personal harm occurs."
+        "We help people slow things down, recognize common scam patterns, and tighten a few high-value settings so suspicious messages are easier to spot and less likely to turn into real damage."
       ],
       "items": [
-        "Teach recognition of phone, email, and website scams using real-world examples",
-        "Secure computers, phones, and tablets with settings that reduce scam exposure",
-        "Block malicious websites, phishing links, and scam infrastructure",
-        "Configure call screening, email filtering, and safe browsing protections",
-        "Assist with evaluating suspicious messages or recovering from compromised accounts"
+        "Walk through real-world phone, email, text, and website scams",
+        "Show how to spot urgency, impersonation, and fake payment requests",
+        "Review safer settings for computers, phones, browsers, email, and calls",
+        "Help evaluate suspicious messages and explain what to do next",
+        "Clean up risky settings or follow up after a scam scare or near miss"
       ]
     },
     {
       "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
-        "Choose Scam & Fraud Protection when the main need is education, prevention, and safer day-to-day handling of suspicious calls, emails, texts, and websites. If the issue is already a compromised computer, [Virus & Malware Removal](/services/virus-removal) may be the better first step. If the main problem is securing accounts and passwords after an incident, [Password Manager Setup & Account Safety](/services/password-management) may be the better fit."
+        "Choose Scam & Fraud Protection when the main need is prevention, education, or help responding to suspicious messages.",
+        "If a device is already infected, [Virus & Malware Removal](/services/virus-removal) is usually the better place to start.",
+        "If the main issue is securing accounts, passwords, and multi-factor login after a scare, [Password Manager Setup & Account Safety](/services/password-management) may be the better fit."
       ]
     },
     {

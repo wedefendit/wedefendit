@@ -192,8 +192,9 @@ export default function ServicePage(props: ServicesPageProps) {
             </h1>
             
             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 dark:text-slate-300 sm:text-lg">
-              Professional cybersecurity and I.T. support for homeowners,
-              retirees, and small businesses.
+              {isRemote
+                ? "Professional cybersecurity and I.T. support for homeowners, retirees, and small businesses."
+                : "Start with the problem you need solved. We focus on clear, practical help for homes and small businesses in Ocala, Belleview, The Villages, and nearby Central Florida communities."}
             </p>
             </div>
           </header>
@@ -215,15 +216,15 @@ export default function ServicePage(props: ServicesPageProps) {
 
           <section className="text-sm text-gray-600 dark:text-gray-400 italic text-center max-w-3xl mx-auto">
             <p>
-              Not seeing the service you need? We offer additional I.T.
-              solutions beyond what&apos;s listed here.{" "}
+              Not every job fits neatly into a service card. If you are not
+              sure where your issue belongs,{" "}
               <Link
                 href="/contact"
                 className="text-blue-600 dark:text-sky-400 hover:underline"
               >
                 Contact us
               </Link>{" "}
-              to discuss your needs.
+              and we&apos;ll help point you in the right direction.
             </p>
           </section>
         </div>

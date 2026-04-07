@@ -1,8 +1,8 @@
 {
   "id": "remote-tech-tutoring",
   "title": "Remote IT & Cybersecurity Tutoring",
-  "headline": "One-on-one IT and cybersecurity tutoring, online.",
-  "description": "Live one-on-one remote tutoring for IT, cybersecurity, Linux, networking, programming, and digital safety. Built for students, career changers, professionals, and self-taught learners who want hands-on help.",
+  "headline": "Focused one-on-one help for specific IT and cybersecurity topics.",
+  "description": "Live one-on-one remote guidance for students, career changers, and self-taught learners who want help with a specific class, project, lab, or skill area. Built around practical questions, hands-on help, and focused sessions instead of generic course material.",
   "metaTitle": "Remote IT & Cybersecurity Tutoring Online | Defend I.T. Solutions",
   "metaDescription": "Live one-on-one online tutoring for IT, cybersecurity, Linux, networking, programming, and digital safety. Personalized sessions built around your goals and skill level.",
   "keywords": [
@@ -28,9 +28,9 @@
     {
       "heading": "Who This Helps",
       "paragraph": [
-        "Each tutoring session is tailored to your goals, experience level, and learning style.",
-        "This is a strong fit for students, career changers, working professionals, and self-taught learners who want real-time help instead of generic videos or prerecorded lessons.",
-        "Whether you're preparing for a class, certification, interview, homelab project, or personal study plan, sessions stay focused on practical skills you can use right away."
+        "This service is best for students, career changers, and self-taught learners who want focused help on a specific topic instead of a broad tutoring program.",
+        "Sessions work well for classes, certifications, homelab projects, interview prep, and skill gaps where real-time help is more useful than prerecorded content.",
+        "If you only need beginner-friendly help with everyday technology, [1-on-1 Remote Tech Training](/services/remote/remote-training) is usually the better fit."
       ]
     },
     {
@@ -46,9 +46,9 @@
     {
       "heading": "How Sessions Work",
       "paragraph": [
-        "Sessions are conducted remotely over Zoom with live screen sharing.",
-        "No support plan or special software is required.",
-        "You choose the pace, topics, and depth, and we adapt the session to match."
+        "Sessions are conducted remotely with live screen sharing and guided explanation.",
+        "You bring the topic, question, or problem, and the session stays focused on that goal.",
+        "This is guided technical instruction, not managed support or an ongoing support plan."
       ]
     }
   ],

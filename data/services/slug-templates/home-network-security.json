@@ -1,8 +1,8 @@
 {
   "id": "home-network-security",
   "title": "Home Network Security & Wi-Fi Hardening",
-  "headline": "Protect your home from scams, spying, and insecure smart devices using security-first networking practices.",
-  "description": "Professional home network security and Wi-Fi hardening services using DNS filtering, device isolation, firewall configuration, and privacy-first controls, serving Ocala, Belleview, The Villages, and surrounding Central Florida communities.",
+  "headline": "Make your home Wi-Fi and connected devices safer without making them harder to use.",
+  "description": "Home network security and Wi-Fi hardening for Ocala, Belleview, The Villages, and nearby Central Florida, focused on safer router settings, guest access, device separation, cleaner network organization, and practical risk reduction.",
   "metaTitle": "Home Network Security in Ocala & The Villages | Defend I.T. Solutions",
   "metaDescription": "Protect your router, Wi-Fi, and smart devices with home network hardening, DNS filtering, guest network setup, and practical security guidance in Central Florida.",
   "keywords": [
@@ -28,9 +28,9 @@
     {
       "heading": "Did You Know?",
       "paragraph": [
-        "Many home routers keep their default settings long after installation, even when better security options are available.",
-        "Smart TVs, cameras, voice assistants, and other connected devices often share the same network as laptops, phones, and work devices unless they are separated intentionally.",
-        "Safer DNS settings, guest access controls, and better Wi-Fi configuration can reduce phishing, tracking, and unnecessary exposure without making the network harder to use."
+        "Most home networks are set up to work, not necessarily to be well protected.",
+        "Smart TVs, cameras, doorbells, streaming devices, printers, voice assistants, work laptops, and personal phones often end up on the same network by default.",
+        "That does not mean every home network is unsafe. It does mean that \"working\" and \"well protected\" are not the same thing."
       ]
     },
     {
@@ -53,21 +53,23 @@
     {
       "heading": "What We Do",
       "paragraph": [
-        "We implement practical, security-first controls based on established best practices to reduce digital risk and improve privacy in residential networks."
+        "We make practical changes that reduce risk without turning your network into a science project. The focus is safer settings, cleaner device separation, better visibility, and a setup you can still live with day to day."
       ],
       "items": [
-        "DNS filtering to block malware, phishing, ads, and tracking domains",
-        "Wi-Fi hardening with strong encryption and restricted access policies",
-        "Isolation of guest and untrusted devices from primary systems",
-        "Custom firewall rules to limit unnecessary inbound and outbound traffic",
-        "Network segmentation to contain vulnerable or legacy IoT devices",
-        "Use of local-first, open-source tools with no forced cloud dependency"
+        "Review router settings and change weak or outdated defaults",
+        "Strengthen admin access and Wi-Fi security",
+        "Set up guest access for visitors and less-trusted devices",
+        "Separate smart-home or legacy devices when appropriate",
+        "Add safer DNS filtering where it is useful",
+        "Review risky features like remote management and UPnP"
       ]
     },
     {
       "heading": "When This Is the Right Fit",
       "paragraph": [
-        "Choose Home Network Security when your priority is reducing risk, improving privacy, and hardening an existing network. If you mainly need better coverage, new Wi-Fi hardware, or fresh installation of routers or mesh equipment, [Wi-Fi & Network Setup](/services/network-setup) is usually the better starting point. If the project is centered on cameras, voice assistants, or automations, [Smart Home Setup & Security](/services/smart-home-setup) may be the better fit."
+        "Choose Home Network Security when your priority is making an existing network safer and easier to manage.",
+        "If the main problem is weak coverage, dead zones, or installing new network hardware, [Wi-Fi & Network Setup](/services/network-setup) is usually the better starting point.",
+        "If the project centers on cameras, hubs, voice assistants, or automations, [Smart Home Setup & Security](/services/smart-home-setup) may be the better fit."
       ]
     },
     {

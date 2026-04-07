@@ -1,12 +1,12 @@
 {
   "services": [
     {
-      "id": "computer-repair",
-      "title": "Computer Repair",
-      "headline": "Fix slow, crashing, or broken computers—fast.",
-      "icons": ["pc-case", "monitor-smartphone", "wrench"],
-      "summary": "Diagnostics and repair for slow, crashing, overheating, or non-booting laptops and desktops, with honest repair guidance and data-safe troubleshooting.",
-      "cta": "Get Computer Repair"
+      "id": "onsite-tech-support",
+      "title": "On-Site Tech Support",
+      "headline": "In-home help when you need it.",
+      "icons": ["badge-check", "home", "wrench"],
+      "summary": "House-call tech help when the issue spans computers, Wi-Fi, printers, or new devices and you want one visit to sort it out.",
+      "cta": "Book On-Site Support"
     },
     {
       "id": "virus-removal",
@@ -17,36 +17,28 @@
       "cta": "Remove Malware"
     },
     {
-      "id": "scam-protection",
-      "title": "Scam & Fraud Protection",
-      "headline": "Avoid scams before they cause damage.",
-      "icons": ["presentation", "glasses", "shield-alert"],
-      "summary": "Practical scam prevention for households and retirees, including phishing awareness, safer device settings, and help evaluating suspicious calls, texts, and emails.",
-      "cta": "Get Scam Protection"
-    },
-    {
       "id": "network-setup",
       "title": "Wi-Fi & Network Setup",
-      "headline": "Reliable, fast, and secure home networking.",
+      "headline": "Reliable Wi-Fi and network setup for homes and small offices.",
       "icons": ["router", "ethernet-port", "house-plug"],
-      "summary": "Router, mesh, access point, and wired network setup focused on coverage, speed, and reliability, with secure baseline configuration included.",
+      "summary": "Router, mesh, access point, and wired network setup focused on coverage, speed, and reliability, with a secure baseline configuration included.",
       "cta": "Set Up My Network"
     },
     {
       "id": "home-network-security",
       "title": "Home Network Security & Wi-Fi Hardening",
-      "headline": "Protect your Wi-Fi and connected devices.",
+      "headline": "Make your home Wi-Fi and connected devices safer without making them harder to use.",
       "icons": ["house-wifi", "router", "shield-check"],
-      "summary": "Router, Wi-Fi, and device hardening to reduce risk from weak defaults, insecure smart devices, poor segmentation, and unsafe browsing.",
+      "summary": "Router, Wi-Fi, and device hardening that improves settings, guest access, device separation, and overall home-network safety without turning the setup into a science project.",
       "cta": "Secure My Network"
     },
     {
-      "id": "onsite-tech-support",
-      "title": "On-Site Tech Support",
-      "headline": "In-home help when you need it.",
-      "icons": ["badge-check", "home", "wrench"],
-      "summary": "House-call tech help when the issue spans computers, Wi-Fi, printers, or new devices and you want one visit to sort it out.",
-      "cta": "Book On-Site Support"
+      "id": "scam-protection",
+      "title": "Scam & Fraud Protection",
+      "headline": "Practical help spotting scams and protecting yourself online.",
+      "icons": ["presentation", "glasses", "shield-alert"],
+      "summary": "Calm, practical scam-prevention help for households, retirees, caregivers, and small businesses that want help evaluating suspicious calls, texts, emails, websites, and payment requests.",
+      "cta": "Get Scam Protection"
     },
     {
       "id": "password-management",
@@ -55,6 +47,14 @@
       "icons": ["lock", "key-round", "book-lock"],
       "summary": "Password manager setup, breach cleanup, MFA guidance, and safer account habits for households and small businesses that want fewer lockouts and less fraud risk.",
       "cta": "Get Account Safety Help"
+    },
+    {
+      "id": "computer-repair",
+      "title": "Computer Repair",
+      "headline": "Fix slow, crashing, or broken computers—fast.",
+      "icons": ["pc-case", "monitor-smartphone", "wrench"],
+      "summary": "Diagnostics and repair for slow, crashing, overheating, or non-booting laptops and desktops, with honest repair guidance and data-safe troubleshooting.",
+      "cta": "Get Computer Repair"
     },
     {
       "id": "data-recovery",
@@ -83,17 +83,17 @@
     {
       "id": "smart-home-setup",
       "title": "Smart Home Setup & Security",
-      "headline": "Set up cameras, assistants, and automations safely.",
+      "headline": "Set up cameras, doorbells, and smart devices with clearer privacy and fewer headaches.",
       "icons": ["house-wifi", "camera", "shield-check"],
-      "summary": "Privacy-first setup for cameras, doorbells, speakers, hubs, and routines, with cleaner permissions, stronger device settings, and less guesswork.",
+      "summary": "Help with cameras, doorbells, speakers, hubs, and routines so the setup is easier to manage, easier to share safely, and less likely to create privacy or access problems later.",
       "cta": "Set Up My Smart Home"
     },
     {
       "id": "custom-solutions",
       "title": "Custom Technology Project Planning",
-      "headline": "Start with consultation for specialized privacy and networking projects.",
+      "headline": "Start with a consultation when the job does not fit a standard service page.",
       "icons": ["puzzle", "monitor-cog", "user"],
-      "summary": "Project planning and implementation help for privacy-focused home and small-business technology work that does not fit standard repair, Wi-Fi, or smart-home service pages.",
+      "summary": "Project planning for home and small-business technology work that needs consultation before implementation, especially when privacy, networking, storage, access, or multi-device coordination are part of the job.",
       "cta": "Request Consultation"
     }
   ]

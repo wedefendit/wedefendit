@@ -177,27 +177,47 @@ export default function About() {
             className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_58%)] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.09),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5"
           >
             <p className="text-lg text-gray-900 dark:text-white">
-              <strong className="text-blue-600 dark:text-sky-400">
-                Defend I.T. Solutions
-              </strong>{" "}
-              is a locally owned cybersecurity and tech support company based in
-              Ocala, Florida, serving homeowners and small businesses in Ocala,
-              Belleview, The Villages, and surrounding Central Florida
-              communities.
+              Defend I.T. Solutions is a founder-led cybersecurity and tech
+              support business based in Ocala, serving homeowners and small
+              businesses across Ocala, Belleview, The Villages, and nearby
+              Central Florida communities.
             </p>
 
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
-              We believe technology should make life easier, not more
-              stressful. That is why we focus on secure home and small business
-              networks, scam prevention, malware and virus cleanup, device
-              troubleshooting, and honest guidance you can actually understand.
+              We help with practical problems like malware, scams, Wi-Fi
+              issues, device setup, safer account habits, and day-to-day
+              technology problems. The goal is to make technology feel safer
+              and easier to manage, not more confusing.
             </p>
 
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
-              Whether you need in-home help, on-site business support, or
-              remote IT assistance, our goal is simple: deliver practical,
-              security-first solutions without upsells, scare tactics, or
-              confusing tech jargon.
+              Whether the job is on-site or remote, the focus stays the same:
+              practical help, clear recommendations, and no pressure to buy
+              more than you actually need.
+            </p>
+          </section>
+
+          <section className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_58%)] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.09),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5">
+            <h2 className="text-2xl md:text-3xl font-semibold mb-4">
+              Why This Business Exists
+            </h2>
+            <p className="text-lg text-gray-700 dark:text-gray-300">
+              Too many people are asked to trust devices, apps, and networks
+              they were never given enough information to evaluate. Defend I.T.
+              Solutions exists to close that gap with practical local help,
+              safer defaults, and clear explanations that do not leave people
+              dependent on guesswork.
+            </p>
+            <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
+              That means helping with everyday problems like malware, account
+              safety, Wi-Fi issues, smart-home setups, and small-business
+              technology decisions while also applying stronger security
+              judgment when a job actually needs it.
+            </p>
+            <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
+              The goal is not to make technology feel more complicated. It is
+              to reduce avoidable risk, solve real problems, and leave people
+              with setups that are safer, more reliable, and easier to manage.
             </p>
           </section>
 
@@ -209,40 +229,6 @@ export default function About() {
               Our Core Values
             </h2>
             <RenderValues />
-          </section>
-
-          <section
-            aria-labelledby="why-different"
-            className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_58%)] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.09),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5"
-          >
-            <h2
-              id="why-different"
-              className="text-2xl md:text-3xl font-semibold mb-4 flex items-center gap-3"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-200/80 bg-sky-100/85 shadow-[0_8px_18px_rgba(59,130,246,0.12)] dark:border-sky-400/14 dark:bg-slate-800/88 dark:shadow-[0_10px_22px_rgba(2,132,199,0.14)]">
-                <svg
-                  className="w-5 h-5 text-blue-700 dark:text-sky-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              Why We&apos;re Different
-            </h2>
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              Defend I.T. Solutions combines real cybersecurity knowledge with
-              practical, hands-on IT support. From securing smart homes and
-              Wi-Fi networks to cleaning infected computers and helping small
-              businesses stay protected, we deliver trusted local service
-              backed by real-world security experience.
-            </p>
           </section>
 
           {/* Services CTA */}
