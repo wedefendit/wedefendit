@@ -26,16 +26,16 @@ export default function ServicesPage() {
     <ServicePage
       meta={{
         title:
-          "Computer Repair, Virus Removal & Tech Support in Central Florida | Defend I.T. Solutions",
+          "Computer Repair, Virus Removal & Wi-Fi Help in Central Florida | Defend I.T. Solutions",
         description:
-          "Local computer repair, virus removal, scam protection, Wi-Fi and home network help, on-site tech support, and password safety for Ocala, Belleview, The Villages, and nearby Central Florida communities.",
+          "Computer repair, virus removal, scam protection, Wi-Fi and home network help, on-site tech support, and password manager setup for Ocala, Belleview, The Villages, and nearby Central Florida communities.",
         image: "https://www.wedefendit.com/og-image.png",
         url: canonical,
         canonical,
         keywords:
-          "computer repair Ocala, virus removal Ocala, scam protection The Villages, Wi-Fi setup Belleview, on-site tech support Central Florida, password help Ocala, local IT support",
+          "computer repair Ocala, virus removal Ocala, scam protection The Villages, Wi-Fi help Belleview, on-site tech support Central Florida, password manager setup Ocala, local tech help",
       }}
-      h1="Central Florida Computer Repair, Virus Removal & Tech Support"
+      h1="Local Computer Repair, Virus Removal & Wi-Fi Help"
       services={services}
     />
   );

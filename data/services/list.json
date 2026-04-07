@@ -50,35 +50,35 @@
     },
     {
       "id": "password-management",
-      "title": "Password Management & Digital Safety",
-      "headline": "Secure accounts without memorizing everything.",
+      "title": "Password Manager Setup & Account Safety",
+      "headline": "Fix password confusion, MFA gaps, and risky account habits.",
       "icons": ["lock", "key-round", "book-lock"],
       "summary": "Password manager setup, breach cleanup, MFA guidance, and safer account habits for households and small businesses that want fewer lockouts and less fraud risk.",
-      "cta": "Secure My Accounts"
+      "cta": "Get Account Safety Help"
     },
     {
       "id": "data-recovery",
-      "title": "Backup & Data Recovery",
+      "title": "Data Recovery & Backup Help",
       "headline": "Recover important files and stop future loss.",
       "icons": ["hard-drive", "clock", "file-check"],
       "summary": "Help with deleted files, failing drives, and non-booting systems when recovery is possible, plus backup setup to reduce the chance of doing this twice.",
-      "cta": "Protect My Data"
+      "cta": "Get Data Recovery Help"
     },
     {
       "id": "pc-upgrades",
-      "title": "PC & Laptop Upgrades",
-      "headline": "Speed up an aging computer before replacing it.",
+      "title": "Laptop & PC Speed Upgrades",
+      "headline": "Speed up a computer that is still worth keeping.",
       "icons": ["hard-drive", "gauge", "bolt"],
       "summary": "SSD, RAM, battery, and thermal-service upgrades that improve speed, stability, and lifespan when the computer is worth keeping.",
-      "cta": "Upgrade My Computer"
+      "cta": "Get Upgrade Help"
     },
     {
       "id": "software-troubleshooting",
-      "title": "Software Installation & Troubleshooting",
-      "headline": "Fix update failures, driver conflicts, and unstable apps.",
+      "title": "Software Troubleshooting & Installs",
+      "headline": "Fix Windows and Mac software problems without a full wipe.",
       "icons": ["cpu", "settings", "terminal"],
       "summary": "Help with Windows and macOS update failures, driver problems, app crashes, login issues, and clean installs without defaulting to a full wipe.",
-      "cta": "Fix Software Issues"
+      "cta": "Get Software Help"
     },
     {
       "id": "smart-home-setup",
@@ -90,8 +90,8 @@
     },
     {
       "id": "custom-solutions",
-      "title": "Custom Technology Solutions",
-      "headline": "Consultation and planning for specialized privacy and networking projects.",
+      "title": "Custom Technology Project Planning",
+      "headline": "Start with consultation for specialized privacy and networking projects.",
       "icons": ["puzzle", "monitor-cog", "user"],
       "summary": "Project planning and implementation help for privacy-focused home and small-business technology work that does not fit standard repair, Wi-Fi, or smart-home service pages.",
       "cta": "Request Consultation"

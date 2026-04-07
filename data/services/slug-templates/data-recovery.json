@@ -73,7 +73,7 @@
     {
       "heading": "When Another Service May Be a Better Fit",
       "paragraph": [
-        "Choose Data Recovery & Backup Help when your top priority is saving files, moving data safely, or putting dependable backups in place. If the computer itself is also slow, damaged, or unstable, Computer Repair may be the better starting point. If you mainly want the system to feel faster rather than recover files, PC & Laptop Upgrades may be the better match."
+        "Choose Data Recovery & Backup Help when your top priority is saving files, moving data safely, or putting dependable backups in place. If the computer itself is also slow, damaged, or unstable, Computer Repair may be the better starting point. If you mainly want the system to feel faster rather than recover files, Laptop & PC Speed Upgrades may be the better match."
       ]
     },
     {
@@ -93,7 +93,7 @@
       "slug": "virus-removal"
     },
     {
-      "label": "PC & Laptop Upgrades",
+      "label": "Laptop & PC Speed Upgrades",
       "slug": "pc-upgrades"
     }
   ],
@@ -121,12 +121,12 @@
       "slug": "virus-removal"
     },
     {
-      "label": "PC & Laptop Upgrades",
+      "label": "Laptop & PC Speed Upgrades",
       "slug": "pc-upgrades"
     }
   ],
   "cta": {
-    "label": "Protect My Data",
+    "label": "Schedule Data Recovery Help",
     "link": "/contact#schedule-service"
   }
 }

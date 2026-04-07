@@ -107,12 +107,12 @@ export default function Home() {
   return (
     <>
       <Meta
-        title="Defend I.T. Solutions | Local Computer Repair, Scam Protection & IT Support"
-        description="Local computer repair, scam protection, Wi-Fi help, and on-site tech support for homeowners, retirees, and small businesses in Ocala, The Villages, and Belleview."
+        title="Computer Repair, Virus Removal & Local Tech Help in Central Florida | Defend I.T. Solutions"
+        description="Computer repair, virus removal, scam protection, Wi-Fi help, on-site tech support, and account safety for homeowners, retirees, and small businesses in Ocala, The Villages, and Belleview."
         image="https://www.wedefendit.com/og-image.png"
         url="https://www.wedefendit.com/"
         canonical="https://www.wedefendit.com/"
-        keywords="cybersecurity, IT support, Ocala FL, The Villages, Belleview, small business IT, home tech support, network security, computer repair, online safety"
+        keywords="computer repair Ocala FL, virus removal The Villages FL, scam protection Belleview FL, Wi-Fi help Central Florida, on-site tech support Ocala, password manager setup Central Florida, local tech help"
         structuredData={localBusinessLd}
       />
 
@@ -120,20 +120,21 @@ export default function Home() {
         {/* Hero Section */}
         <header className="text-center px-4 py-8 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-gray-900 dark:text-white mb-4">
-            Cybersecurity & IT Support
+            Computer Repair, Virus Removal
             <span className="block text-blue-600 dark:text-sky-400 mt-2">
-              You Can Actually Understand
+              for Ocala, The Villages & Belleview
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
-            Serving Ocala, The Villages, and Belleview with honest tech support
-            for homes and small businesses.
+            Practical help with slow computers, scam protection, Wi-Fi issues,
+            and on-site tech problems for homes and small businesses across
+            Central Florida.
           </p>
 
           {/* Primary CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/contact"
+              href="/contact#schedule-service"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
             >
               <Phone className="w-5 h-5" />
@@ -157,8 +158,8 @@ export default function Home() {
             What We Do
           </h2>
           <p className="text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
-            We keep your technology safe, fix problems when they happen, and
-            help you understand it all along the way.
+            We help with computer repair, malware cleanup, scam protection,
+            home Wi-Fi issues, and on-site tech support without the jargon.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -222,10 +223,10 @@ export default function Home() {
               {displayPhone}
             </a>
             <Link
-              href="/contact"
+              href="/contact#schedule-service"
               className="text-blue-600 dark:text-sky-400 hover:underline text-lg font-medium"
             >
-            Contact us to schedule →
+            Contact us to schedule local service →
             </Link>
           </div>
         </section>
