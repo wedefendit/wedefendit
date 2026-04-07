@@ -42,11 +42,12 @@ function HeadingSection() {
   return (
     <header className="my-4 space-y-3 text-center">
       <h1 className="mx-auto max-w-[14ch] text-balance text-3xl font-bold leading-tight sm:max-w-none sm:text-4xl md:text-5xl">
-        Contact Us in Ocala, The Villages & Belleview
+        Contact Defend I.T. Solutions
       </h1>
       <h2 className="mx-auto mb-6 mt-2 max-w-2xl text-base text-gray-600 dark:text-gray-300 sm:text-lg md:text-xl">
-        {name} helps with local computer repair, virus removal, scam
-        protection, Wi-Fi help, and on-site support across Central Florida.
+        Local help with computer repair, virus removal, scam protection, Wi-Fi
+        issues, and on-site tech support across Ocala, Belleview, The
+        Villages, and nearby Central Florida.
       </h2>
     </header>
   );
@@ -321,9 +322,7 @@ export default function ContactPage() {
               </div>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              Have a question about computer repair, scam protection, Wi-Fi
-              help, or another local service? Fill out the form below and
-              we&apos;ll get back to you.
+              Tell us what you need help with and we&apos;ll get back to you.
             </p>
             <ContactForm className="max-w-xl mx-auto" />
           </section>

@@ -4,20 +4,20 @@
     {
       "id": "remote-support",
       "title": "Remote Tech Support",
-      "headline": "Remote help for everyday computer and software problems for plan members.",
+      "headline": "Remote help for everyday computer and software problems.",
       "icons": ["monitor", "wifi", "headphones"],
       "requiresPlan": true,
-      "summary": "Get secure remote help for software issues, settings, printers, email, and everyday computer problems once your remote support plan is in place.",
-      "cta": "Get Help Now"
+      "summary": "Remote help for software problems, settings, printers, email, and everyday computer issues once your support plan is in place.",
+      "cta": "Request Remote Help"
     },
     {
       "id": "remote-virus-removal",
       "title": "Remote Virus & Malware Removal",
-      "headline": "Remote malware cleanup for plan members with secure access already in place.",
+      "headline": "Remote malware cleanup when secure access is already in place.",
       "icons": ["shield-plus", "bug", "alert-triangle"],
       "requiresPlan": true,
-      "summary": "Clean up spyware, pop-ups, browser hijacks, and other malware remotely when secure access is already in place through your support plan.",
-      "cta": "Clean My System"
+      "summary": "Remote help cleaning up pop-ups, browser hijacks, spyware, and similar infections when secure access is already in place through your support plan.",
+      "cta": "Request Remote Malware Help"
     },
     {
       "id": "remote-training",
@@ -25,33 +25,33 @@
       "headline": "Beginner-friendly online training for everyday tech confidence.",
       "icons": ["graduation-cap", "mouse-pointer-click", "presentation"],
       "summary": "Private online training for everyday computer, phone, internet, and online-safety skills, with patient guidance for beginners, seniors, and families.",
-      "cta": "Book a Session"
+      "cta": "Request Training"
     },
     {
       "id": "remote-security-assessment",
       "title": "Remote Security Assessment",
-      "headline": "Remote security review for Central Florida plan members.",
+      "headline": "A guided security review for local clients with a support plan.",
       "icons": ["shield-check", "search", "alert-circle"],
       "requiresPlan": true,
-      "summary": "Review devices, accounts, browser settings, updates, and backups remotely to find weak points and tighten them with clear next steps.",
-      "cta": "Schedule Assessment"
+      "summary": "Review devices, accounts, browser settings, updates, and backups to spot weak points and clean up the basics.",
+      "cta": "Request a Security Review"
     },
     {
       "id": "remote-privacy-hardening",
       "title": "Privacy Hardening & Digital Safety",
-      "headline": "Remote privacy help for Central Florida plan members.",
+      "headline": "Remote privacy help for local clients with a support plan.",
       "icons": ["lock", "eye-off", "key-round"],
       "requiresPlan": true,
-      "summary": "Harden browsers, messaging apps, DNS, VPN settings, and device privacy controls through a guided remote session for enrolled plan members.",
-      "cta": "Protect My Privacy"
+      "summary": "Tighten browsers, messaging apps, DNS, VPN settings, and device privacy controls through a guided remote session.",
+      "cta": "Request Privacy Help"
     },
     {
       "id": "remote-tech-tutoring",
       "title": "Remote IT & Cybersecurity Tutoring",
-      "headline": "Focused one-on-one help for specific IT and cybersecurity topics.",
+      "headline": "Focused one-on-one help for specific tech topics.",
       "icons": ["graduation-cap", "laptop", "message-circle"],
-      "summary": "Live remote guidance for students, career changers, and self-taught learners who want help with a specific class, project, lab, or skill area.",
-      "cta": "Book a Session"
+      "summary": "Live remote guidance for students and career changers who want help with a class, project, lab, or specific skill area.",
+      "cta": "Request Tutoring"
     }
   ]
 }

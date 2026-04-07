@@ -193,7 +193,7 @@ export default function ServicePage(props: ServicesPageProps) {
             
             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 dark:text-slate-300 sm:text-lg">
               {isRemote
-                ? "Professional cybersecurity and I.T. support for homeowners, retirees, and small businesses."
+                ? "Remote help, guided training, and plan-based services for problems that do not need an on-site visit."
                 : "Start with the problem you need solved. We focus on clear, practical help for homes and small businesses in Ocala, Belleview, The Villages, and nearby Central Florida communities."}
             </p>
             </div>
@@ -216,15 +216,15 @@ export default function ServicePage(props: ServicesPageProps) {
 
           <section className="text-sm text-gray-600 dark:text-gray-400 italic text-center max-w-3xl mx-auto">
             <p>
-              Not every job fits neatly into a service card. If you are not
-              sure where your issue belongs,{" "}
+              Not every problem fits neatly into a service card. If you&apos;re
+              not sure where your issue belongs,{" "}
               <Link
                 href="/contact"
                 className="text-blue-600 dark:text-sky-400 hover:underline"
               >
-                Contact us
+                contact us
               </Link>{" "}
-              and we&apos;ll help point you in the right direction.
+              and we&apos;ll help you choose the right starting point.
             </p>
           </section>
         </div>

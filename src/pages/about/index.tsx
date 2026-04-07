@@ -177,10 +177,9 @@ export default function About() {
             className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_58%)] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-slate-700/70 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.09),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5"
           >
             <p className="text-lg text-gray-900 dark:text-white">
-              Defend I.T. Solutions is a founder-led cybersecurity and tech
-              support business based in Ocala, serving homeowners and small
-              businesses across Ocala, Belleview, The Villages, and nearby
-              Central Florida communities.
+              Defend I.T. Solutions is a founder-led local business based in
+              Ocala, serving homeowners and small businesses across Ocala,
+              Belleview, The Villages, and nearby Central Florida communities.
             </p>
 
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
@@ -191,9 +190,9 @@ export default function About() {
             </p>
 
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
-              Whether the job is on-site or remote, the focus stays the same:
-              practical help, clear recommendations, and no pressure to buy
-              more than you actually need.
+              Whether the job is on-site or remote, the approach stays the
+              same: clear recommendations, honest guidance, and no pressure to
+              buy more than you need.
             </p>
           </section>
 
@@ -202,22 +201,19 @@ export default function About() {
               Why This Business Exists
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300">
-              Too many people are asked to trust devices, apps, and networks
-              they were never given enough information to evaluate. Defend I.T.
-              Solutions exists to close that gap with practical local help,
-              safer defaults, and clear explanations that do not leave people
-              dependent on guesswork.
+              Too many people are expected to trust devices, apps, and
+              networks they were never given enough information to judge. This
+              business exists to close that gap with practical help, safer
+              defaults, and explanations that actually make sense.
             </p>
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
               That means helping with everyday problems like malware, account
-              safety, Wi-Fi issues, smart-home setups, and small-business
-              technology decisions while also applying stronger security
-              judgment when a job actually needs it.
+              issues, Wi-Fi trouble, smart-home setup, and small-business
+              technology decisions without turning every job into a lecture.
             </p>
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
-              The goal is not to make technology feel more complicated. It is
-              to reduce avoidable risk, solve real problems, and leave people
-              with setups that are safer, more reliable, and easier to manage.
+              The goal is simple: solve the problem, reduce avoidable risk,
+              and leave people with technology that feels easier to manage.
             </p>
           </section>
 

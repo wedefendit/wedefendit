@@ -101,12 +101,12 @@ export default function Home() {
   return (
     <>
       <Meta
-        title="Computer Repair, Virus Removal & Local Tech Help in Central Florida | Defend I.T. Solutions"
+        title="Computer Repair, Virus Removal & Local Tech Support in Central Florida | Defend I.T. Solutions"
         description="Computer repair, virus removal, scam protection, Wi-Fi help, on-site tech support, and account safety for homeowners, retirees, and small businesses in Ocala, The Villages, and Belleview."
         image="https://www.wedefendit.com/og-image.png"
         url="https://www.wedefendit.com/"
         canonical="https://www.wedefendit.com/"
-        keywords="computer repair Ocala FL, virus removal The Villages FL, scam protection Belleview FL, Wi-Fi help Central Florida, on-site tech support Ocala, password manager setup Central Florida, local tech help"
+        keywords="computer repair Ocala FL, virus removal The Villages FL, scam protection Belleview FL, Wi-Fi help Central Florida, on-site tech support Ocala, password manager setup Central Florida, local tech support"
         structuredData={localBusinessLd}
       />
 
@@ -114,15 +114,10 @@ export default function Home() {
         {/* Hero Section */}
         <header className="mx-auto max-w-5xl px-4 py-5 text-center sm:px-6 sm:py-8 md:py-10">
           <h1 className="mx-auto mb-4 max-w-4xl text-balance text-3xl font-bold leading-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl xl:text-7xl">
-            Local Tech Help, Virus Removal, and{" "}
-            <span className="whitespace-nowrap">Wi-Fi</span> Support for Homes
-            and Small Businesses
+            Cybersecurity and Tech Support for Homes and Small Businesses
           </h1>
           <p className="mx-auto mb-8 max-w-3xl text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:text-lg md:text-xl">
-            Serving Ocala, Belleview, The Villages, and nearby Central Florida
-            communities with practical help for malware, scams,{" "}
-            <span className="whitespace-nowrap">Wi-Fi</span> problems, new
-            devices, and on-site tech issues.
+            Proudly serving Ocala, Belleview, and The Villages
           </p>
 
           {/* Primary CTA */}
@@ -154,8 +149,8 @@ export default function Home() {
           <p className="text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
             We help with everyday tech problems and the security issues that
             come with them. That includes infected computers, scam scares, weak
-            Wi-Fi, confusing device setups, and homes or small offices that
-            need a cleaner, safer setup.
+            Wi-Fi, confusing device setups, and homes or small offices that need
+            a cleaner, safer setup.
           </p>
 
           <div className="grid max-w-2xl gap-6 mx-auto lg:max-w-5xl lg:grid-cols-3">
@@ -173,12 +168,11 @@ export default function Home() {
               </h2>
 
               <p className="mt-6 max-w-[66ch] text-base leading-7 text-gray-700 dark:text-gray-400 sm:text-lg sm:leading-8">
-                Defend I.T. Solutions is a founder-led local business built for
-                people who want honest guidance, plain-English answers, and real
-                help with home or small-business technology. The focus is not to
-                overcomplicate things. It is to fix problems, reduce avoidable
-                risk, and leave people with technology that is easier to use and
-                easier to trust.
+                Defend I.T. Solutions is a local business for people who want
+                straight answers and real help with home or small-business tech.
+                The goal is simple: fix the problem, lower avoidable risk, and
+                leave you with a setup that is easier to use and easier to
+                trust.
               </p>
 
               <div className="mt-8 grid gap-x-10 gap-y-5 text-gray-700 dark:text-gray-300 md:grid-cols-2">
@@ -196,17 +190,18 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="space-y-5">
-                  {[
-                    "Clear quotes before work begins",
-                    "No pressure sales",
-                  ].map((item) => (
-                    <div key={item} className="flex items-start gap-3">
-                      <span className="text-blue-600 dark:text-sky-400 font-bold text-xl flex-shrink-0">
-                        •
-                      </span>
-                      <p className="text-base font-medium sm:text-lg">{item}</p>
-                    </div>
-                  ))}
+                  {["Clear quotes before work begins", "No pressure sales"].map(
+                    (item) => (
+                      <div key={item} className="flex items-start gap-3">
+                        <span className="text-blue-600 dark:text-sky-400 font-bold text-xl flex-shrink-0">
+                          •
+                        </span>
+                        <p className="text-base font-medium sm:text-lg">
+                          {item}
+                        </p>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 
@@ -248,7 +243,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
       </PageContainer>
     </>
   );

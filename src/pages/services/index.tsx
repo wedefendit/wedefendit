@@ -33,7 +33,7 @@ export default function ServicesPage() {
         url: canonical,
         canonical,
         keywords:
-          "computer repair Ocala, virus removal Ocala, scam protection The Villages, Wi-Fi help Belleview, on-site tech support Central Florida, password manager setup Ocala, local tech help",
+          "computer repair Ocala, virus removal Ocala, scam protection The Villages, Wi-Fi help Belleview, on-site tech support Central Florida, password manager setup Ocala, local tech support",
       }}
       h1="Local Computer Repair, Virus Removal & Wi-Fi Help"
       services={services}

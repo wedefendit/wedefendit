@@ -53,14 +53,14 @@
     {
       "heading": "What We Do",
       "paragraph": [
-        "We make practical changes that reduce risk without turning your network into a science project. The focus is safer settings, cleaner device separation, better visibility, and a setup you can still live with day to day."
+        "We make practical changes that reduce risk without turning your network into a science project. The focus is safer settings, cleaner device separation, and better visibility into what is connected."
       ],
       "items": [
         "Review router settings and change weak or outdated defaults",
         "Strengthen admin access and Wi-Fi security",
         "Set up guest access for visitors and less-trusted devices",
-        "Separate smart-home or legacy devices when appropriate",
-        "Add safer DNS filtering where it is useful",
+        "Separate smart-home or legacy devices when it makes sense",
+        "Add safer DNS filtering where it is helpful",
         "Review risky features like remote management and UPnP"
       ]
     },
