@@ -220,7 +220,7 @@ export const Footer: React.FC = () => {
 
         <div className="flex flex-col items-center gap-2 text-xs text-center md:flex-row md:justify-center">
           {contact.phone && (
-            <a href={`tel:${contact.phone.replace(/[^0-9]/g, "")}`}>
+            <a href={`tel:${contact.phone.replaceAll(/[^0-9]/g, "")}`}>
               {contact.phone.replace("+1", "")}
             </a>
           )}

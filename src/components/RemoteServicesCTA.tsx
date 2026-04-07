@@ -22,8 +22,8 @@ export default function RemoteServicesCTA(props: RemoteServicesCTAProps) {
           <h3 className="text-gray-700 dark:text-gray-300 mb-4 text-left  text-base sm:text-2xl font-semibold">
             Need a Remote Service Plan?
           </h3>
-          <span className="flex w-full flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white/74 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_58%)] p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md sm:p-12 dark:border-slate-700/70 dark:bg-slate-950/62 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.1),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5">
-            <p className="my-2 sm:my-4 text-gray-50 dark:text-gray-200 text-lg text-center font-bold">
+          <span className="flex w-full flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white/74 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.03),transparent_56%)] p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)] ring-1 ring-white/70 backdrop-blur-md sm:p-12 dark:border-slate-700/70 dark:bg-slate-950/62 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.1),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5">
+            <p className="my-2 sm:my-4 text-slate-700 dark:text-gray-200 text-lg text-center font-bold">
               We offer flexible remote support plans tailored to your needs.
             </p>
             <Link
@@ -46,7 +46,7 @@ export default function RemoteServicesCTA(props: RemoteServicesCTAProps) {
             : "Looking for Remote Service Options?"}
         </h3>
 
-        <span className="flex w-full flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.05),transparent_58%)] p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md sm:p-6 dark:border-slate-700/70 dark:bg-slate-950/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.09),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5">
+        <span className="flex w-full flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white/72 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.03),transparent_56%)] p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)] ring-1 ring-white/70 backdrop-blur-md sm:p-6 dark:border-slate-700/70 dark:bg-slate-950/58 dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.09),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5">
           <p className="my-2 sm:my-4 text-black dark:text-gray-200 text-lg text-center">
             {props?.isRemote
               ? "We offer a range of on-site services."

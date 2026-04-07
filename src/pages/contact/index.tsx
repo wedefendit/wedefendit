@@ -40,11 +40,11 @@ const { fingerprint, key_id, key_url, secure_email } = gpg;
 
 function HeadingSection() {
   return (
-    <header className="text-center space-y-2 my-4">
-      <h1 className="text-4xl sm:text-5xl font-bold">
+    <header className="my-4 space-y-3 text-center">
+      <h1 className="mx-auto max-w-[14ch] text-balance text-3xl font-bold leading-tight sm:max-w-none sm:text-4xl md:text-5xl">
         Contact Us in Ocala, The Villages & Belleview
       </h1>
-      <h2 className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mt-2 mb-6">
+      <h2 className="mx-auto mb-6 mt-2 max-w-2xl text-base text-gray-600 dark:text-gray-300 sm:text-lg md:text-xl">
         {name} helps with local computer repair, virus removal, scam
         protection, Wi-Fi help, and on-site support across Central Florida.
       </h2>
@@ -293,7 +293,7 @@ export default function ContactPage() {
       />
 
       <PageContainer>
-        <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
+        <div className="max-w-6xl mx-auto w-full px-3 py-8 sm:px-4 sm:py-10 space-y-8 sm:space-y-10">
           <BreadCrumbs
             includeJsonLd={true}
             items={[{ name: "Home", href: "/" }, { name: "Contact" }]}
@@ -302,7 +302,7 @@ export default function ContactPage() {
           <HeadingSection />
 
           {/* Main Contact Section - Two Column Layout */}
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid gap-6 md:grid-cols-2 md:gap-8">
             <PrimaryContact />
             <ContactInfoCard />
           </div>

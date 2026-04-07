@@ -35,13 +35,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <ThemeToggle />
       <Link href="/" title="Defend I.T. Solutions Home">
         <Logo
-          className="w-64 h-64 md:w-96 md:h-96 mb-4 text-gray-800 dark:text-sky-400  glow transition-all duration-700 animate-fade-in -mt-4 z-20"
+          className="mb-3 h-36 w-36 -mt-2 text-gray-800 transition-all duration-700 animate-fade-in dark:text-sky-400 sm:mb-3 sm:h-44 sm:w-44 sm:-mt-3 md:mb-4 md:h-64 md:w-64 md:-mt-4 lg:h-80 lg:w-80 z-20"
           xlinkTitle="Defend I.T. Solutions Home"
         />
       </Link>
 
       <div
-        className="absolute inset-0 bg-[url('/circuit.png')] bg-center bg-repeat bg-fixed opacity-3.25 pointer-events-none z-0 w-full h-full"
+        className="absolute inset-0 h-full w-full bg-[url('/circuit.png')] bg-center bg-repeat bg-scroll opacity-3.25 pointer-events-none z-0 md:bg-fixed"
         aria-hidden="true"
       />
 

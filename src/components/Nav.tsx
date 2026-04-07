@@ -129,7 +129,7 @@ function MobileBar({ pathname }: { pathname: string }) {
       <button
         type="button"
         onClick={toggleMenu}
-        className="text-black dark:text-gray-300 dark:hover:text-sky-500 text-2xl"
+        className="rounded-md p-2 text-2xl text-black transition hover:bg-black/5 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-sky-500"
         aria-controls="mobile-drawer"
       >
         &#9776;
@@ -144,18 +144,18 @@ function MobileBar({ pathname }: { pathname: string }) {
         <div
           id="mobile-drawer"
           onClick={(e) => e.stopPropagation()}
-          className={` dark:bg-gray-900/95 backdrop-blur-md w-2/3 max-w-xs h-full absolute left-0 top-0 transition-transform duration-300 ${
+          className={`absolute left-0 top-0 h-full w-[82vw] max-w-sm border-r border-slate-200/80 bg-white/95 shadow-xl backdrop-blur-md transition-transform duration-300 dark:border-slate-700/70 dark:bg-gray-900/95 ${
             menuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <button
             onClick={toggleMenu}
-            className="absolute top-4 right-4 text-white text-3xl dark:hover:text-blue-500"
+            className="absolute top-4 right-4 text-3xl text-slate-700 hover:text-blue-500 dark:text-white dark:hover:text-blue-500"
           >
             &times;
           </button>
 
-          <ul className="flex flex-col space-y-6 p-4 bg-black/90 dark:bg-gray-900/95">
+          <ul className="flex flex-col space-y-6 p-5 pt-16 text-base bg-white/96 dark:bg-gray-900/95">
             <RenderNavItems
               navItems={navItems}
               pathname={pathname}
@@ -172,11 +172,11 @@ export function Navbar() {
   const { pathname } = useRouter();
 
   return (
-    <nav className="py-1 px-5 w-full lg:sticky lg:top-0 lg:z-50 flex justify-between items-center lg:border-b lg:border-gray-300 lg:dark:border-gray-800 lg:p-4">
+    <nav className="flex w-full items-center justify-between px-4 py-2 sm:px-5 lg:sticky lg:top-0 lg:z-50 lg:border-b lg:border-gray-300 lg:p-4 lg:dark:border-gray-800">
       <Link
         href="/"
         title="Defend I.T. Solutions Home"
-        className="hover:text-blue-600 dark:hover:text-blue-400 font-semibold"
+        className="max-w-[72vw] truncate text-sm font-semibold hover:text-blue-600 dark:hover:text-blue-400 sm:max-w-none sm:text-base"
       >
         {name}&trade;
       </Link>

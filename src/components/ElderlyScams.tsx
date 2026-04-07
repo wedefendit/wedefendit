@@ -68,10 +68,10 @@ export const ElderlyScamsList: React.FC<ElderlyScamsListProps> = ({
             return (
               <article
                 key={`${iconName}-${i}`}
-                className="relative flex flex-col overflow-hidden rounded-xl border border-red-300/80 bg-white/78 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.11),transparent_58%)] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/75 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-red-400/90 hover:bg-white/88 hover:shadow-[0_18px_38px_rgba(15,23,42,0.12)] dark:border-red-400/16 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.12),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5 dark:hover:border-red-400/28 dark:hover:bg-slate-900/74 dark:hover:shadow-[0_24px_46px_rgba(2,6,23,0.36)]"
+                className="relative flex flex-col overflow-hidden rounded-xl border border-red-300/70 bg-white/78 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.05),transparent_54%)] p-6 shadow-[0_10px_24px_rgba(15,23,42,0.06)] ring-1 ring-white/75 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-red-400/80 hover:bg-white/86 hover:shadow-[0_14px_30px_rgba(15,23,42,0.1)] dark:border-red-400/16 dark:bg-slate-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.12),transparent_60%)] dark:shadow-[0_18px_36px_rgba(2,6,23,0.3)] dark:ring-white/5 dark:hover:border-red-400/28 dark:hover:bg-slate-900/74 dark:hover:shadow-[0_24px_46px_rgba(2,6,23,0.36)]"
               >
                 <div className="mb-4 grid grid-cols-[4rem_minmax(0,1fr)_4rem] items-center gap-4">
-                  <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border border-red-300/90 bg-red-100/95 shadow-[0_10px_22px_rgba(239,68,68,0.16)] dark:border-red-400/16 dark:bg-slate-800/88 dark:shadow-[0_10px_22px_rgba(239,68,68,0.12)]">
+                  <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border border-red-300/80 bg-red-100/92 shadow-[0_8px_18px_rgba(239,68,68,0.1)] dark:border-red-400/16 dark:bg-slate-800/88 dark:shadow-[0_10px_22px_rgba(239,68,68,0.12)]">
                     <Icon
                       className="w-8 h-8 text-red-800 dark:text-red-300"
                       aria-hidden="true"

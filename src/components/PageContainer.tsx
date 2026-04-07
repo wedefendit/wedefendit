@@ -15,9 +15,9 @@ party without express written consent.
 export function PageContainer({ children }: { children: React.ReactNode }) {
   return (
     <main
-      className={`font-sans relative h-full w-full flex flex-col items-center justify-start -mt-10 `}
+      className="font-sans relative flex h-full w-full flex-col items-center justify-start -mt-3 sm:-mt-6 md:-mt-10"
     >
-      <div className="relative z-5 flex flex-col items-center justify-center gap-8 p-1 sm:p-0">
+      <div className="relative z-5 flex w-full max-w-full flex-col items-center justify-center gap-6 px-3 sm:gap-8 sm:px-0">
         {children}
       </div>
     </main>

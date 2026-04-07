@@ -11,13 +11,7 @@ This software is provided for use only by authorized employees, contractors, or
 licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
-import {
-  ShieldCheck,
-  Wrench,
-  House,
-  Phone,
-  ArrowRight,
-} from "lucide-react";
+import { ShieldCheck, Wrench, House, Phone, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { localBusinessLd } from "@/lib/json-ld";
 import companyInfo from "../../data/company-info.json";
@@ -118,31 +112,28 @@ export default function Home() {
 
       <PageContainer>
         {/* Hero Section */}
-        <header className="text-center px-4 py-8 max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-gray-900 dark:text-white mb-4">
-            Computer Repair, Virus Removal
-            <span className="block text-blue-600 dark:text-sky-400 mt-2">
-              for Ocala, The Villages & Belleview
-            </span>
+        <header className="mx-auto max-w-5xl px-4 py-5 text-center sm:px-6 sm:py-8 md:py-10">
+          <h1 className="mx-auto mb-4 max-w-4xl text-balance text-4xl font-bold leading-[0.95] text-gray-900 dark:text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+            Local Computer Repair, Virus Removal &amp; Network Security
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
-            Practical help with slow computers, scam protection, Wi-Fi issues,
-            and on-site tech problems for homes and small businesses across
-            Central Florida.
+          <p className="mx-auto mb-8 max-w-3xl text-base text-gray-600 dark:text-gray-300 sm:text-lg md:text-xl">
+            Serving Ocala, The Villages, Belleview, and nearby Central Florida
+            communities with practical help for slow computers, scam
+            protection, Wi-Fi issues, and on-site tech problems.
           </p>
 
           {/* Primary CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
             <Link
               href="/contact#schedule-service"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
             >
               <Phone className="w-5 h-5" />
               Schedule Local Service
             </Link>
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-sky-500 text-gray-700 dark:text-gray-300 text-lg font-semibold transition-all"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-gray-300 px-6 py-3.5 text-base font-semibold text-gray-700 transition-all hover:border-blue-500 dark:border-gray-600 dark:text-gray-300 dark:hover:border-sky-500 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
             >
               View Local Services
               <ArrowRight className="w-5 h-5" />
@@ -158,11 +149,11 @@ export default function Home() {
             What We Do
           </h2>
           <p className="text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
-            We help with computer repair, malware cleanup, scam protection,
-            home Wi-Fi issues, and on-site tech support without the jargon.
+            We help with computer repair, malware cleanup, scam protection, home
+            Wi-Fi issues, and on-site tech support without the jargon.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3 mx-auto">
             {benefits.map((benefit) => (
               <BenefitCard key={benefit.title} {...benefit} />
             ))}
@@ -214,19 +205,19 @@ export default function Home() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Call us today or schedule a convenient time to talk.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
             <a
               href={`tel:${contact.phone.replace(/[^0-9]/g, "")}`}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
             >
               <Phone className="w-5 h-5" />
               {displayPhone}
             </a>
             <Link
               href="/contact#schedule-service"
-              className="text-blue-600 dark:text-sky-400 hover:underline text-lg font-medium"
+              className="text-center text-base font-medium text-blue-600 hover:underline dark:text-sky-400 sm:text-lg"
             >
-            Contact us to schedule local service →
+              Contact us to schedule local service →
             </Link>
           </div>
         </section>

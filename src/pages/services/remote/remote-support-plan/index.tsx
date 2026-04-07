@@ -596,17 +596,19 @@ export default function RemoteSupportPlanPage() {
             <h2 id="enroll" className="text-2xl font-semibold mb-4">
               Ready to Enroll
             </h2>
-            <div className="mt-3 rounded-lg bg-gradient-to-br from-blue-600 to-sky-600 dark:from-sky-700 dark:to-blue-700 text-white p-8 shadow-lg text-center">
-              <p className="text-lg mb-2 font-semibold">
+            <div className="relative mt-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/76 p-8 text-center shadow-[0_16px_38px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-sky-400/18 dark:bg-slate-950/74 dark:shadow-[0_22px_48px_rgba(2,6,23,0.36)] dark:ring-white/5">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.06),transparent_54%)] dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.12),transparent_52%)]" />
+              <div className="relative">
+              <p className="text-lg mb-2 font-semibold text-gray-900 dark:text-white">
                 Get Started with Remote Support
               </p>
-              <p className="text-sm opacity-95 mb-6 max-w-2xl mx-auto">
+              <p className="text-sm mb-6 max-w-2xl mx-auto text-gray-700 dark:text-gray-300">
                 Initial on-site setup and enrollment are included at no
                 additional cost* when you join the Remote Support Plan.
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-blue-700 dark:text-sky-900 font-semibold hover:bg-gray-100 dark:hover:bg-gray-200 transition-all shadow-lg"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200/80 bg-white/88 px-6 py-3 text-blue-700 font-semibold shadow-[0_10px_22px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-white dark:border-sky-400/20 dark:bg-slate-900/80 dark:text-sky-200 dark:shadow-[0_14px_28px_rgba(2,6,23,0.26)] dark:ring-white/5 dark:hover:border-sky-400/30 dark:hover:bg-slate-900"
               >
                 Request Remote Setup
                 <svg
@@ -623,10 +625,11 @@ export default function RemoteSupportPlanPage() {
                   />
                 </svg>
               </Link>
-              <p className="mt-4 text-xs opacity-85">
+              <p className="mt-4 text-xs text-gray-600 dark:text-gray-400">
                 * Within our local service area (Ocala, Belleview, The
                 Villages).
               </p>
+              </div>
             </div>
           </section>
 

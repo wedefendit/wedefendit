@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import { Lightbulb } from "lucide-react";
 import * as Icons from "lucide-react";
+import type { ReactNode } from "react";
 import {
   PageContainer,
   Meta,
@@ -60,6 +61,46 @@ export type ServiceSlugProps = {
   related?: { label: string; slug: string }[];
   remote?: boolean;
 };
+
+const INLINE_LINK_PATTERN = /\[([^[\]]+)\]\((\/[^)\s]+)\)/g;
+
+function renderInlineLinks(text: string): ReactNode {
+  const matches = [...text.matchAll(INLINE_LINK_PATTERN)];
+
+  if (matches.length === 0) {
+    return text;
+  }
+
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+
+  matches.forEach((match, idx) => {
+    const [fullMatch, label, href] = match;
+    const start = match.index ?? 0;
+
+    if (start > lastIndex) {
+      nodes.push(text.slice(lastIndex, start));
+    }
+
+    nodes.push(
+      <Link
+        key={`${href}-${idx}-${start}`}
+        href={href}
+        className="font-medium text-blue-700 underline underline-offset-2 transition hover:text-blue-800 dark:text-sky-300 dark:hover:text-sky-200"
+      >
+        {label}
+      </Link>,
+    );
+
+    lastIndex = start + fullMatch.length;
+  });
+
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+
+  return nodes;
+}
 
 export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
   const [first, ...rest] = service.sections;
@@ -145,15 +186,15 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
       />
 
       <PageContainer>
-        <div className="max-w-4xl mx-auto py-8 sm:py-10 space-y-6 sm:space-y-7 px-4 sm:px-6 text-left rounded-lg shadow-lg bg-gray-50/10 dark:bg-slate-950/20 z-0">
+        <div className="max-w-4xl mx-auto w-full py-8 sm:py-10 space-y-6 sm:space-y-7 px-3 sm:px-6 text-left rounded-lg shadow-lg bg-gray-50/10 dark:bg-slate-950/20 z-0">
           <BreadCrumbs items={crumbs} baseUrl="https://www.wedefendit.com" />
 
           {/* Hero Section with Icons */}
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/78 px-6 py-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/75 backdrop-blur-md dark:border-sky-400/18 dark:bg-slate-950/78 dark:shadow-[0_24px_60px_rgba(2,6,23,0.42)] dark:ring-white/5">
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/78 px-5 py-6 shadow-[0_18px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/75 backdrop-blur-md dark:border-sky-400/18 dark:bg-slate-950/78 dark:shadow-[0_24px_60px_rgba(2,6,23,0.42)] dark:ring-white/5 sm:px-6 sm:py-8">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_54%)] dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),transparent_52%)]" />
             <div className="pointer-events-none absolute left-1/2 top-0 h-24 w-52 -translate-x-1/2 rounded-full bg-sky-300/25 blur-3xl dark:bg-sky-400/16" />
             <div className="relative space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-sky-700 shadow-[0_8px_20px_rgba(56,189,248,0.12)] backdrop-blur-sm dark:border-sky-400/18 dark:bg-slate-900/70 dark:text-sky-300 dark:shadow-[0_12px_28px_rgba(2,132,199,0.16)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-white/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-[0_8px_20px_rgba(56,189,248,0.12)] backdrop-blur-sm dark:border-sky-400/18 dark:bg-slate-900/70 dark:text-sky-300 dark:shadow-[0_12px_28px_rgba(2,132,199,0.16)] sm:px-4 sm:text-xs sm:tracking-[0.28em]">
               {isRemote ? "Remote Service" : "Local Service"}
             </div>
 
@@ -179,7 +220,7 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
             )}
 
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold leading-tight text-slate-950 dark:text-white sm:text-4xl">
+              <h1 className="text-3xl font-bold leading-tight text-slate-950 dark:text-white sm:text-4xl lg:text-[2.75rem]">
                 {service.title}
               </h1>
               <p className="text-base text-slate-600 dark:text-slate-300 sm:text-lg">
@@ -202,14 +243,14 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                       key={i}
                       className="text-sm sm:text-base text-yellow-900/90 dark:text-yellow-50"
                     >
-                      {t}
+                      {renderInlineLinks(t)}
                     </p>
                   ))}
                 </div>
               ) : (
                 first!.paragraph && (
                   <p className="mt-2 text-sm sm:text-base text-yellow-900/90 dark:text-yellow-50">
-                    {first!.paragraph}
+                    {renderInlineLinks(first!.paragraph)}
                   </p>
                 )
               )}
@@ -221,7 +262,7 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
               key={idx}
               className="pt-6 sm:pt-8 first:pt-0 border-t border-gray-200/60 dark:border-gray-700/60 first:border-t-0"
             >
-              <h2 className="text-2xl font-semibold">{section.heading}</h2>
+              <h2 className="text-xl font-semibold sm:text-2xl">{section.heading}</h2>
 
               {section.paragraph &&
                 (Array.isArray(section.paragraph) ? (
@@ -231,20 +272,20 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                         key={i}
                         className="text-gray-700 dark:text-gray-300 text-sm sm:text-base"
                       >
-                        {text}
+                        {renderInlineLinks(text)}
                       </p>
                     ))}
                   </div>
                 ) : (
                   <p className="mt-2 text-gray-700 dark:text-gray-300 text-sm sm:text-base">
-                    {section.paragraph}
+                    {renderInlineLinks(section.paragraph)}
                   </p>
                 ))}
 
               {section.items && (
                 <ul className="mt-3 list-disc pl-5 sm:pl-6 text-gray-700 dark:text-gray-300 text-sm sm:text-base space-y-2 marker:text-sky-500 dark:marker:text-sky-400">
                   {section.items.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <li key={i}>{renderInlineLinks(item)}</li>
                   ))}
                 </ul>
               )}
