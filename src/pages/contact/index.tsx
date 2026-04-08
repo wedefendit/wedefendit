@@ -45,9 +45,8 @@ function HeadingSection() {
         Contact Defend I.T. Solutions
       </h1>
       <h2 className="mx-auto mb-6 mt-2 max-w-2xl text-base text-gray-600 dark:text-gray-300 sm:text-lg md:text-xl">
-        Local help with computer repair, virus removal, scam protection, Wi-Fi
-        issues, and on-site tech support across Ocala, Belleview, The
-        Villages, and nearby Central Florida.
+        Get expert help today. We provide on-site and remote tech support across
+        Ocala, Belleview, and The Villages.
       </h2>
     </header>
   );

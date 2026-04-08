@@ -149,8 +149,8 @@ export default function Home() {
           <p className="text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
             We help with everyday tech problems and the security issues that
             come with them. That includes infected computers, scam scares, weak
-            Wi-Fi, confusing device setups, and homes or small offices that need
-            a cleaner, safer setup.
+            Wi-Fi, confusing device setups, and homes or small offices that want
+            more secure systems.
           </p>
 
           <div className="grid max-w-2xl gap-6 mx-auto lg:max-w-5xl lg:grid-cols-3">
@@ -168,11 +168,9 @@ export default function Home() {
               </h2>
 
               <p className="mt-6 max-w-[66ch] text-base leading-7 text-gray-700 dark:text-gray-400 sm:text-lg sm:leading-8">
-                Defend I.T. Solutions is a local business for people who want
-                straight answers and real help with home or small-business tech.
-                The goal is simple: fix the problem, lower avoidable risk, and
-                leave you with a setup that is easier to use and easier to
-                trust.
+                Defend I.T. Solutions is a locally owned business focused on
+                practical cybersecurity and tech support for homes and small
+                businesses.
               </p>
 
               <div className="mt-8 grid gap-x-10 gap-y-5 text-gray-700 dark:text-gray-300 md:grid-cols-2">
@@ -225,7 +223,7 @@ export default function Home() {
 
                 <div className="flex flex-col items-start gap-2 md:items-end">
                   <a
-                    href={`tel:${contact.phone.replace(/[^0-9]/g, "")}`}
+                    href={`tel:${contact.phone.replaceAll(/[^\D]/g, "")}`}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] md:w-auto"
                   >
                     <Phone className="w-5 h-5 flex-shrink-0" />
