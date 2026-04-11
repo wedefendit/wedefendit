@@ -22,59 +22,244 @@ import companyInfo from "../../data/company-info.json";
 
 const { name } = companyInfo;
 
-const navItems = [
+type NavChild = Readonly<{ name: string; href: string }>;
+type NavItem = Readonly<{
+  name: string;
+  href: string;
+  children?: ReadonlyArray<NavChild>;
+}>;
+
+const navItems: ReadonlyArray<NavItem> = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Services", href: "/services" },
   { name: "SIGINT", href: "/sigint" },
-  { name: "Awareness", href: "/awareness" },
+  {
+    name: "Awareness",
+    href: "/awareness",
+    children: [
+      { name: "Overview", href: "/awareness" },
+      { name: "The Digital House", href: "/awareness/digital-house" },
+    ],
+  },
   { name: "Contact", href: "/contact" },
 ];
+
+function cleanPath(p: string): string {
+  const noQ = p.split("#")[0].split("?")[0];
+  const trimmed = noQ.replace(/\/+$/, "");
+  return trimmed === "" ? "/" : trimmed;
+}
+
+function hrefMatches(target: string, current: string): boolean {
+  const t = cleanPath(target);
+  if (t === "/") return current === t;
+  return current === t || current.startsWith(`${t}/`);
+}
+
+function hrefExact(target: string, current: string): boolean {
+  return cleanPath(target) === current;
+}
+
+function isBranchActive(item: NavItem, current: string): boolean {
+  if (hrefMatches(item.href, current)) return true;
+  return item.children?.some((c) => hrefMatches(c.href, current)) ?? false;
+}
+
+function DesktopNavItem({
+  item,
+  current,
+}: Readonly<{ item: NavItem; current: string }>) {
+  const [open, setOpen] = useState(false);
+  const active = isBranchActive(item, current);
+  const baseClass = active
+    ? "text-blue-500 dark:text-sky-400 font-semibold underline underline-offset-4"
+    : "hover:text-blue-500 dark:hover:text-sky-400 text-gray-800 dark:text-gray-200 hover:underline underline-offset-4 font-semibold";
+
+  if (!item.children || item.children.length === 0) {
+    return (
+      <li>
+        <Link
+          href={item.href}
+          title={`${item.name} - Defend I.T. Solutions`}
+          className={baseClass}
+        >
+          {item.name}
+        </Link>
+      </li>
+    );
+  }
+
+  const handleBlur = (e: React.FocusEvent<HTMLLIElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setOpen(false);
+    }
+  };
+
+  return (
+    <li
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={handleBlur}
+    >
+      <div className="inline-flex items-center gap-1">
+        <Link
+          href={item.href}
+          title={`${item.name} - Defend I.T. Solutions`}
+          className={baseClass}
+          aria-haspopup="true"
+          aria-expanded={open}
+        >
+          {item.name}
+        </Link>
+        <span
+          aria-hidden
+          className={`text-xs leading-none transition-transform duration-150 ${
+            open ? "rotate-180" : ""
+          } ${
+            active
+              ? "text-blue-500 dark:text-sky-400"
+              : "text-gray-800 dark:text-gray-200"
+          }`}
+        >
+          ▾
+        </span>
+      </div>
+      <div
+        className={`absolute left-0 top-full z-50 pt-3 transition-opacity duration-150 ${
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        }`}
+      >
+        <div className="min-w-48 rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-900">
+          <ul className="flex flex-col text-sm">
+            {item.children.map((child) => {
+              const childActive = hrefExact(child.href, current);
+              return (
+                <li key={child.href}>
+                  <Link
+                    href={child.href}
+                    title={`${child.name} - Defend I.T. Solutions`}
+                    onClick={() => setOpen(false)}
+                    className={[
+                      "block whitespace-nowrap rounded-md px-3 py-2 font-medium transition-colors",
+                      childActive
+                        ? "text-blue-500 dark:text-sky-400"
+                        : "text-gray-800 hover:text-blue-500 dark:text-gray-200 dark:hover:text-sky-400",
+                    ].join(" ")}
+                  >
+                    {child.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function MobileNavItem({
+  item,
+  current,
+}: Readonly<{ item: NavItem; current: string }>) {
+  const [open, setOpen] = useState<boolean>(() =>
+    item.children ? isBranchActive(item, current) : false,
+  );
+
+  if (!item.children || item.children.length === 0) {
+    const active = hrefMatches(item.href, current);
+    return (
+      <li>
+        <Link
+          href={item.href}
+          title={`${item.name} - Defend I.T. Solutions`}
+          className={
+            active
+              ? "text-blue-500 dark:text-sky-400 font-semibold underline underline-offset-4"
+              : "hover:text-blue-500 dark:hover:text-sky-400 text-gray-300 hover:underline underline-offset-4 font-semibold"
+          }
+        >
+          {item.name}
+        </Link>
+      </li>
+    );
+  }
+
+  const branchActive = isBranchActive(item, current);
+
+  return (
+    <li>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={[
+          "flex w-full items-center justify-between gap-3 font-semibold",
+          branchActive
+            ? "text-blue-500 dark:text-sky-400"
+            : "text-gray-300 hover:text-blue-500 dark:hover:text-sky-400",
+        ].join(" ")}
+      >
+        <span className={branchActive ? "underline underline-offset-4" : ""}>
+          {item.name}
+        </span>
+        <span
+          aria-hidden
+          className={`text-xs transition-transform duration-150 ${
+            open ? "rotate-180" : ""
+          }`}
+        >
+          ▾
+        </span>
+      </button>
+      {open && (
+        <ul className="mt-4 ml-2 space-y-4 border-l border-gray-700 pl-4">
+          {item.children.map((child) => {
+            const childActive = hrefExact(child.href, current);
+            return (
+              <li key={child.href}>
+                <Link
+                  href={child.href}
+                  title={`${child.name} - Defend I.T. Solutions`}
+                  className={
+                    childActive
+                      ? "text-blue-500 dark:text-sky-400 font-semibold underline underline-offset-4"
+                      : "hover:text-blue-500 dark:hover:text-sky-400 text-gray-300 hover:underline underline-offset-4 font-semibold"
+                  }
+                >
+                  {child.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </li>
+  );
+}
 
 function RenderNavItems({
   navItems,
   pathname,
   isMobile = false,
 }: Readonly<{
-  navItems: { name: string; href: string }[];
+  navItems: ReadonlyArray<NavItem>;
   pathname: string;
   isMobile?: boolean;
 }>) {
-  const clean = (p: string) => {
-    const noQ = p.split("#")[0].split("?")[0];
-    const trimmed = noQ.replace(/\/+$/, "");
-    return trimmed === "" ? "/" : trimmed;
-  };
-
-  const current = clean(pathname);
-
-  return navItems.map(({ name, href }) => {
-    const target = clean(href);
-    const textColor = isMobile
-      ? "text-gray-300"
-      : "text-gray-800 dark:text-gray-200";
-
-    const isActive =
-      target === "/"
-        ? current === target
-        : current === target || current.startsWith(`${target}/`);
-
-    return (
-      <li key={`${name}-${target}`}>
-        <Link
-          href={href}
-          title={`${name} - Defend I.T. Solutions`}
-          className={
-            isActive
-              ? "text-blue-500 dark:text-sky-400 font-semibold underline underline-offset-4"
-              : `hover:text-blue-500 dark:hover:text-sky-400 ${textColor} hover:underline underline-offset-4 font-semibold`
-          }
-        >
-          {name}
-        </Link>
-      </li>
-    );
-  });
+  const current = cleanPath(pathname);
+  return navItems.map((item) =>
+    isMobile ? (
+      <MobileNavItem key={item.href} item={item} current={current} />
+    ) : (
+      <DesktopNavItem key={item.href} item={item} current={current} />
+    ),
+  );
 }
 
 function DesktopBar({ pathname }: { pathname: string }) {

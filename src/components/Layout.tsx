@@ -35,7 +35,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <ThemeToggle />
       <Link href="/" title="Defend I.T. Solutions Home">
         <Logo
-          className="mb-3 h-36 w-36 -mt-2 text-gray-800 transition-all duration-700 animate-fade-in dark:text-sky-400 sm:mb-3 sm:h-44 sm:w-44 sm:-mt-3 md:mb-4 md:h-64 md:w-64 md:-mt-4 lg:h-80 lg:w-80 z-20"
+          className="mb-3 h-52 w-52 -mt-2 text-gray-800 transition-all duration-700 animate-fade-in dark:text-sky-400 sm:mb-3 sm:h-56 sm:w-56 sm:-mt-3 md:mb-4 md:h-64 md:w-64 md:-mt-4 lg:h-80 lg:w-80 z-20"
           xlinkTitle="Defend I.T. Solutions Home"
         />
       </Link>
