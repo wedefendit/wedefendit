@@ -1,36 +1,57 @@
-/*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Difficulty } from "../shared/types";
 import { useGameShell } from "../shared/GameShell";
 import { getGamePreference, setGamePreference } from "../shared/storage";
-import { DEVICES, ROOM_ZONE_ASSIGNMENTS, calculateScore, type Device, type DeviceId, type DevicePlacement, type RoomId, type ZoneId } from "./engine";
-import { inventoryColumnsForRail, isCompactDesktopLayout, widthToBand } from "./layout";
-import { DIGITAL_HOUSE_GAME_ID, HELP_PREF_KEY, HOME_NETWORK_ROOKIE, NETWORK_ARCHITECT, RISKY_DEVICE_IDS, TRUSTED_DEVICE_IDS, emptyPlacements, nextDifficulty, type ActiveToast, type BadgeJustEarned, type LastPlacement, type PlacementMap, type ScoreDelta, type ViewportProfile } from "./model";
+import {
+  DEVICES,
+  ROOM_ZONE_ASSIGNMENTS,
+  calculateScore,
+  type Device,
+  type DeviceId,
+  type DevicePlacement,
+  type RoomId,
+  type ZoneId,
+} from "./engine";
+import {
+  inventoryColumnsForRail,
+  isCompactDesktopLayout,
+  widthToBand,
+} from "./layout";
+import {
+  DIGITAL_HOUSE_GAME_ID,
+  ONBOARDING_PREF_KEY,
+  HOME_NETWORK_ROOKIE,
+  NETWORK_ARCHITECT,
+  RISKY_DEVICE_IDS,
+  TRUSTED_DEVICE_IDS,
+  emptyPlacements,
+  nextDifficulty,
+  coachSteps,
+  type ActiveToast,
+  type BadgeJustEarned,
+  type LastPlacement,
+  type PlacementMap,
+  type ScoreDelta,
+  type ViewportProfile,
+  type ZoneBlockedFeedback,
+} from "./model";
 import { buildOpenRiskItems } from "./summary";
 import type { DeviceIconTone } from "./ui/DeviceIcon";
+import { useIdleHint, type IdleSnapshot } from "./hooks/useIdleHint";
+
+// ======== Pure helpers (exported for tests — unchanged) ========
 
 export function mergeRoomZones(
-  preassignedZones: Record<RoomId, ZoneId | null>,
-  userZoneOverrides: Partial<Record<RoomId, ZoneId>>,
+  preassigned: Record<RoomId, ZoneId | null>,
+  overrides: Partial<Record<RoomId, ZoneId>>,
 ): Record<RoomId, ZoneId | null> {
-  const merged: Record<RoomId, ZoneId | null> = { ...preassignedZones };
-  for (const [roomId, zoneId] of Object.entries(userZoneOverrides) as Array<[RoomId, ZoneId]>) {
-    if (preassignedZones[roomId] === null) merged[roomId] = zoneId;
+  const m: Record<RoomId, ZoneId | null> = { ...preassigned };
+  for (const [rid, zid] of Object.entries(overrides) as Array<
+    [RoomId, ZoneId]
+  >) {
+    if (preassigned[rid] === null) m[rid] = zid;
   }
-  return merged;
+  return m;
 }
 
 export function reconcilePlacementsWithRoomZones(
@@ -39,74 +60,81 @@ export function reconcilePlacementsWithRoomZones(
 ): PlacementMap {
   let changed = false;
   const next: PlacementMap = { ...placements };
-  for (const device of DEVICES) {
-    const placement = placements[device.id];
-    if (!placement) continue;
-    const newZone = roomZones[placement.roomId];
-    if (newZone === null) {
-      next[device.id] = null;
+  for (const d of DEVICES) {
+    const p = placements[d.id];
+    if (!p) continue;
+    const nz = roomZones[p.roomId];
+    if (nz === null) {
+      next[d.id] = null;
       changed = true;
-    } else if (newZone !== placement.zoneId) {
-      next[device.id] = { roomId: placement.roomId, zoneId: newZone };
+    } else if (nz !== p.zoneId) {
+      next[d.id] = { roomId: p.roomId, zoneId: nz };
       changed = true;
     }
   }
   return changed ? next : placements;
 }
 
-export function toggleSelectedDevice(current: DeviceId | null, deviceId: DeviceId): DeviceId | null {
+export function toggleSelectedDevice(
+  current: DeviceId | null,
+  deviceId: DeviceId,
+): DeviceId | null {
   return current === deviceId ? null : deviceId;
 }
 
 export function buildPlacedIds(placements: PlacementMap): Set<DeviceId> {
-  const placed = new Set<DeviceId>();
-  for (const device of DEVICES) {
-    if (placements[device.id]) placed.add(device.id);
-  }
-  return placed;
+  const s = new Set<DeviceId>();
+  for (const d of DEVICES) if (placements[d.id]) s.add(d.id);
+  return s;
 }
 
-export function buildDevicesByRoom(placements: PlacementMap): Map<RoomId, Device[]> {
-  const devicesByRoom = new Map<RoomId, Device[]>();
-  for (const device of DEVICES) {
-    const placement = placements[device.id];
-    if (!placement) continue;
-    const list = devicesByRoom.get(placement.roomId) ?? [];
-    list.push(device);
-    devicesByRoom.set(placement.roomId, list);
+export function buildDevicesByRoom(
+  placements: PlacementMap,
+): Map<RoomId, Device[]> {
+  const m = new Map<RoomId, Device[]>();
+  for (const d of DEVICES) {
+    const p = placements[d.id];
+    if (!p) continue;
+    const l = m.get(p.roomId) ?? [];
+    l.push(d);
+    m.set(p.roomId, l);
   }
-  return devicesByRoom;
+  return m;
 }
 
-export function buildPlacedZones(placements: PlacementMap): Record<DeviceId, ZoneId | null> {
-  const placedZones = {} as Record<DeviceId, ZoneId | null>;
-  for (const device of DEVICES) {
-    const placement = placements[device.id];
-    placedZones[device.id] = placement ? placement.zoneId : null;
+export function buildPlacedZones(
+  placements: PlacementMap,
+): Record<DeviceId, ZoneId | null> {
+  const o = {} as Record<DeviceId, ZoneId | null>;
+  for (const d of DEVICES) {
+    const p = placements[d.id];
+    o[d.id] = p ? p.zoneId : null;
   }
-  return placedZones;
+  return o;
 }
 
 export function deriveRiskyRooms(placements: PlacementMap): Set<RoomId> {
   const byRoom = new Map<RoomId, DeviceId[]>();
-  for (const device of DEVICES) {
-    const placement = placements[device.id];
-    if (placement?.zoneId !== "main") continue;
-    const list = byRoom.get(placement.roomId) ?? [];
-    list.push(device.id);
-    byRoom.set(placement.roomId, list);
+  for (const d of DEVICES) {
+    const p = placements[d.id];
+    if (p?.zoneId !== "main") continue;
+    const l = byRoom.get(p.roomId) ?? [];
+    l.push(d.id);
+    byRoom.set(p.roomId, l);
   }
-  const riskyRooms = new Set<RoomId>();
-  for (const [roomId, ids] of byRoom) {
-    const hasTrusted = ids.some((id) => TRUSTED_DEVICE_IDS.has(id));
-    const hasRisky = ids.some((id) => RISKY_DEVICE_IDS.has(id));
-    if (hasTrusted && hasRisky) riskyRooms.add(roomId);
+  const risky = new Set<RoomId>();
+  for (const [rid, ids] of byRoom) {
+    if (
+      ids.some((id) => TRUSTED_DEVICE_IDS.has(id)) &&
+      ids.some((id) => RISKY_DEVICE_IDS.has(id))
+    )
+      risky.add(rid);
   }
-  return riskyRooms;
+  return risky;
 }
 
 export function shouldAutoOpenHelp(pref: boolean | undefined): boolean {
-  return pref === true ? false : true;
+  return pref !== true;
 }
 
 export function buildScoreFeedback({
@@ -123,34 +151,39 @@ export function buildScoreFeedback({
   placedCount: number;
 }) {
   const delta = nextTotal - previousTotal;
-  if (delta === 0) {
+  if (delta === 0)
     return {
       delta,
       nextStreak: streak,
       nextHalfwayShown: halfwayShown,
       nextToast: null as Omit<NonNullable<ActiveToast>, "key"> | null,
     };
-  }
-  const nextStreak = delta > 0 ? streak + 1 : 0;
-  if (halfwayShown === false && placedCount === 5 && delta > 0) {
+  const ns = delta > 0 ? streak + 1 : 0;
+  if (!halfwayShown && placedCount === 5 && delta > 0)
     return {
       delta,
-      nextStreak,
+      nextStreak: ns,
       nextHalfwayShown: true,
-      nextToast: { type: "halfway", label: "Halfway there", hint: "5 of 10 placed" } as Omit<NonNullable<ActiveToast>, "key">,
+      nextToast: {
+        type: "halfway",
+        label: "Halfway there",
+        hint: "5 of 10 placed",
+      } as Omit<NonNullable<ActiveToast>, "key">,
     };
-  }
-  if (nextStreak >= 3) {
+  if (ns >= 3)
     return {
       delta,
-      nextStreak,
+      nextStreak: ns,
       nextHalfwayShown: halfwayShown,
-      nextToast: { type: "streak", label: String(nextStreak) + "× streak", hint: "Nice rhythm" } as Omit<NonNullable<ActiveToast>, "key">,
+      nextToast: {
+        type: "streak",
+        label: `${ns}× streak`,
+        hint: "Nice rhythm",
+      } as Omit<NonNullable<ActiveToast>, "key">,
     };
-  }
   return {
     delta,
-    nextStreak,
+    nextStreak: ns,
     nextHalfwayShown: halfwayShown,
     nextToast: null as Omit<NonNullable<ActiveToast>, "key"> | null,
   };
@@ -167,54 +200,56 @@ export function resolveEarnedBadge({
   hadRookie: boolean;
   hadArchitect: boolean;
 }): BadgeJustEarned {
-  let nextBadge: BadgeJustEarned = null;
-  if (hadRookie === false) nextBadge = "rookie";
-  if (difficulty === "hard" && total >= 70 && hadArchitect === false) nextBadge = "architect";
-  return nextBadge;
+  let b: BadgeJustEarned = null;
+  if (!hadRookie) b = "rookie";
+  if (difficulty === "hard" && total >= 70 && !hadArchitect) b = "architect";
+  return b;
 }
 
+// ======== Viewport hook (unchanged) ========
+
 function useViewportProfile(): ViewportProfile {
-  const [profile, setProfile] = useState<ViewportProfile>({
+  const [p, setP] = useState<ViewportProfile>({
     width: 0,
     height: 0,
     band: "phone",
     isCoarsePointer: false,
   });
-
   useEffect(() => {
-    const coarseQuery = globalThis.matchMedia("(pointer: coarse)");
-    const hoverQuery = globalThis.matchMedia("(hover: none)");
+    const cq = globalThis.matchMedia("(pointer: coarse)");
+    const hq = globalThis.matchMedia("(hover: none)");
     const update = () => {
-      const width = globalThis.innerWidth;
-      const height = globalThis.innerHeight;
-      setProfile({
-        width,
-        height,
-        band: widthToBand(width),
-        isCoarsePointer: coarseQuery.matches || hoverQuery.matches,
+      const w = globalThis.innerWidth,
+        h = globalThis.innerHeight;
+      setP({
+        width: w,
+        height: h,
+        band: widthToBand(w),
+        isCoarsePointer: cq.matches || hq.matches,
       });
     };
-    const bind = (query: MediaQueryList, listener: () => void) => {
-      if (typeof query.addEventListener === "function") {
-        query.addEventListener("change", listener);
-        return () => query.removeEventListener("change", listener);
+    const bind = (q: MediaQueryList, fn: () => void) => {
+      if (typeof q.addEventListener === "function") {
+        q.addEventListener("change", fn);
+        return () => q.removeEventListener("change", fn);
       }
-      query.addListener(listener);
-      return () => query.removeListener(listener);
+      q.addListener(fn);
+      return () => q.removeListener(fn);
     };
     update();
-    const unbindCoarse = bind(coarseQuery, update);
-    const unbindHover = bind(hoverQuery, update);
+    const u1 = bind(cq, update),
+      u2 = bind(hq, update);
     globalThis.addEventListener("resize", update);
     return () => {
-      unbindCoarse();
-      unbindHover();
+      u1();
+      u2();
       globalThis.removeEventListener("resize", update);
     };
   }, []);
-
-  return profile;
+  return p;
 }
+
+// ======== Touch drag (unchanged) ========
 
 type TouchDragState = {
   deviceId: DeviceId;
@@ -223,8 +258,8 @@ type TouchDragState = {
 };
 
 function useTouchDrag(
-  onPlace: (deviceId: DeviceId, roomId: RoomId) => void,
-  onHoverRoom: (roomId: RoomId | null) => void,
+  onPlace: (did: DeviceId, rid: RoomId) => void,
+  onHoverRoom: (rid: RoomId | null) => void,
 ) {
   const stateRef = useRef<TouchDragState | null>(null);
   const onPlaceRef = useRef(onPlace);
@@ -233,78 +268,65 @@ function useTouchDrag(
   onHoverRef.current = onHoverRoom;
 
   const startDrag = useCallback((deviceId: DeviceId, originTouch: Touch) => {
-    // Create a ghost element that follows the finger.
     const ghost = document.createElement("div");
     ghost.style.cssText =
-      "position:fixed;z-index:9999;pointer-events:none;width:44px;height:44px;" +
-      "border-radius:12px;background:rgba(56,189,248,0.85);border:2px solid #0ea5e9;" +
-      "box-shadow:0 8px 24px rgba(56,189,248,0.5);display:flex;align-items:center;" +
-      "justify-content:center;font-size:18px;color:#fff;font-weight:900;" +
-      "transform:translate(-50%,-50%) scale(1.1);";
+      "position:fixed;z-index:9999;pointer-events:none;width:44px;height:44px;border-radius:12px;background:rgba(56,189,248,0.85);border:2px solid #0ea5e9;box-shadow:0 8px 24px rgba(56,189,248,0.5);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:900;transform:translate(-50%,-50%) scale(1.1);";
     ghost.textContent = "↓";
     ghost.style.left = originTouch.clientX + "px";
     ghost.style.top = originTouch.clientY + "px";
     document.body.appendChild(ghost);
-
     stateRef.current = { deviceId, ghost, currentRoom: null };
-
     const onMove = (e: TouchEvent) => {
-      const state = stateRef.current;
-      if (!state) return;
-      const touch = e.touches[0];
-      if (!touch) return;
-      e.preventDefault(); // stop scroll — works because { passive: false }
-
-      state.ghost.style.left = touch.clientX + "px";
-      state.ghost.style.top = touch.clientY + "px";
-
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      let roomId: RoomId | null = null;
+      const s = stateRef.current;
+      if (!s) return;
+      const t = e.touches[0];
+      if (!t) return;
+      e.preventDefault();
+      s.ghost.style.left = t.clientX + "px";
+      s.ghost.style.top = t.clientY + "px";
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      let rid: RoomId | null = null;
       if (el) {
-        const roomEl = el.closest("[data-testid^='dh-room-']") as HTMLElement | null;
-        if (roomEl) {
-          const testId = roomEl.getAttribute("data-testid") ?? "";
-          const match = testId.match(/^dh-room-(.+)$/);
-          if (match?.[1] && !match[1].startsWith("zone")) {
-            roomId = match[1] as RoomId;
-          }
+        const re = el.closest(
+          "[data-testid^='dh-room-']",
+        ) as HTMLElement | null;
+        if (re) {
+          const m = (re.getAttribute("data-testid") ?? "").match(
+            /^dh-room-(.+)$/,
+          );
+          if (m?.[1] && !m[1].startsWith("zone")) rid = m[1] as RoomId;
         }
       }
-      if (roomId !== state.currentRoom) {
-        state.currentRoom = roomId;
-        onHoverRef.current(roomId);
+      if (rid !== s.currentRoom) {
+        s.currentRoom = rid;
+        onHoverRef.current(rid);
       }
     };
-
     const onEnd = () => {
-      const state = stateRef.current;
-      if (state) {
-        state.ghost.remove();
-        if (state.currentRoom) {
-          onPlaceRef.current(state.deviceId, state.currentRoom);
-        }
+      const s = stateRef.current;
+      if (s) {
+        s.ghost.remove();
+        if (s.currentRoom) onPlaceRef.current(s.deviceId, s.currentRoom);
         onHoverRef.current(null);
         stateRef.current = null;
       }
-      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchmove", onMove, { capture: true });
       document.removeEventListener("touchend", onEnd);
       document.removeEventListener("touchcancel", onEnd);
     };
-
-    // Attach to document with { passive: false } so preventDefault works.
-    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchmove", onMove, {
+      passive: false,
+      capture: true,
+    });
     document.addEventListener("touchend", onEnd);
     document.addEventListener("touchcancel", onEnd);
   }, []);
 
-  // The component attaches onTouchStart via React (which IS passive-safe
-  // for touchstart on individual elements). The touchmove/end listeners
-  // go on document with { passive: false }.
   const handleTouchStart = useCallback(
     (deviceId: DeviceId, e: React.TouchEvent) => {
-      const touch = e.nativeEvent.touches[0];
-      if (!touch) return;
-      startDrag(deviceId, touch);
+      const t = e.nativeEvent.touches[0];
+      if (!t) return;
+      startDrag(deviceId, t);
     },
     [startDrag],
   );
@@ -312,12 +334,13 @@ function useTouchDrag(
   return { handleTouchStart };
 }
 
-// ---- Risk helper ----
-
+// ======== Main controller ========
 
 export function useDigitalHouseController() {
   const viewport = useViewportProfile();
-  const mobile = viewport.band === "phone";
+  const mobile = viewport.band === "phone" || viewport.height < 500;
+  const tablet =
+    !mobile && viewport.width < 1100 && viewport.height > viewport.width;
   const allowDrag = true;
   const {
     difficulty,
@@ -332,49 +355,67 @@ export function useDigitalHouseController() {
   const [placements, setPlacements] = useState<PlacementMap>(emptyPlacements);
   const [selectedId, setSelectedId] = useState<DeviceId | null>(null);
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
-  const [lastPlacement, setLastPlacement] = useState<LastPlacement | null>(null);
+  const [lastPlacement, setLastPlacement] = useState<LastPlacement | null>(
+    null,
+  );
   const [showEnd, setShowEnd] = useState(false);
   const [badgeJustEarned, setBadgeJustEarned] = useState<BadgeJustEarned>(null);
   const [userZoneOverrides, setUserZoneOverrides] = useState<
     Partial<Record<RoomId, ZoneId>>
   >({});
-  // Game-feel bits: floating score delta, halfway milestone, streak
   const [scoreDelta, setScoreDelta] = useState<ScoreDelta>(null);
   const [halfwayShown, setHalfwayShown] = useState(false);
   const [streak, setStreak] = useState(0);
-  // Single active toast slot — newest replaces previous so they never stack.
   const [activeToast, setActiveToast] = useState<ActiveToast>(null);
   const toastKeyRef = useRef(0);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [trayHeight, setTrayHeight] = useState(0);
   const [openZoneRoom, setOpenZoneRoom] = useState<RoomId | null>(null);
   const [railWidth, setRailWidth] = useState(0);
-  const trayRef = useRef<HTMLDivElement | null>(null);
   const railRef = useRef<HTMLDivElement | null>(null);
   const prevTotalRef = useRef(50);
   const deltaKeyRef = useRef(0);
   const hasRecordedRef = useRef(false);
 
+  // NEW: zone-blocked feedback
+  const [zoneBlocked, setZoneBlocked] = useState<ZoneBlockedFeedback | null>(
+    null,
+  );
+  const zbKeyRef = useRef(0);
+
+  // NEW: onboarding
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const coachStepsConfig = useMemo(
+    () => coachSteps(difficulty, mobile),
+    [difficulty, mobile],
+  );
+
+  // NEW: track whether user has assigned any zone this run
+  const [hasAssignedZone, setHasAssignedZone] = useState(false);
+
   const preassignedZones = useMemo(
     () => ROOM_ZONE_ASSIGNMENTS[difficulty],
     [difficulty],
   );
-
   const roomZones: Record<RoomId, ZoneId | null> = useMemo(
     () => mergeRoomZones(preassignedZones, userZoneOverrides),
     [preassignedZones, userZoneOverrides],
   );
-
   const compactDesktop = !mobile && isCompactDesktopLayout(viewport.width);
   const houseZoneControls = difficulty !== "easy";
-  const deviceTone: DeviceIconTone = difficulty === "easy" ? "category" : "neutral";
+  const deviceTone: DeviceIconTone =
+    difficulty === "easy" ? "category" : "neutral";
   const guidedDeviceCards = difficulty === "easy";
-  const inventoryColumns: 2 | 3 | 4 = inventoryColumnsForRail(
-    viewport.width,
-    railWidth,
+  const inventoryColumns: 2 | 3 | 4 = tablet
+    ? 3
+    : inventoryColumnsForRail(viewport.width, railWidth);
+
+  // NEW: has unzoned rooms (for idle hint)
+  const hasUnzonedRooms = useMemo(
+    () => Object.values(roomZones).some((z) => z === null),
+    [roomZones],
   );
 
-  // Reset state on shell reset / difficulty change
+  // Reset on difficulty/shell reset
   useEffect(() => {
     setPlacements(emptyPlacements());
     setSelectedId(null);
@@ -388,13 +429,16 @@ export function useDigitalHouseController() {
     setStreak(0);
     setActiveToast(null);
     setOpenZoneRoom(null);
+    setZoneBlocked(null);
+    setHasAssignedZone(false);
     prevTotalRef.current = 50;
     deltaKeyRef.current = 0;
     toastKeyRef.current = 0;
+    hasRecordedRef.current = 0 as unknown as boolean;
     hasRecordedRef.current = false;
   }, [resetCount, difficulty]);
 
-  // Re-zone existing placements when their room's effective zone changes
+  // Re-zone placements when room zones change
   useEffect(() => {
     setPlacements((prev) => {
       let changed = false;
@@ -402,12 +446,12 @@ export function useDigitalHouseController() {
       for (const d of DEVICES) {
         const p = prev[d.id];
         if (!p) continue;
-        const newZone = roomZones[p.roomId];
-        if (newZone === null) {
+        const nz = roomZones[p.roomId];
+        if (nz === null) {
           next[d.id] = null;
           changed = true;
-        } else if (newZone !== p.zoneId) {
-          next[d.id] = { roomId: p.roomId, zoneId: newZone };
+        } else if (nz !== p.zoneId) {
+          next[d.id] = { roomId: p.roomId, zoneId: nz };
           changed = true;
         }
       }
@@ -439,35 +483,22 @@ export function useDigitalHouseController() {
     return s;
   }, [placements]);
   const isComplete = placedIds.size === DEVICES.length;
-
   const riskyRooms = useMemo(() => deriveRiskyRooms(placements), [placements]);
+  const devicesByRoom = useMemo(
+    () => buildDevicesByRoom(placements),
+    [placements],
+  );
+  const placedZones = useMemo(() => buildPlacedZones(placements), [placements]);
 
-  const devicesByRoom = useMemo(() => {
-    const m = new Map<RoomId, Device[]>();
-    for (const d of DEVICES) {
-      const p = placements[d.id];
-      if (!p) continue;
-      const list = m.get(p.roomId) ?? [];
-      list.push(d);
-      m.set(p.roomId, list);
-    }
-    return m;
-  }, [placements]);
+  // NEW: selected device info for analysis strip
+  const selectedDevice = useMemo(() => {
+    if (!selectedId) return null;
+    const d = DEVICES.find((dev) => dev.id === selectedId);
+    if (!d) return null;
+    return { id: d.id, name: d.name, description: d.description };
+  }, [selectedId]);
 
-  // Map device → zone for coloring placed devices by their zone.
-  const placedZones = useMemo(() => {
-    const out = {} as Record<DeviceId, ZoneId | null>;
-    for (const d of DEVICES) {
-      const p = placements[d.id];
-      out[d.id] = p ? p.zoneId : null;
-    }
-    return out;
-  }, [placements]);
-
-  // Game-feel: when the total changes due to a new placement, fire the
-  // floating delta, check halfway milestone, and track streak of positive
-  // placements. Toasts are mutually exclusive — newest replaces previous,
-  // tracked via a single activeToast slot.
+  // Score feedback (toast, delta, streak)
   useEffect(() => {
     const prev = prevTotalRef.current;
     const delta = result.total - prev;
@@ -475,7 +506,6 @@ export function useDigitalHouseController() {
     if (delta === 0) return;
     deltaKeyRef.current += 1;
     setScoreDelta({ key: deltaKeyRef.current, value: delta });
-
     const showToast = (
       type: "halfway" | "streak",
       label: string,
@@ -484,32 +514,30 @@ export function useDigitalHouseController() {
       toastKeyRef.current += 1;
       setActiveToast({ key: toastKeyRef.current, type, label, hint });
     };
-
-    // Streak tracking — consecutive positive deltas. Compute next streak
-    // synchronously so we can decide which toast (if any) to fire.
-    let nextStreak = 0;
-    if (delta > 0) nextStreak = streak + 1;
+    const nextStreak = delta > 0 ? streak + 1 : 0;
     setStreak(nextStreak);
-
-    // Halfway milestone — fire once per run, only on an improving placement.
-    // Halfway wins over streak when both would fire on the same placement.
     if (!halfwayShown && placedIds.size === 5 && delta > 0) {
       setHalfwayShown(true);
       showToast("halfway", "Halfway there", "5 of 10 placed");
-    } else if (nextStreak >= 3) {
+    } else if (nextStreak >= 3)
       showToast("streak", `${nextStreak}× streak`, "Nice rhythm");
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result.total]);
 
-  // Auto-dismiss the active toast after ~2.2s.
   useEffect(() => {
     if (!activeToast) return;
     const t = globalThis.setTimeout(() => setActiveToast(null), 2200);
     return () => globalThis.clearTimeout(t);
   }, [activeToast?.key]);
 
-  // Completion: record score + badges + show end summary after a beat
+  // Auto-dismiss zone-blocked feedback
+  useEffect(() => {
+    if (!zoneBlocked) return;
+    const t = globalThis.setTimeout(() => setZoneBlocked(null), 2500);
+    return () => globalThis.clearTimeout(t);
+  }, [zoneBlocked?.key]);
+
+  // Completion
   useEffect(() => {
     if (!isComplete || hasRecordedRef.current) return;
     hasRecordedRef.current = true;
@@ -524,7 +552,7 @@ export function useDigitalHouseController() {
     });
     const hadRookie = hasBadge(HOME_NETWORK_ROOKIE.id);
     awardBadge(HOME_NETWORK_ROOKIE);
-    let newBadge: "rookie" | "architect" | null = null;
+    let newBadge: BadgeJustEarned = null;
     if (!hadRookie) newBadge = "rookie";
     if (difficulty === "hard" && result.total >= 70) {
       const hadArch = hasBadge(NETWORK_ARCHITECT.id);
@@ -546,11 +574,17 @@ export function useDigitalHouseController() {
     hasBadge,
   ]);
 
-  // Handlers
+  // ======== Handlers ========
+
   const placeDevice = useCallback(
     (deviceId: DeviceId, roomId: RoomId) => {
       const zoneId = roomZones[roomId];
-      if (!zoneId) return;
+      // FIX: instead of silently returning, show feedback
+      if (!zoneId) {
+        zbKeyRef.current += 1;
+        setZoneBlocked({ key: zbKeyRef.current, roomId });
+        return;
+      }
       setPlacements((prev) => ({ ...prev, [deviceId]: { roomId, zoneId } }));
       setLastPlacement({ deviceId, zoneId, roomId });
       setSelectedId(null);
@@ -583,37 +617,19 @@ export function useDigitalHouseController() {
   const assignZone = useCallback((roomId: RoomId, zoneId: ZoneId) => {
     setUserZoneOverrides((prev) => ({ ...prev, [roomId]: zoneId }));
     setOpenZoneRoom(null);
+    setHasAssignedZone(true); // NEW: track zone assignment
   }, []);
 
   const onTryHarder = useCallback(() => {
     setShowEnd(false);
     setDifficulty(nextDifficulty(difficulty));
   }, [difficulty, setDifficulty]);
-
-  // Touch drag for mobile — maps touch events to device placement.
   const touchDrag = useTouchDrag(placeDevice, setHoveredRoom);
-
   const handleReset = useCallback(() => {
     shellReset();
   }, [shellReset]);
 
-
-  useEffect(() => {
-    if (!mobile) {
-      setTrayHeight(0);
-      return;
-    }
-    const tray = trayRef.current;
-    if (!tray) return;
-    const measure = () => {
-      setTrayHeight(Math.ceil(tray.getBoundingClientRect().height));
-    };
-    measure();
-    const ro = new globalThis.ResizeObserver(measure);
-    ro.observe(tray);
-    return () => ro.disconnect();
-  }, [mobile]);
-
+  // Rail width measurement (desktop only)
   useEffect(() => {
     if (mobile) {
       setRailWidth(0);
@@ -621,9 +637,8 @@ export function useDigitalHouseController() {
     }
     const rail = railRef.current;
     if (!rail) return;
-    const measure = () => {
+    const measure = () =>
       setRailWidth(Math.ceil(rail.getBoundingClientRect().width));
-    };
     measure();
     const ro = new globalThis.ResizeObserver(measure);
     ro.observe(rail);
@@ -634,20 +649,63 @@ export function useDigitalHouseController() {
     if (!houseZoneControls) setOpenZoneRoom(null);
   }, [houseZoneControls]);
 
+  // NEW: Onboarding (replaces auto-help-modal)
   useEffect(() => {
-    const pref = getGamePreference<boolean>(DIGITAL_HOUSE_GAME_ID, HELP_PREF_KEY);
-    if (shouldAutoOpenHelp(pref) === false) {
-      return;
-    }
-    setHelpOpen(true);
+    const pref = getGamePreference<boolean>(
+      DIGITAL_HOUSE_GAME_ID,
+      ONBOARDING_PREF_KEY,
+    );
+    if (pref === true) return; // user dismissed with "don't show again"
+    // Small delay so DOM is ready for spotlight measurement
+    const t = globalThis.setTimeout(() => setShowOnboarding(true), 400);
+    return () => globalThis.clearTimeout(t);
+  }, []);
+
+  const dismissOnboarding = useCallback((dontShowAgain: boolean) => {
+    if (dontShowAgain)
+      setGamePreference(DIGITAL_HOUSE_GAME_ID, ONBOARDING_PREF_KEY, true);
+    setShowOnboarding(false);
   }, []);
 
   const dismissHelp = useCallback((dontShowAgain: boolean) => {
-    if (dontShowAgain) {
-      setGamePreference(DIGITAL_HOUSE_GAME_ID, HELP_PREF_KEY, true);
-    }
+    // Keep the old help pref for the help button
+    if (dontShowAgain)
+      setGamePreference(DIGITAL_HOUSE_GAME_ID, ONBOARDING_PREF_KEY, true);
     setHelpOpen(false);
   }, []);
+
+  const openHelp = useCallback(() => setHelpOpen(true), []);
+  const closeSummary = useCallback(() => setShowEnd(false), []);
+  const openSummary = useCallback(() => setShowEnd(true), []);
+  const handleTryAgain = useCallback(() => {
+    setShowEnd(false);
+    handleReset();
+  }, [handleReset]);
+
+  // NEW: idle hint integration
+  const idleSnap: IdleSnapshot = useMemo(
+    () => ({
+      placedCount: placedIds.size,
+      selectedId,
+      selectedName: selectedDevice?.name ?? null,
+      isComplete,
+      hasUnzonedRooms,
+      difficulty,
+      hasAssignedZone,
+    }),
+    [
+      placedIds.size,
+      selectedId,
+      selectedDevice?.name,
+      isComplete,
+      hasUnzonedRooms,
+      difficulty,
+      hasAssignedZone,
+    ],
+  );
+
+  const { hint: idleHint, dismissHint: dismissIdleHint } =
+    useIdleHint(idleSnap);
 
   const houseProps = {
     roomZones,
@@ -672,38 +730,21 @@ export function useDigitalHouseController() {
     onTouchDragStart: touchDrag.handleTouchStart,
   };
 
-  const openHelp = useCallback(() => {
-    setHelpOpen(true);
-  }, []);
-
-  const closeSummary = useCallback(() => {
-    setShowEnd(false);
-  }, []);
-
-  const openSummary = useCallback(() => {
-    setShowEnd(true);
-  }, []);
-
-  const handleTryAgain = useCallback(() => {
-    setShowEnd(false);
-    handleReset();
-  }, [handleReset]);
-
   return {
     viewport,
     mobile,
+    tablet,
     compactDesktop,
     allowDrag,
     difficulty,
     result,
     placements,
     selectedId,
+    selectedDevice,
     lastPlacement,
     showEnd,
     badgeJustEarned,
     helpOpen,
-    trayHeight,
-    trayRef,
     railRef,
     activeToast,
     scoreDelta,
@@ -722,8 +763,14 @@ export function useDigitalHouseController() {
     handleTryAgain,
     handleSelect,
     returnDevice,
-    toolbarOffset: Math.max(trayHeight, 132),
     totalDevices: DEVICES.length,
     riskCount,
+    // NEW exports
+    showOnboarding,
+    coachStepsConfig,
+    dismissOnboarding,
+    idleHint,
+    dismissIdleHint,
+    zoneBlockedFeedback: zoneBlocked,
   };
 }

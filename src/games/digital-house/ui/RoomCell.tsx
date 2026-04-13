@@ -173,7 +173,7 @@ export function RoomCell({
     }
   };
 
-  const zoneSuffix = zoneId ? " — " + ZONE_LABEL[zoneId] + " zone" : "";
+  const zoneSuffix = zoneId ? ", " + ZONE_LABEL[zoneId] + " zone" : "";
   const chipLabel = zoneControl?.currentZone
     ? ZONE_LABEL[zoneControl.currentZone].toUpperCase()
     : "SET";
@@ -198,13 +198,16 @@ export function RoomCell({
         cursor: isSelectMode ? "pointer" : "default",
         background: floor.base,
         borderRadius: 5,
-        border: "2px solid " + (active ? accent : isRisky ? "#dc2626" : "rgba(139,115,85,0.55)"),
+        border:
+          "2px solid " +
+          (active ? accent : isRisky ? "#dc2626" : "rgba(139,115,85,0.55)"),
         boxShadow: active
           ? "inset 0 0 24px " + glow + ", 0 4px 12px rgba(0,0,0,0.25)"
           : isRisky
             ? "inset 0 0 18px rgba(220,38,38,0.18), 0 2px 6px rgba(0,0,0,0.2)"
             : "inset 0 2px 6px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.15)",
-        transition: "border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease",
+        transition:
+          "border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease",
         animation: isRisky ? "dh-dangerPulse 2s ease-in-out infinite" : "none",
         touchAction: "manipulation",
         ...style,
@@ -264,7 +267,13 @@ export function RoomCell({
           {meta.name}
         </span>
         {zoneControl ? (
-          <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+          <div
+            style={{
+              position: "relative",
+              display: "inline-flex",
+              alignItems: "center",
+            }}
+          >
             <button
               type="button"
               data-testid={"dh-room-zone-" + roomId}
@@ -282,8 +291,12 @@ export function RoomCell({
                 alignItems: "center",
                 gap: 3,
                 border: "1px solid transparent",
-                borderColor: zoneControl.currentZone ? chipAccent : "rgba(255,255,255,0.18)",
-                background: zoneControl.currentZone ? chipAccent : "rgba(255,255,255,0.06)",
+                borderColor: zoneControl.currentZone
+                  ? chipAccent
+                  : "rgba(255,255,255,0.18)",
+                background: zoneControl.currentZone
+                  ? chipAccent
+                  : "rgba(255,255,255,0.06)",
                 color: zoneControl.currentZone ? "#0b1120" : "#f8fafc",
                 fontSize: 9,
                 fontWeight: 800,
@@ -298,13 +311,15 @@ export function RoomCell({
               }}
             >
               <span>{chipLabel}</span>
-              {zoneControl.locked && zoneControl.showLock ? <Lock size={10} /> : null}
+              {zoneControl.locked && zoneControl.showLock ? (
+                <Lock size={10} />
+              ) : null}
               {!zoneControl.locked ? <ChevronDown size={10} /> : null}
             </button>
             {!zoneControl.locked && zoneControl.open ? (
               <div
-                data-testid={"dh-room-zone-popover-" + roomId}
                 role="dialog"
+                data-testid={"dh-room-zone-popover-" + roomId}
                 aria-label={meta.name + " zone options"}
                 onClick={(e) => e.stopPropagation()}
                 style={{
@@ -331,7 +346,9 @@ export function RoomCell({
                     <button
                       key={nextZone}
                       type="button"
-                      data-testid={"dh-room-zone-option-" + roomId + "-" + nextZone}
+                      data-testid={
+                        "dh-room-zone-option-" + roomId + "-" + nextZone
+                      }
                       onClick={(e) => {
                         stopBubble(e);
                         zoneControl.onAssign(nextZone);
@@ -339,8 +356,12 @@ export function RoomCell({
                       style={{
                         minHeight: 26,
                         borderRadius: 7,
-                        border: "1px solid " + (activeZone ? nextAccent : "rgba(148,163,184,0.22)"),
-                        background: activeZone ? nextAccent : "rgba(15,23,42,0.45)",
+                        border:
+                          "1px solid " +
+                          (activeZone ? nextAccent : "rgba(148,163,184,0.22)"),
+                        background: activeZone
+                          ? nextAccent
+                          : "rgba(15,23,42,0.45)",
                         color: activeZone ? "#0b1120" : "#f8fafc",
                         fontSize: 10,
                         fontWeight: 800,
@@ -475,7 +496,10 @@ function DeviceChip({
     <button
       type="button"
       title={device.name}
-      aria-label={device.name + (allowDrag ? " — tap or drag to move" : " — tap to move")}
+      aria-label={
+        device.name +
+        (allowDrag ? ", drag or click to move" : ", click to move")
+      }
       draggable={allowDrag}
       onClick={handleClick}
       onDragStart={allowDrag ? handleDragStart : undefined}

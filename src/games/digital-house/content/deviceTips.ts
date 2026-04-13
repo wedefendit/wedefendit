@@ -23,7 +23,7 @@ import type { ZoneId } from "../engine/zones";
  */
 export const DEVICE_TIPS: Record<DeviceId, Record<ZoneId, string>> = {
   "work-laptop": {
-    main: "Right where it belongs — protected alongside your trusted devices.",
+    main: "Right where it belongs, protected alongside your trusted devices.",
     guest: "Cut off from the devices it actually needs to reach.",
     iot: "Exposed to every smart device in the house.",
   },
@@ -38,14 +38,14 @@ export const DEVICE_TIPS: Record<DeviceId, Record<ZoneId, string>> = {
     iot: "Unnecessary exposure to IoT gear.",
   },
   "guest-phone": {
-    main: "A visitor now has full network trust — the exact thing to avoid.",
-    guest: "Perfect — isolated internet for friends, no shared trust.",
+    main: "A visitor now has full network trust, the exact thing to avoid.",
+    guest: "Perfect. Isolated internet for friends, no shared trust.",
     iot: "Better than Main, but still not isolated on a true Guest network.",
   },
   printer: {
     main: "Convenient, but printers rarely get patched.",
     guest: "Isolated but harder to actually print to.",
-    iot: "Safer — the printer does its job without touching trusted devices.",
+    iot: "Safer. The printer does its job without touching trusted devices.",
   },
   "smart-tv": {
     main: "TVs phone home constantly. Too much trust for a streaming box.",
@@ -65,7 +65,7 @@ export const DEVICE_TIPS: Record<DeviceId, Record<ZoneId, string>> = {
   "doorbell-camera": {
     main: "Direct path from outside to every trusted device.",
     guest: "Exterior device, still with too much reach.",
-    iot: "Exterior devices belong here — contained and reachable.",
+    iot: "Exterior devices belong here, contained and reachable.",
   },
   "camera-hub": {
     main: "A compromised camera becomes a path to your work files.",
@@ -80,11 +80,11 @@ export const DEVICE_TIPS: Record<DeviceId, Record<ZoneId, string>> = {
  */
 export const COMBO_TIPS: Record<AppliedCombo["id"], string> = {
   "guest-mixed-with-trusted":
-    "Guest device mixed with trusted devices — the layout we tell people to break first.",
+    "Guest device mixed with trusted devices, the layout we tell people to break first.",
   "camera-on-main":
-    "Camera on Main — direct path from outside to your trusted devices.",
+    "Camera on Main. Direct path from outside to your trusted devices.",
   "entertainment-clutter":
     "Smart devices cluttering the trusted zone.",
   "single-zone-dump":
-    "Everything in one zone — any single device can reach everything else.",
+    "Everything in one zone. Any single device can reach everything else.",
 };

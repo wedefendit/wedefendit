@@ -40,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       id="main-scroll-container"
       className={
         isGameRoute
-          ? "relative z-10 flex min-h-screen w-full flex-col min-[820px]:h-dvh min-[820px]:overflow-hidden"
+          ? "relative z-10 flex h-dvh w-full flex-col overflow-clip"
           : "relative w-full min-h-screen flex flex-col z-10 justify-between items-center"
       }
     >

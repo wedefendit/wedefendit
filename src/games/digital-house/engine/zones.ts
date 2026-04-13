@@ -42,7 +42,7 @@ export const ZONES: Zone[] = [
     name: "Main Network",
     shortName: "Main",
     description:
-      "For devices you trust most and depend on every day — work and personal.",
+      "For devices you trust most and depend on every day, work and personal.",
   },
   {
     id: "guest",
@@ -69,7 +69,7 @@ export const ROOMS: Room[] = [
   {
     id: "living-room",
     name: "Living Room",
-    description: "Entertainment and family clutter — TV, console, speaker.",
+    description: "Entertainment and family clutter: TV, console, speaker.",
   },
   {
     id: "kitchen",
@@ -94,7 +94,7 @@ export const ROOMS: Room[] = [
  * - Easy: every room is pre-tagged with a zone so the player only places
  *   devices. Guest separation is introduced in Medium and Hard.
  * - Medium: the most intuitive rooms are pre-tagged, rest are blank (null).
- * - Hard: nothing is pre-tagged — the player assigns every zone and every device.
+ * - Hard: nothing is pre-tagged. the player assigns every zone and every device.
  *
  * A `null` value means the player must assign the zone for that room.
  */

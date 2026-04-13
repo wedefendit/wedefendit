@@ -1,3 +1,5 @@
+import type { Difficulty } from "../shared/types";
+
 export type ViewportBand = "phone" | "narrow" | "wide" | "ultra";
 
 export function widthToBand(width: number): ViewportBand {
@@ -18,3 +20,24 @@ export function inventoryColumnsForRail(width: number, railWidth: number): 2 | 3
   if ((band === "wide" || band === "ultra") && railWidth >= 520) return 3;
   return 2;
 }
+
+/**
+ * Known fixed chrome heights on mobile (px).
+ * The house container uses these via CSS calc — no DOM queries needed.
+ */
+export const MOBILE_CHROME = {
+  siteNav: 40,
+  gameHeader: 36,
+  scoreStrip: 44,
+  analysisStrip: 40,
+  deviceStrip: 48,
+  gaps: 12,
+} as const;
+
+export const MOBILE_CHROME_TOTAL =
+  MOBILE_CHROME.siteNav +
+  MOBILE_CHROME.gameHeader +
+  MOBILE_CHROME.scoreStrip +
+  MOBILE_CHROME.analysisStrip +
+  MOBILE_CHROME.deviceStrip +
+  MOBILE_CHROME.gaps;

@@ -99,7 +99,7 @@ describe("digital house summary helpers", () => {
     );
 
     expect(risks).toContain(
-      "Camera on Main — direct path from outside to your trusted devices.",
+      "Camera on Main. Direct path from outside to your trusted devices.",
     );
     expect(
       risks.some((risk) => risk.includes("outside the isolated IoT segment")),
@@ -139,7 +139,7 @@ describe("digital house summary helpers", () => {
     expect(items.map((item) => item.label)).toEqual([
       "Easy mode still leaves the guest phone off a true Guest network.",
       "A camera is still outside the isolated IoT segment.",
-      "Everything in one zone — any single device can reach everything else.",
+      "Everything in one zone. Any single device can reach everything else.",
     ]);
   });
 

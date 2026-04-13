@@ -19,7 +19,12 @@ import type { Difficulty } from "../../shared/types";
 import type { ScoreResult } from "../engine";
 import type { BadgeJustEarned, PlacementMap } from "../model";
 import { nextDifficulty } from "../model";
-import { getBadgeLabel, scanImprovements, scanRisks, scanWins } from "../summary";
+import {
+  getBadgeLabel,
+  scanImprovements,
+  scanRisks,
+  scanWins,
+} from "../summary";
 
 export type EndSummaryModalProps = Readonly<{
   result: ScoreResult;
@@ -46,7 +51,11 @@ export function EndSummaryModal({
 }: EndSummaryModalProps) {
   const countedScore = useCountUp(result.total, 1200);
   const scoreTier =
-    result.total >= 70 ? "healthy" : result.total >= 40 ? "cautious" : "critical";
+    result.total >= 70
+      ? "healthy"
+      : result.total >= 40
+        ? "cautious"
+        : "critical";
   const scoreColor =
     scoreTier === "healthy"
       ? "#38bdf8"
@@ -78,8 +87,8 @@ export function EndSummaryModal({
         className="absolute inset-0 h-full w-full cursor-default bg-transparent"
         tabIndex={-1}
       />
-      <dialog
-        open
+      <div
+        role="dialog"
         aria-modal="true"
         aria-label="After-action report"
         style={{ animation: "dh-modalRise 0.7s cubic-bezier(0.22,1.2,0.36,1)" }}
@@ -125,8 +134,8 @@ export function EndSummaryModal({
             <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-amber-700 shadow-[0_0_20px_rgba(251,191,36,0.25)] dark:text-amber-200">
               <Award size={12} />
               {badge === "architect"
-                ? "Network Architect — earned"
-                : "Home Network Rookie — earned"}
+                ? "Network Architect earned"
+                : "Home Network Rookie earned"}
             </div>
           )}
           {!badge && (
@@ -178,7 +187,8 @@ export function EndSummaryModal({
               onClick={onTryHarder}
               className="rounded-xl border border-sky-500/50 bg-sky-50 px-4 py-2 text-xs font-bold text-sky-700 transition-colors hover:border-sky-400 hover:bg-sky-100 dark:bg-sky-600/20 dark:text-sky-100 dark:hover:bg-sky-600/30"
             >
-              Try {nextDifficulty(currentDifficulty) === "hard" ? "Hard" : "Medium"}
+              Try{" "}
+              {nextDifficulty(currentDifficulty) === "hard" ? "Hard" : "Medium"}
             </button>
           )}
           <Link
@@ -188,7 +198,7 @@ export function EndSummaryModal({
             Get Help →
           </Link>
         </div>
-      </dialog>
+      </div>
     </div>
   );
 }
@@ -251,7 +261,8 @@ function useCountUp(target: number, durationMs = 1200): number {
     };
     rafRef.current = globalThis.requestAnimationFrame(tick);
     return () => {
-      if (rafRef.current !== null) globalThis.cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null)
+        globalThis.cancelAnimationFrame(rafRef.current);
     };
     // Only restart when target or duration changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -261,4 +272,3 @@ function useCountUp(target: number, durationMs = 1200): number {
 }
 
 // ---- Summary scanners ----
-
