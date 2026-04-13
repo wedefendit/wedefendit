@@ -31,7 +31,7 @@ const DESKTOP_VIEWPORTS = [
   { width: 1024, height: 600 },  // Nest Hub
   { width: 1920, height: 1080 },
 ];
-type Difficulty = "easy" | "medium";
+type Difficulty = "easy" | "medium" | "hard";
 type Viewport = { width: number; height: number };
 type Box = {
   x: number;
@@ -172,6 +172,18 @@ async function roomHasDevice(page: Page, roomId: string, title: string) {
         ).length,
       title,
     );
+}
+
+async function placeDevice(page: Page, deviceId: string, roomId: string) {
+  await page.getByTestId("dh-device-" + deviceId).click();
+  await page.getByTestId("dh-room-" + roomId).click();
+}
+
+async function assignRoomZone(page: Page, roomId: string, zoneId: string) {
+  await page.getByTestId("dh-room-zone-" + roomId).click();
+  await expect(page.getByTestId("dh-room-zone-popover-" + roomId)).toBeVisible();
+  await page.getByTestId("dh-room-zone-option-" + roomId + "-" + zoneId).click();
+  await expect(page.getByTestId("dh-room-zone-popover-" + roomId)).toHaveCount(0);
 }
 
 test.describe("Digital House desktop audit", () => {
@@ -403,5 +415,67 @@ test.describe("Digital House phone audit", () => {
 
     await attachScreenshot(page, testInfo, "theme-light-mobile");
     await attachMetrics(page, testInfo, "theme-light-mobile-metrics");
+  });
+});
+
+
+test.describe("Digital House scoring audit", () => {
+  test.use({ hasTouch: false, isMobile: false });
+
+  test("easy best-case board still reports unresolved guest isolation", async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await openGame(page, "easy");
+
+    await placeDevice(page, "work-laptop", "office");
+    await placeDevice(page, "personal-phone", "bedroom");
+    await placeDevice(page, "tablet", "bedroom");
+    await placeDevice(page, "guest-phone", "entry-exterior");
+    await placeDevice(page, "printer", "kitchen");
+    await placeDevice(page, "smart-tv", "living-room");
+    await placeDevice(page, "smart-speaker", "living-room");
+    await placeDevice(page, "game-console", "living-room");
+    await placeDevice(page, "doorbell-camera", "entry-exterior");
+    await placeDevice(page, "camera-hub", "kitchen");
+
+    await page.getByRole("button", { name: /after-action report/i }).scrollIntoViewIfNeeded();
+    await page.getByRole("button", { name: /after-action report/i }).click();
+    const summary = page.getByLabel(/after-action report/i);
+    await expect(summary).toBeVisible();
+    await expect(page.getByTestId("dh-summary-score")).toHaveText("88");
+    await expect(summary).toContainText("Easy mode still leaves the guest phone off a true Guest network.");
+    await expect(summary).toContainText("Easy mode cannot assign a true Guest network. Try Medium or Hard to isolate the guest phone there.");
+
+    await attachScreenshot(page, testInfo, "scoring-easy-best-case");
+  });
+
+  test("hard ideal board still reaches 100 with no open risk section", async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await openGame(page, "hard");
+
+    await assignRoomZone(page, "office", "main");
+    await assignRoomZone(page, "bedroom", "main");
+    await assignRoomZone(page, "living-room", "iot");
+    await assignRoomZone(page, "kitchen", "guest");
+    await assignRoomZone(page, "entry-exterior", "iot");
+
+    await placeDevice(page, "work-laptop", "office");
+    await placeDevice(page, "personal-phone", "bedroom");
+    await placeDevice(page, "tablet", "bedroom");
+    await placeDevice(page, "guest-phone", "kitchen");
+    await placeDevice(page, "printer", "entry-exterior");
+    await placeDevice(page, "smart-tv", "living-room");
+    await placeDevice(page, "smart-speaker", "living-room");
+    await placeDevice(page, "game-console", "living-room");
+    await placeDevice(page, "doorbell-camera", "entry-exterior");
+    await placeDevice(page, "camera-hub", "entry-exterior");
+
+    await page.getByRole("button", { name: /after-action report/i }).scrollIntoViewIfNeeded();
+    await page.getByRole("button", { name: /after-action report/i }).click();
+    const summary = page.getByLabel(/after-action report/i);
+    await expect(summary).toBeVisible();
+    await expect(page.getByTestId("dh-summary-score")).toHaveText("100");
+    await expect(summary).not.toContainText(/what still adds risk/i);
+
+    await attachScreenshot(page, testInfo, "scoring-hard-perfect");
   });
 });

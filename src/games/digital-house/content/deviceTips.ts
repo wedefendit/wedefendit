@@ -40,7 +40,7 @@ export const DEVICE_TIPS: Record<DeviceId, Record<ZoneId, string>> = {
   "guest-phone": {
     main: "A visitor now has full network trust — the exact thing to avoid.",
     guest: "Perfect — isolated internet for friends, no shared trust.",
-    iot: "Better than Main, but still in the room with your cameras.",
+    iot: "Better than Main, but still not isolated on a true Guest network.",
   },
   printer: {
     main: "Convenient, but printers rarely get patched.",

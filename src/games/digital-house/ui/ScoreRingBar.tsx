@@ -15,7 +15,7 @@ party without express written consent.
 import { useEffect, useId, useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { useAnimatedNumber } from "../hooks/useAnimatedNumber";
-import type { AppliedCombo } from "../engine/scoring";
+import type { OpenRiskItem } from "../summary";
 
 // ---- Theme thresholds ----
 //
@@ -61,10 +61,8 @@ type ScoreRingBarProps = Readonly<{
   mobile: boolean;
   /** Compact mode — smaller rings + tighter padding for sidebar / mobile bar use. */
   compact?: boolean;
-  /** Active combo penalties (count) — shows an ⚠ badge that opens a popover. */
-  combos?: ReadonlyArray<AppliedCombo>;
-  /** Map of combo id → human-readable tip. */
-  comboTips?: Record<string, string>;
+  /** Active risk findings (count) — shows an ⚠ badge that opens a popover. */
+  riskItems?: ReadonlyArray<OpenRiskItem>;
 }>;
 
 export function ScoreRingBar({
@@ -76,8 +74,7 @@ export function ScoreRingBar({
   totalDevices,
   mobile,
   compact = false,
-  combos = [],
-  comboTips = {},
+  riskItems = [],
 }: ScoreRingBarProps) {
   const ringSize = compact ? (mobile ? 34 : 40) : mobile ? 58 : 70;
   const overallFontSize = compact ? (mobile ? 18 : 34) : mobile ? 34 : 44;
@@ -97,16 +94,16 @@ export function ScoreRingBar({
 
   const progressPct = Math.round((placedCount / totalDevices) * 100);
 
-  const [comboOpen, setComboOpen] = useState(false);
+  const [riskOpen, setRiskOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (!comboOpen) return;
+    if (!riskOpen) return;
     const onDown = (e: MouseEvent) => {
       if (!popoverRef.current) return;
-      if (!popoverRef.current.contains(e.target as Node)) setComboOpen(false);
+      if (!popoverRef.current.contains(e.target as Node)) setRiskOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setComboOpen(false);
+      if (e.key === "Escape") setRiskOpen(false);
     };
     globalThis.addEventListener("mousedown", onDown);
     globalThis.addEventListener("keydown", onKey);
@@ -114,11 +111,11 @@ export function ScoreRingBar({
       globalThis.removeEventListener("mousedown", onDown);
       globalThis.removeEventListener("keydown", onKey);
     };
-  }, [comboOpen]);
+  }, [riskOpen]);
   // Close popover automatically if all combos clear.
   useEffect(() => {
-    if (combos.length === 0) setComboOpen(false);
-  }, [combos.length]);
+    if (riskItems.length === 0) setRiskOpen(false);
+  }, [riskItems.length]);
 
   return (
     <div
@@ -227,34 +224,34 @@ export function ScoreRingBar({
           <dialog open> in Chrome/Safari has user-agent styles (position:
           fixed; margin: auto) that fight our absolute positioning and
           send the popover off-screen. */}
-      {combos.length > 0 && (
+      {riskItems.length > 0 && (
         <div ref={popoverRef} className="absolute right-2 top-2 z-10">
           <button
             type="button"
-            aria-label={`${combos.length} combo penalty${combos.length === 1 ? "" : "s"} active`}
-            aria-expanded={comboOpen}
-            onClick={() => setComboOpen((v) => !v)}
+            aria-label={`${riskItems.length} open risk${riskItems.length === 1 ? "" : "s"} active`}
+            aria-expanded={riskOpen}
+            onClick={() => setRiskOpen((v) => !v)}
             className="inline-flex items-center gap-1 rounded-full border border-rose-400/50 bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-700 shadow-[0_0_12px_rgba(239,68,68,0.3)] backdrop-blur-sm transition-colors hover:bg-rose-500/25 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200"
           >
             <span aria-hidden className="animate-pulse">
               ⚠
             </span>
-            {combos.length}
+            {riskItems.length}
           </button>
-          {comboOpen && (
+          {riskOpen && (
             // eslint-disable-next-line jsx-a11y/prefer-tag-over-role, sonarjs/prefer-element-type
             <div
               role="dialog"
-              aria-label="Active combo penalties"
+              aria-label="Open risk findings"
               className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-24px)] overflow-hidden rounded-xl border border-rose-300/60 bg-white/96 p-3 shadow-[0_16px_40px_rgba(239,68,68,0.2)] backdrop-blur-md dark:border-rose-400/30 dark:bg-slate-900/96 dark:shadow-[0_20px_46px_rgba(239,68,68,0.25)]"
             >
               <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-200">
                 <AlertTriangle size={11} />
-                Pressure building
+                Open risks
               </div>
               <ul className="space-y-1.5 text-[12px] leading-snug text-rose-900 dark:text-rose-100">
-                {combos.map((c) => (
-                  <li key={c.id} className="flex items-start gap-1.5">
+                {riskItems.map((item) => (
+                  <li key={item.id} className="flex items-start gap-1.5">
                     <span
                       aria-hidden
                       className="mt-0.5 text-rose-500 dark:text-rose-300"
@@ -262,10 +259,10 @@ export function ScoreRingBar({
                       •
                     </span>
                     <span>
-                      {comboTips[c.id] ?? c.label}
-                      {c.count ? (
+                      {item.label}
+                      {item.count ? (
                         <span className="ml-1 text-rose-600 dark:text-rose-300">
-                          (×{c.count})
+                          (×{item.count})
                         </span>
                       ) : null}
                     </span>
