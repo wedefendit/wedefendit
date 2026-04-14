@@ -57,10 +57,17 @@ export function DeviceStrip({
     if (!el) return;
     updateFade();
     el.addEventListener("scroll", updateFade, { passive: true });
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
     const ro = new globalThis.ResizeObserver(updateFade);
     ro.observe(el);
     return () => {
       el.removeEventListener("scroll", updateFade);
+      el.removeEventListener("wheel", onWheel);
       ro.disconnect();
     };
   }, [updateFade]);
@@ -120,8 +127,15 @@ export function DeviceStrip({
       {fade !== "start" && (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent"
-        />
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-10 items-center justify-start bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent pl-1.5"
+        >
+          <span
+            className="text-[18px] font-black text-sky-400"
+            style={{ animation: "dh-hintPulse 1.5s ease-in-out infinite" }}
+          >
+            ‹
+          </span>
+        </div>
       )}
       {fade !== "end" && (
         <div
@@ -138,7 +152,7 @@ export function DeviceStrip({
       )}
       <div
         ref={scrollRef}
-        className="overflow-x-auto px-1 py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="overflow-x-auto px-1 py-0.5 overscroll-x-contain"
         style={{ scrollSnapType: "x mandatory" }}
       >
         <div className="mx-auto flex w-fit gap-1.5">
@@ -187,28 +201,21 @@ export function DeviceStrip({
                 aria-label={dev.name}
                 title={dev.name}
                 className={[
-                  "touch-manipulation flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border bg-white/90 shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all dark:bg-slate-900/80",
+                  "touch-manipulation flex w-14 min-w-14 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-lg border p-1.5 bg-white/90 shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all dark:bg-slate-900/80",
                   sel
                     ? "scale-[1.06] shadow-[0_0_14px_rgba(56,189,248,0.35)] ring-1 ring-sky-300/80 dark:shadow-[0_0_14px_rgba(56,189,248,0.45)] dark:ring-sky-300/70"
                     : placed
                       ? "cursor-pointer opacity-40"
                       : "cursor-pointer hover:bg-slate-100/90 dark:hover:bg-slate-800/90",
                 ].join(" ")}
-                style={{
-                  borderColor: bc,
-                  height: 42,
-                  width: 50,
-                  minWidth: 50,
-                  scrollSnapAlign: "start",
-                  touchAction: "manipulation",
-                }}
+                style={{ borderColor: bc }}
               >
                 <DeviceIcon
                   deviceId={dev.id}
                   category={dev.category}
                   size="tile"
                   tone={toneFor(dev.id, placed)}
-                  className={placed ? "opacity-75" : ""}
+                  className={placed ? "opacity-75" : "" + " mt-0.5"}
                 />
                 <span
                   className={[

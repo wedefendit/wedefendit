@@ -291,7 +291,7 @@ function RiskBadge({
   className?: string;
 }>) {
   return (
-    <div ref={popRef} className={className || "relative z-10"}>
+    <div ref={popRef} className={className || "relative z-30"}>
       <button
         type="button"
         aria-label={`${count} open risk${count === 1 ? "" : "s"} active`}

@@ -230,7 +230,7 @@ export function DigitalHouseScoreHud({
   scoreDelta,
 }: DigitalHouseScoreHudProps) {
   return (
-    <div className="dh-score-slot relative w-full shrink-0">
+    <div className="dh-score-slot relative z-20 w-full shrink-0">
       <ScoreRingBar
         privacy={result.privacy}
         blastRadius={result.blastRadius}
