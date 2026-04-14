@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { calculateScore, type PlacementFinding, type ScoreResult } from "./engine";
+import {
+  calculateScore,
+  type PlacementFinding,
+  type ScoreResult,
+} from "./engine";
 import { emptyPlacements } from "./model";
 import {
   buildOpenRiskItems,
@@ -43,11 +47,19 @@ describe("digital house summary helpers", () => {
 
     const wins = scanWins(placements);
 
-    expect(wins).toContain("Guest access isolated on its own network.");
-    expect(wins).toContain("Both cameras contained on the IoT network.");
-    expect(wins).toContain("Work and personal devices sharing one trusted zone.");
-    expect(wins).toContain("Entertainment devices separated from your trusted network.");
-    expect(wins).toContain("Printer treated as the untrusted IoT device it actually is.");
+    expect(wins).toContain("Guest access is on its own separate network.");
+    expect(wins).toContain(
+      "Both cameras are separated from your personal devices.",
+    );
+    expect(wins).toContain(
+      "Work and personal devices are together on the same network.",
+    );
+    expect(wins).toContain(
+      "Entertainment devices are separated from your personal stuff.",
+    );
+    expect(wins).toContain(
+      "Printer is separated from your personal devices where it belongs.",
+    );
   });
 
   it("calls out the Easy-mode guest gap from placement findings", () => {
@@ -67,10 +79,10 @@ describe("digital house summary helpers", () => {
     });
 
     expect(scanRisks(placements, result, "easy")).toContain(
-      "Easy mode still leaves the guest phone off a true Guest network.",
+      "Easy mode doesn't let you create a separate guest network.",
     );
     expect(scanImprovements(placements, result, "easy")).toContain(
-      "Easy mode cannot assign a true Guest network. Try Medium or Hard to isolate the guest phone there.",
+      "Easy mode doesn't have a guest network. Try Medium or Hard to separate visitor devices.",
     );
   });
 
@@ -99,10 +111,10 @@ describe("digital house summary helpers", () => {
     );
 
     expect(risks).toContain(
-      "Camera on Main. Direct path from outside to your trusted devices.",
+      "Camera on Main. A camera facing the street can see your personal devices.",
     );
     expect(
-      risks.some((risk) => risk.includes("outside the isolated IoT segment")),
+      risks.some((risk) => risk.includes("more access than it needs")),
     ).toBe(false);
   });
 
@@ -137,9 +149,9 @@ describe("digital house summary helpers", () => {
     );
 
     expect(items.map((item) => item.label)).toEqual([
-      "Easy mode still leaves the guest phone off a true Guest network.",
-      "A camera is still outside the isolated IoT segment.",
-      "Everything in one zone. Any single device can reach everything else.",
+      "Easy mode doesn't let you create a separate guest network.",
+      "A camera still has more access than it needs.",
+      "Everything is on one network. If any device gets hacked, the rest are exposed.",
     ]);
   });
 
@@ -156,20 +168,25 @@ describe("digital house summary helpers", () => {
     placements["doorbell-camera"] = { roomId: "entry-exterior", zoneId: "iot" };
     placements["camera-hub"] = { roomId: "kitchen", zoneId: "iot" };
 
+    const placedDevices = Object.entries(placements).filter(
+      (
+        entry,
+      ): entry is [
+        keyof typeof placements,
+        NonNullable<(typeof placements)[keyof typeof placements]>,
+      ] => Boolean(entry[1]),
+    );
+
     const result = calculateScore(
-      Object.entries(placements)
-        .filter((entry): entry is [string, NonNullable<(typeof placements)[string]>] =>
-          Boolean(entry[1]),
-        )
-        .map(([deviceId, placement]) => ({
-          deviceId: deviceId as any,
-          zoneId: placement.zoneId,
-        })),
+      placedDevices.map(([deviceId, placement]) => ({
+        deviceId,
+        zoneId: placement.zoneId,
+      })),
     );
 
     expect(result.total).toBe(88);
     expect(scanRisks(placements, result, "easy")).toContain(
-      "Easy mode still leaves the guest phone off a true Guest network.",
+      "Easy mode doesn't let you create a separate guest network.",
     );
   });
 

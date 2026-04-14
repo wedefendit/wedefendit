@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,22 +14,12 @@
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
-      "@/data/*": [
-        "./data/*"
-      ],
-      "@/lib/*": [
-        "./lib/*"
-      ],
-      "@/*": [
-        "./src/*"
-      ]
+      "@/data/*": ["./data/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": [
     "node_modules",
     "tests/**",

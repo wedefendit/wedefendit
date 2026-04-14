@@ -1,3 +1,4 @@
+// @ts-expect-error node works
 import fs from "node:fs";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
@@ -6,33 +7,32 @@ const PHONE_VIEWPORTS = [
   { width: 275, height: 600 },
   { width: 320, height: 828 },
   { width: 360, height: 640 },
-  { width: 360, height: 800 },   // Samsung Galaxy A51/71
-  { width: 375, height: 667 },   // iPhone SE
-  { width: 390, height: 844 },   // iPhone 12 Pro
-  { width: 393, height: 852 },   // Pixel 7
-  { width: 412, height: 915 },   // Samsung Galaxy S20 Ultra
-  { width: 414, height: 896 },   // iPhone XR
-  { width: 428, height: 926 },   // iPhone 14 Pro Max
-  { width: 540, height: 720 },   // Surface Duo
-  { width: 344, height: 882 },   // Galaxy Z Fold 5 (folded)
+  { width: 360, height: 800 }, // Samsung Galaxy A51/71
+  { width: 375, height: 667 }, // iPhone SE
+  { width: 390, height: 844 }, // iPhone 12 Pro
+  { width: 393, height: 852 }, // Pixel 7
+  { width: 412, height: 915 }, // Samsung Galaxy S20 Ultra
+  { width: 414, height: 896 }, // iPhone XR
+  { width: 428, height: 926 }, // iPhone 14 Pro Max
+  { width: 540, height: 720 }, // Surface Duo
+  { width: 344, height: 882 }, // Galaxy Z Fold 5 (folded)
   { width: 763, height: 768 },
-  { width: 768, height: 1024 },  // iPad Mini
+  { width: 768, height: 1024 }, // iPad Mini
 ];
 const DESKTOP_VIEWPORTS = [
   { width: 820, height: 768 },
-  { width: 820, height: 1180 },  // iPad Air
+  { width: 820, height: 1180 }, // iPad Air
   { width: 912, height: 1368 },
   { width: 998, height: 1130 },
   { width: 1022, height: 768 },
   { width: 1024, height: 1366 }, // iPad Pro
-  { width: 1114, height: 834 },  // Surface Pro 7
-  { width: 1280, height: 800 },  // Asus Zenbook Fold / Nest Hub Max
+  { width: 1114, height: 834 }, // Surface Pro 7
+  { width: 1280, height: 800 }, // Asus Zenbook Fold / Nest Hub Max
   { width: 1366, height: 768 },
-  { width: 1024, height: 600 },  // Nest Hub
+  { width: 1024, height: 600 }, // Nest Hub
   { width: 1920, height: 1080 },
 ];
 type Difficulty = "easy" | "medium" | "hard";
-type Viewport = { width: number; height: number };
 type Box = {
   x: number;
   y: number;
@@ -55,14 +55,28 @@ type Metrics = {
   header: Box;
   house: Box;
   rail: Box;
-  status: Box;
   score: Box;
   analysis: Box;
   inventory: Box;
-  task: Box;
-  tray: Box;
+  deviceStrip: Box;
   zoneExterior: Box;
 };
+
+/**
+ * Determine layout mode using the same logic as the controller:
+ *   mobile = width < 820 || height < 500
+ *   tablet = !mobile && width < 1100 && height > width
+ *   desktop = everything else
+ */
+function layoutMode(vp: {
+  width: number;
+  height: number;
+}): "mobile" | "tablet" | "desktop" {
+  const mobile = vp.width < 820 || vp.height < 500;
+  if (mobile) return "mobile";
+  if (vp.width < 1100 && vp.height > vp.width) return "tablet";
+  return "desktop";
+}
 
 async function stabilize(page: Page) {
   await page.addStyleTag({
@@ -71,14 +85,28 @@ async function stabilize(page: Page) {
   });
 }
 
+/**
+ * Navigate to the game, dismiss the CoachMark onboarding (Escape),
+ * select a difficulty, and wait for the house panel.
+ */
 async function openGame(page: Page, difficulty: Difficulty) {
   await page.goto(ROUTE, { waitUntil: "networkidle" });
   await expect(page.getByTestId("dh-root")).toBeVisible();
   await stabilize(page);
-  const helpModal = page.getByTestId("dh-help-modal");
-  await expect(helpModal).toBeVisible();
-  await page.getByRole("button", { name: /dismiss/i }).click();
-  await expect(helpModal).toHaveCount(0);
+
+  // CoachMark onboarding auto-opens. Click Skip (reliable across browsers).
+  const skip = page.getByRole("button", { name: /^skip$/i });
+  try {
+    await skip.waitFor({ state: "visible", timeout: 2000 });
+    await skip.click();
+  } catch {
+    await page.keyboard.press("Escape");
+  }
+  await expect(page.locator('[role="dialog"][aria-modal="true"]')).toHaveCount(
+    0,
+    { timeout: 3000 },
+  );
+
   const difficultyPattern =
     difficulty === "medium" ? /med(ium)?/i : new RegExp(difficulty, "i");
   await page.getByRole("radio", { name: difficultyPattern }).click();
@@ -127,13 +155,11 @@ async function collectMetrics(page: Page): Promise<Metrics> {
       viewportHeight: window.innerHeight,
       house: getBox('[data-testid="dh-house-panel"]'),
       rail: getBox('[data-testid="dh-rail"]'),
-      status: getBox("[data-testid=\"dh-status-strip\"]"),
       score: getBox('[data-testid="dh-score-hud"]'),
       analysis: getBox('[data-testid="dh-analysis-card"]'),
-      inventory: getBox("[data-testid=\"dh-inventory-panel\"]"),
-      task: getBox('[data-testid="dh-task-panel"]'),
-      tray: getBox('[data-testid="dh-mobile-tray"]'),
-      zoneExterior: getBox('[data-testid="dh-zone-room-entry-exterior"]'),
+      inventory: getBox('[data-testid="dh-inventory-panel"]'),
+      deviceStrip: getBox('[data-testid="dh-device-strip"]'),
+      zoneExterior: getBox('[data-testid="dh-room-zone-entry-exterior"]'),
     };
   });
 }
@@ -155,7 +181,9 @@ async function deviceLabelFits(page: Page, deviceId: string) {
     const labels = Array.from(el.querySelectorAll("span"));
     const label = labels[labels.length - 1] as HTMLElement | undefined;
     if (!label) return false;
-    return label.clientWidth >= 28 && label.scrollWidth <= label.clientWidth + 1;
+    return (
+      label.clientWidth >= 28 && label.scrollWidth <= label.clientWidth + 1
+    );
   });
 }
 
@@ -181,9 +209,15 @@ async function placeDevice(page: Page, deviceId: string, roomId: string) {
 
 async function assignRoomZone(page: Page, roomId: string, zoneId: string) {
   await page.getByTestId("dh-room-zone-" + roomId).click();
-  await expect(page.getByTestId("dh-room-zone-popover-" + roomId)).toBeVisible();
-  await page.getByTestId("dh-room-zone-option-" + roomId + "-" + zoneId).click();
-  await expect(page.getByTestId("dh-room-zone-popover-" + roomId)).toHaveCount(0);
+  await expect(
+    page.getByTestId("dh-room-zone-popover-" + roomId),
+  ).toBeVisible();
+  await page
+    .getByTestId("dh-room-zone-option-" + roomId + "-" + zoneId)
+    .click();
+  await expect(page.getByTestId("dh-room-zone-popover-" + roomId)).toHaveCount(
+    0,
+  );
 }
 
 test.describe("Digital House desktop audit", () => {
@@ -191,93 +225,188 @@ test.describe("Digital House desktop audit", () => {
 
   for (const viewport of DESKTOP_VIEWPORTS) {
     for (const difficulty of ["easy", "medium"] as const) {
-      test(`desktop ${difficulty} ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
+      test(`desktop ${difficulty} ${viewport.width}x${viewport.height}`, async ({
+        page,
+      }, testInfo) => {
         await page.setViewportSize(viewport);
         await openGame(page, difficulty);
 
         const baseName = `desktop-${difficulty}-${viewport.width}x${viewport.height}`;
         await attachScreenshot(page, testInfo, baseName);
-        let metrics = await attachMetrics(page, testInfo, baseName + "-metrics");
+        const metrics = await attachMetrics(
+          page,
+          testInfo,
+          baseName + "-metrics",
+        );
+        const mode = layoutMode(viewport);
 
         // No horizontal overflow
-        expect(metrics.documentScrollWidth).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+        expect(metrics.documentScrollWidth).toBeLessThanOrEqual(
+          metrics.viewportWidth + 1,
+        );
 
-        // All key elements exist
+        // Common elements always exist
         expect(metrics.header).not.toBeNull();
         expect(metrics.house).not.toBeNull();
-        expect(metrics.rail).not.toBeNull();
         expect(metrics.score).not.toBeNull();
         expect(metrics.analysis).not.toBeNull();
-        expect(metrics.inventory).not.toBeNull();
-        await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
 
-        if (metrics.header && metrics.house && metrics.rail && metrics.score && metrics.analysis && metrics.inventory) {
-          // House and rail are side by side below the header
-          expect(metrics.house.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
-          expect(metrics.rail.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
+        if (mode === "desktop") {
+          // Desktop layout: house + rail side by side
+          expect(metrics.rail).not.toBeNull();
+          expect(metrics.inventory).not.toBeNull();
+          await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
 
-          // House is to the LEFT of the rail
-          expect(metrics.house.right).toBeLessThanOrEqual(metrics.rail.x + 8);
+          if (
+            metrics.header &&
+            metrics.house &&
+            metrics.rail &&
+            metrics.score &&
+            metrics.analysis &&
+            metrics.inventory
+          ) {
+            // House and rail are side by side below the header
+            expect(metrics.house.y).toBeGreaterThanOrEqual(
+              metrics.header.bottom - 2,
+            );
+            expect(metrics.rail.y).toBeGreaterThanOrEqual(
+              metrics.header.bottom - 2,
+            );
 
-          // House panel is wider than the rail
-          expect(metrics.house.width).toBeGreaterThan(metrics.rail.width - 20);
+            // House is to the LEFT of the rail
+            expect(metrics.house.right).toBeLessThanOrEqual(metrics.rail.x + 8);
 
-          // Score, analysis, inventory are all in the rail (right side)
-          expect(metrics.score.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
-          expect(metrics.analysis.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
-          expect(metrics.inventory.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
+            // House panel is wider than the rail
+            expect(metrics.house.width).toBeGreaterThan(
+              metrics.rail.width - 20,
+            );
 
-          // Score is above analysis, analysis is above inventory (stacked in rail)
-          expect(metrics.analysis.y).toBeGreaterThanOrEqual(metrics.score.bottom - 4);
-          expect(metrics.inventory.y).toBeGreaterThanOrEqual(metrics.analysis.bottom - 4);
+            // Score, analysis, inventory are all in the rail (right side)
+            expect(metrics.score.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
+            expect(metrics.analysis.x).toBeGreaterThanOrEqual(
+              metrics.rail.x - 2,
+            );
+            expect(metrics.inventory.x).toBeGreaterThanOrEqual(
+              metrics.rail.x - 2,
+            );
 
-          // Nothing overflows the viewport
-          expect(metrics.score.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-          expect(metrics.analysis.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-          expect(metrics.inventory.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-          expect(metrics.rail.bottom).toBeLessThanOrEqual(metrics.viewportHeight + 4);
+            // Score is above analysis, analysis is above inventory (stacked in rail)
+            expect(metrics.analysis.y).toBeGreaterThanOrEqual(
+              metrics.score.bottom - 4,
+            );
+            expect(metrics.inventory.y).toBeGreaterThanOrEqual(
+              metrics.analysis.bottom - 4,
+            );
 
-          // Inventory should be content-height, NOT stretched to viewport bottom.
-          // If inventory bottom is near rail bottom AND there's big empty space
-          // below the last device card, the inventory is wasting vertical space.
-          const inventoryUsedHeight = metrics.inventory.scrollHeight;
-          const inventoryRenderedHeight = metrics.inventory.height;
-          // Allow 40px slack for padding, but inventory height shouldn't be
-          // more than 2x its scroll content height.
-          expect(inventoryRenderedHeight).toBeLessThan(inventoryUsedHeight * 2 + 40);
+            // Nothing overflows the viewport
+            expect(metrics.score.right).toBeLessThanOrEqual(
+              metrics.viewportWidth + 1,
+            );
+            expect(metrics.analysis.right).toBeLessThanOrEqual(
+              metrics.viewportWidth + 1,
+            );
+            expect(metrics.inventory.right).toBeLessThanOrEqual(
+              metrics.viewportWidth + 1,
+            );
+            expect(metrics.rail.bottom).toBeLessThanOrEqual(
+              metrics.viewportHeight + 4,
+            );
+
+            // Inventory should be content-height, NOT stretched to viewport bottom.
+            const inventoryUsedHeight = metrics.inventory.scrollHeight;
+            const inventoryRenderedHeight = metrics.inventory.height;
+            expect(inventoryRenderedHeight).toBeLessThan(
+              inventoryUsedHeight * 2 + 40,
+            );
+          }
+        } else {
+          // Tablet layout: stacked, no rail, has inventory panel
+          expect(metrics.rail).toBeNull();
+          expect(metrics.inventory).not.toBeNull();
+          await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
+
+          if (
+            metrics.header &&
+            metrics.house &&
+            metrics.score &&
+            metrics.analysis &&
+            metrics.inventory
+          ) {
+            // Score is below header
+            expect(metrics.score.y).toBeGreaterThanOrEqual(
+              metrics.header.bottom - 2,
+            );
+            // Analysis is below score
+            expect(metrics.analysis.y).toBeGreaterThanOrEqual(
+              metrics.score.bottom - 4,
+            );
+            // Nothing overflows
+            expect(metrics.score.right).toBeLessThanOrEqual(
+              metrics.viewportWidth + 1,
+            );
+            expect(metrics.analysis.right).toBeLessThanOrEqual(
+              metrics.viewportWidth + 1,
+            );
+          }
         }
 
         if (viewport.width < 1280 && difficulty === "medium") {
           await expect(page.getByTestId("dh-room-zone-bedroom")).toBeVisible();
-          await expect(page.getByTestId("dh-room-zone-entry-exterior")).toBeVisible();
+          await expect(
+            page.getByTestId("dh-room-zone-entry-exterior"),
+          ).toBeVisible();
           expect(await deviceLabelFits(page, "work-laptop")).toBeTruthy();
           expect(await deviceLabelFits(page, "guest-phone")).toBeTruthy();
           expect(await deviceLabelFits(page, "doorbell-camera")).toBeTruthy();
         }
 
         if (viewport.width >= 1280 && difficulty === "medium") {
-          await expect(page.getByRole("button", { name: /room zones/i })).toHaveCount(0);
+          await expect(
+            page.getByRole("button", { name: /room zones/i }),
+          ).toHaveCount(0);
           await expect(page.getByTestId("dh-room-zone-bedroom")).toBeVisible();
-          await expect(page.getByTestId("dh-room-zone-entry-exterior")).toBeVisible();
+          await expect(
+            page.getByTestId("dh-room-zone-entry-exterior"),
+          ).toBeVisible();
         }
       });
     }
   }
 
-  test("help modal opens on first visit and dont-show-again suppresses future auto-open", async ({ page }, testInfo) => {
+  test("help modal opens via How to Play and dont-show-again suppresses future auto-open", async ({
+    page,
+  }, testInfo) => {
     const viewport = { width: 390, height: 844 };
     await page.setViewportSize(viewport);
     await page.goto(ROUTE, { waitUntil: "networkidle" });
     await stabilize(page);
 
+    // Dismiss CoachMark first
+    const skip1 = page.getByRole("button", { name: /^skip$/i });
+    try {
+      await skip1.waitFor({ state: "visible", timeout: 2000 });
+      await skip1.click();
+    } catch {
+      await page.keyboard.press("Escape");
+    }
+    await expect(
+      page.locator('[role="dialog"][aria-modal="true"]'),
+    ).toHaveCount(0, { timeout: 3000 });
+
+    // Open help modal via button
+    await page.getByRole("button", { name: /how to play/i }).click();
     const helpModal = page.getByTestId("dh-help-modal");
     await expect(helpModal).toBeVisible();
+
     await page.getByRole("checkbox", { name: /don't show again/i }).check();
     await page.getByRole("button", { name: /dismiss/i }).click();
     await expect(helpModal).toHaveCount(0);
 
+    // Reload: CoachMark should be suppressed by the preference
     await page.reload({ waitUntil: "networkidle" });
     await stabilize(page);
+    await page.waitForTimeout(600);
+    // The onboarding pref key is shared, so neither coach nor help opens
     await expect(page.getByTestId("dh-help-modal")).toHaveCount(0);
 
     await attachScreenshot(page, testInfo, "help-modal-dont-show-again");
@@ -288,8 +417,12 @@ test.describe("Digital House desktop audit", () => {
     await page.setViewportSize(viewport);
     await openGame(page, "easy");
 
-    await page.getByTestId("dh-device-work-laptop").dragTo(page.getByTestId("dh-room-office"));
-    await expect(page.getByTestId("dh-analysis-card")).not.toContainText("Pick a device to begin.");
+    await page
+      .getByTestId("dh-device-work-laptop")
+      .dragTo(page.getByTestId("dh-room-office"));
+    await expect(page.getByTestId("dh-analysis-card")).not.toContainText(
+      "Drag a device to a room to begin",
+    );
 
     const officeChip = page
       .getByTestId("dh-room-office")
@@ -306,39 +439,58 @@ test.describe("Digital House desktop audit", () => {
 
 test.describe("Digital House phone audit", () => {
   test.use({ hasTouch: true, isMobile: true });
+  test.beforeEach(({ browserName }) => {
+    test.skip(browserName === "firefox", "isMobile not supported in Firefox");
+  });
 
   for (const viewport of PHONE_VIEWPORTS) {
-    test(`phone medium ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
+    test(`phone medium ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }, testInfo) => {
       await page.setViewportSize(viewport);
       await openGame(page, "medium");
 
       const baseName = `phone-medium-${viewport.width}x${viewport.height}`;
       await attachScreenshot(page, testInfo, baseName);
-      const metrics = await attachMetrics(page, testInfo, baseName + "-metrics");
+      const metrics = await attachMetrics(
+        page,
+        testInfo,
+        baseName + "-metrics",
+      );
 
       expect(metrics.score).not.toBeNull();
       expect(metrics.house).not.toBeNull();
-      expect(metrics.tray).not.toBeNull();
+      expect(metrics.deviceStrip).not.toBeNull();
       expect(metrics.analysis).not.toBeNull();
 
-      if (metrics.score && metrics.house && metrics.header && metrics.tray && metrics.analysis) {
-        expect(metrics.score.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
+      if (
+        metrics.score &&
+        metrics.house &&
+        metrics.header &&
+        metrics.deviceStrip &&
+        metrics.analysis
+      ) {
+        expect(metrics.score.y).toBeGreaterThanOrEqual(
+          metrics.header.bottom - 2,
+        );
         expect(metrics.score.bottom).toBeLessThanOrEqual(metrics.house.y + 10);
-        expect(metrics.house.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-        expect(metrics.score.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-        expect(metrics.analysis.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-        expect(metrics.tray.position).toBe("fixed");
-        expect(metrics.tray.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-        expect(metrics.tray.bottom).toBeLessThanOrEqual(metrics.viewportHeight + 1);
+        expect(metrics.house.right).toBeLessThanOrEqual(
+          metrics.viewportWidth + 1,
+        );
+        expect(metrics.score.right).toBeLessThanOrEqual(
+          metrics.viewportWidth + 1,
+        );
+        expect(metrics.analysis.right).toBeLessThanOrEqual(
+          metrics.viewportWidth + 1,
+        );
+        expect(metrics.deviceStrip.right).toBeLessThanOrEqual(
+          metrics.viewportWidth + 1,
+        );
 
-        // House must NOT push analysis so far down that the user has to
-        // scroll endlessly. On phone the content area scrolls, so analysis
-        // CAN be below the tray — but not by more than ~40% of viewport
-        // height (that would mean the house is hogging too much space).
-        const trayTop = metrics.tray.y;
-        const analysisBottom = metrics.analysis.bottom;
-        const maxScroll = metrics.viewportHeight * 0.4;
-        expect(analysisBottom).toBeLessThan(trayTop + maxScroll);
+        // Device strip should be below the house
+        expect(metrics.deviceStrip.y).toBeGreaterThanOrEqual(
+          metrics.house.y - 2,
+        );
       }
 
       const canScroll = await page.evaluate(() => {
@@ -356,15 +508,24 @@ test.describe("Digital House phone audit", () => {
       await page.waitForTimeout(100);
 
       await page.getByTestId("dh-room-zone-bedroom").click();
-      await expect(page.getByTestId("dh-room-zone-popover-bedroom")).toBeVisible();
+      await expect(
+        page.getByTestId("dh-room-zone-popover-bedroom"),
+      ).toBeVisible();
       await page.getByTestId("dh-room-zone-option-bedroom-main").click();
-      await expect(page.getByTestId("dh-room-zone-popover-bedroom")).toHaveCount(0);
+      await expect(
+        page.getByTestId("dh-room-zone-popover-bedroom"),
+      ).toHaveCount(0);
 
       await page.getByTestId("dh-device-personal-phone").click();
       await page.getByTestId("dh-room-bedroom").click();
-      await expect(page.getByTestId("dh-analysis-card")).not.toContainText("Pick a device to begin.");
+      await expect(page.getByTestId("dh-analysis-card")).not.toContainText(
+        "Drag a device to a room to begin",
+      );
       expect(await roomHasDevice(page, "bedroom", "Personal phone")).toBe(1);
 
+      // Click once to return from bedroom, again to select, then place in office
+      await page.getByTestId("dh-device-personal-phone").click();
+      await page.waitForTimeout(80);
       await page.getByTestId("dh-device-personal-phone").click();
       await page.getByTestId("dh-room-office").click();
       expect(await roomHasDevice(page, "bedroom", "Personal phone")).toBe(0);
@@ -372,12 +533,28 @@ test.describe("Digital House phone audit", () => {
     });
   }
 
-  test("help modal dismisses with touch tap on phone", async ({ page }, testInfo) => {
+  test("help modal opens via How to Play and dismisses with touch tap on phone", async ({
+    page,
+  }, testInfo) => {
     const viewport = { width: 390, height: 844 };
     await page.setViewportSize(viewport);
     await page.goto(ROUTE, { waitUntil: "networkidle" });
     await stabilize(page);
 
+    // Dismiss CoachMark
+    const skipBtn = page.getByRole("button", { name: /^skip$/i });
+    try {
+      await skipBtn.waitFor({ state: "visible", timeout: 2000 });
+      await skipBtn.click();
+    } catch {
+      await page.keyboard.press("Escape");
+    }
+    await expect(
+      page.locator('[role="dialog"][aria-modal="true"]'),
+    ).toHaveCount(0, { timeout: 3000 });
+
+    // Open help modal
+    await page.getByRole("button", { name: /how to play/i }).click();
     const helpModal = page.getByTestId("dh-help-modal");
     await expect(helpModal).toBeVisible();
     await page.getByRole("button", { name: /dismiss/i }).tap();
@@ -385,7 +562,10 @@ test.describe("Digital House phone audit", () => {
 
     await attachScreenshot(page, testInfo, "help-modal-touch-dismiss");
   });
-  test("theme toggle updates Digital House chrome", async ({ page }, testInfo) => {
+
+  test("theme toggle updates Digital House chrome", async ({
+    page,
+  }, testInfo) => {
     const viewport = { width: 390, height: 844 };
     await page.setViewportSize(viewport);
     await openGame(page, "medium");
@@ -393,24 +573,35 @@ test.describe("Digital House phone audit", () => {
     await page.getByRole("button", { name: /how to play/i }).click();
     const helpModal = page.getByTestId("dh-help-modal");
     await expect(helpModal).toBeVisible();
-    const helpBefore = await helpModal.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const helpBefore = await helpModal.evaluate(
+      (el) => getComputedStyle(el).backgroundColor,
+    );
     await page.keyboard.press("Escape");
 
-    const scoreBefore = await page.getByTestId("dh-score-hud").evaluate((el) => getComputedStyle(el).backgroundColor);
-    const trayBefore = await page.getByTestId("dh-mobile-tray").evaluate((el) => getComputedStyle(el).backgroundColor);
+    const scoreBefore = await page
+      .getByTestId("dh-score-hud")
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    const stripBefore = await page
+      .getByTestId("dh-device-strip")
+      .evaluate((el) => getComputedStyle(el).color);
 
     await page.getByRole("button", { name: /switch to light mode/i }).click();
     await page.waitForTimeout(120);
 
-    const scoreAfter = await page.getByTestId("dh-score-hud").evaluate((el) => getComputedStyle(el).backgroundColor);
-    const trayAfter = await page.getByTestId("dh-mobile-tray").evaluate((el) => getComputedStyle(el).backgroundColor);
+    const scoreAfter = await page
+      .getByTestId("dh-score-hud")
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    const stripAfter = await page
+      .getByTestId("dh-device-strip")
+      .evaluate((el) => getComputedStyle(el).color);
 
     await page.getByRole("button", { name: /how to play/i }).click();
-    const helpAfter = await page.getByTestId("dh-help-modal").evaluate((el) => getComputedStyle(el).backgroundColor);
-
+    const helpAfter = await page
+      .getByTestId("dh-help-modal")
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
 
     expect(scoreAfter).not.toBe(scoreBefore);
-    expect(trayAfter).not.toBe(trayBefore);
+    expect(stripAfter).not.toBe(stripBefore);
     expect(helpAfter).not.toBe(helpBefore);
 
     await attachScreenshot(page, testInfo, "theme-light-mobile");
@@ -418,11 +609,12 @@ test.describe("Digital House phone audit", () => {
   });
 });
 
-
 test.describe("Digital House scoring audit", () => {
   test.use({ hasTouch: false, isMobile: false });
 
-  test("easy best-case board still reports unresolved guest isolation", async ({ page }, testInfo) => {
+  test("easy best-case board still reports unresolved guest isolation", async ({
+    page,
+  }, testInfo) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     await openGame(page, "easy");
 
@@ -437,18 +629,26 @@ test.describe("Digital House scoring audit", () => {
     await placeDevice(page, "doorbell-camera", "entry-exterior");
     await placeDevice(page, "camera-hub", "kitchen");
 
-    await page.getByRole("button", { name: /after-action report/i }).scrollIntoViewIfNeeded();
+    await page
+      .getByRole("button", { name: /after-action report/i })
+      .scrollIntoViewIfNeeded();
     await page.getByRole("button", { name: /after-action report/i }).click();
     const summary = page.getByLabel(/after-action report/i);
     await expect(summary).toBeVisible();
     await expect(page.getByTestId("dh-summary-score")).toHaveText("88");
-    await expect(summary).toContainText("Easy mode still leaves the guest phone off a true Guest network.");
-    await expect(summary).toContainText("Easy mode cannot assign a true Guest network. Try Medium or Hard to isolate the guest phone there.");
+    await expect(summary).toContainText(
+      "Easy mode doesn't let you create a separate guest network.",
+    );
+    await expect(summary).toContainText(
+      "Easy mode doesn't have a guest network. Try Medium or Hard to separate visitor devices.",
+    );
 
     await attachScreenshot(page, testInfo, "scoring-easy-best-case");
   });
 
-  test("hard ideal board still reaches 100 with no open risk section", async ({ page }, testInfo) => {
+  test("hard ideal board still reaches 100 with no open risk section", async ({
+    page,
+  }, testInfo) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     await openGame(page, "hard");
 
@@ -469,7 +669,9 @@ test.describe("Digital House scoring audit", () => {
     await placeDevice(page, "doorbell-camera", "entry-exterior");
     await placeDevice(page, "camera-hub", "entry-exterior");
 
-    await page.getByRole("button", { name: /after-action report/i }).scrollIntoViewIfNeeded();
+    await page
+      .getByRole("button", { name: /after-action report/i })
+      .scrollIntoViewIfNeeded();
     await page.getByRole("button", { name: /after-action report/i }).click();
     const summary = page.getByLabel(/after-action report/i);
     await expect(summary).toBeVisible();

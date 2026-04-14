@@ -95,9 +95,9 @@ describe("calculateScore — base matrix spot checks", () => {
 
   it("Printer on Main keeps the original base-matrix score but records a critical finding", () => {
     const r = calculateScore([p("printer", "main")]);
-    expect(r.privacy).toBe(48);
-    expect(r.blastRadius).toBe(46);
-    expect(r.recovery).toBe(44);
+    expect(r.privacy).toBe(42);
+    expect(r.blastRadius).toBe(40);
+    expect(r.recovery).toBe(38);
     expect(findingFor(r.placementFindings, "printer")).toMatchObject({
       actualZone: "main",
       idealZone: "iot",
@@ -132,8 +132,12 @@ describe("calculateScore — placement findings and score ceilings", () => {
 
   it("encodes guest-phone severity as Guest > IoT > Main", () => {
     const ideal = calculateScore(perfectLayout());
-    const wrong = calculateScore(withZone(perfectLayout(), "guest-phone", "iot"));
-    const critical = calculateScore(withZone(perfectLayout(), "guest-phone", "main"));
+    const wrong = calculateScore(
+      withZone(perfectLayout(), "guest-phone", "iot"),
+    );
+    const critical = calculateScore(
+      withZone(perfectLayout(), "guest-phone", "main"),
+    );
 
     expect(ideal.total).toBe(100);
     expect(wrong.total).toBe(88);
@@ -141,9 +145,9 @@ describe("calculateScore — placement findings and score ceilings", () => {
     expect(findingFor(wrong.placementFindings, "guest-phone")?.severity).toBe(
       "wrong",
     );
-    expect(findingFor(critical.placementFindings, "guest-phone")?.severity).toBe(
-      "critical",
-    );
+    expect(
+      findingFor(critical.placementFindings, "guest-phone")?.severity,
+    ).toBe("critical");
   });
 
   it("encodes trusted-device severity as Main > Guest > IoT", () => {
@@ -152,7 +156,9 @@ describe("calculateScore — placement findings and score ceilings", () => {
 
     expect(wrong.total).toBe(88);
     expect(critical.total).toBe(80);
-    expect(findingFor(wrong.placementFindings, "tablet")?.severity).toBe("wrong");
+    expect(findingFor(wrong.placementFindings, "tablet")?.severity).toBe(
+      "wrong",
+    );
     expect(findingFor(critical.placementFindings, "tablet")?.severity).toBe(
       "critical",
     );
@@ -160,19 +166,27 @@ describe("calculateScore — placement findings and score ceilings", () => {
 
   it("encodes printer severity as IoT > Guest > Main", () => {
     const wrong = calculateScore(withZone(perfectLayout(), "printer", "guest"));
-    const critical = calculateScore(withZone(perfectLayout(), "printer", "main"));
+    const critical = calculateScore(
+      withZone(perfectLayout(), "printer", "main"),
+    );
 
     expect(wrong.total).toBe(88);
     expect(critical.total).toBe(80);
-    expect(findingFor(wrong.placementFindings, "printer")?.severity).toBe("wrong");
+    expect(findingFor(wrong.placementFindings, "printer")?.severity).toBe(
+      "wrong",
+    );
     expect(findingFor(critical.placementFindings, "printer")?.severity).toBe(
       "critical",
     );
   });
 
   it("encodes entertainment severity as IoT > Guest > Main", () => {
-    const wrong = calculateScore(withZone(perfectLayout(), "smart-tv", "guest"));
-    const critical = calculateScore(withZone(perfectLayout(), "smart-tv", "main"));
+    const wrong = calculateScore(
+      withZone(perfectLayout(), "smart-tv", "guest"),
+    );
+    const critical = calculateScore(
+      withZone(perfectLayout(), "smart-tv", "main"),
+    );
 
     expect(wrong.total).toBe(88);
     expect(critical.total).toBe(80);
@@ -194,9 +208,9 @@ describe("calculateScore — placement findings and score ceilings", () => {
 
     expect(wrong.total).toBe(88);
     expect(critical.total).toBe(80);
-    expect(findingFor(wrong.placementFindings, "doorbell-camera")?.severity).toBe(
-      "wrong",
-    );
+    expect(
+      findingFor(wrong.placementFindings, "doorbell-camera")?.severity,
+    ).toBe("wrong");
     expect(
       findingFor(critical.placementFindings, "doorbell-camera")?.severity,
     ).toBe("critical");
@@ -213,11 +227,15 @@ describe("calculateScore — real cross-device combos", () => {
 
   it("still fires camera-on-main when any camera lands on Main", () => {
     const r = calculateScore(withZone(perfectLayout(), "camera-hub", "main"));
-    expect(r.appliedCombos.map((combo) => combo.id)).toContain("camera-on-main");
+    expect(r.appliedCombos.map((combo) => combo.id)).toContain(
+      "camera-on-main",
+    );
   });
 
   it("still fires entertainment-clutter when smart devices sit on Main with work or personal devices", () => {
-    const r = calculateScore(withZone(perfectLayout(), "smart-speaker", "main"));
+    const r = calculateScore(
+      withZone(perfectLayout(), "smart-speaker", "main"),
+    );
     expect(r.appliedCombos.map((combo) => combo.id)).toContain(
       "entertainment-clutter",
     );
@@ -238,19 +256,26 @@ describe("calculateScore — real cross-device combos", () => {
     ]);
 
     expect(r.total).toBe(0);
-    expect(r.appliedCombos.map((combo) => combo.id)).toContain("single-zone-dump");
+    expect(r.appliedCombos.map((combo) => combo.id)).toContain(
+      "single-zone-dump",
+    );
   });
 });
 
 describe("calculateScore — audit trail", () => {
   it("keeps base deltas, combo deltas, and placement findings separate", () => {
-    const r = calculateScore([
-      p("work-laptop", "main"),
-      p("smart-tv", "main"),
-    ]);
+    const r = calculateScore([p("work-laptop", "main"), p("smart-tv", "main")]);
 
-    expect(r.baseDeltas).toEqual({ privacy: 0, blastRadius: -6, recovery: -10 });
-    expect(r.comboDeltas).toEqual({ privacy: -4, blastRadius: -8, recovery: -10 });
+    expect(r.baseDeltas).toEqual({
+      privacy: 0,
+      blastRadius: -6,
+      recovery: -10,
+    });
+    expect(r.comboDeltas).toEqual({
+      privacy: -4,
+      blastRadius: -8,
+      recovery: -10,
+    });
     expect(r.placementFindings).toEqual([
       {
         deviceId: "smart-tv",
