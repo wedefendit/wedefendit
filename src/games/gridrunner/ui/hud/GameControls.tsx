@@ -12,19 +12,27 @@ licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
 
-import { DPad } from "./DPad";
-import { ActionButtons } from "./ActionButtons";
+import { DPad, type DPadDirection } from "./DPad";
+import { ActionButtons, type ActionButton } from "./ActionButtons";
+
+type GameControlsProps = Readonly<{
+  onDPadPress?: (dir: DPadDirection) => void;
+  onDPadRelease?: (dir: DPadDirection) => void;
+  onActionPress?: (btn: ActionButton) => void;
+  onActionRelease?: (btn: ActionButton) => void;
+}>;
 
 /**
  * Bottom control bar: d-pad on the left, A/B buttons on the right.
  * Visible on mobile (below lg breakpoint), hidden on desktop where
  * keyboard controls are primary.
- *
- * Sits inside the game frame as a fixed-height bar at the bottom.
- * The game viewport (overworld, battle, etc.) fills the remaining
- * space above.
  */
-export function GameControls() {
+export function GameControls({
+  onDPadPress,
+  onDPadRelease,
+  onActionPress,
+  onActionRelease,
+}: GameControlsProps) {
   return (
     <footer
       data-testid="gr-controls"
@@ -35,8 +43,8 @@ export function GameControls() {
         borderTop: "1px solid #1a3a4a",
       }}
     >
-      <DPad />
-      <ActionButtons />
+      <DPad onPress={onDPadPress} onRelease={onDPadRelease} />
+      <ActionButtons onPress={onActionPress} onRelease={onActionRelease} />
     </footer>
   );
 }

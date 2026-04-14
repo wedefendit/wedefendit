@@ -14,20 +14,40 @@ party without express written consent.
 
 import { GridRunnerShell } from "./GridRunnerShell";
 import { useForceDarkMode } from "./hooks/useForceDarkMode";
+import { useGridRunner } from "./hooks/useGridRunner";
 import { TitleScreen } from "./ui/screens/TitleScreen";
+import { OverworldScreen } from "./ui/screens/OverworldScreen";
 
 /**
  * Top-level GRIDRUNNER component. Manages the screen state machine:
  *   title -> overworld -> building -> battle -> intel
- *
- * Phase 1: only renders the title screen inside the frame shell.
  */
 export function GridRunner() {
   useForceDarkMode();
+  const game = useGridRunner();
+
+  const isTitleScreen = game.screen === "title";
 
   return (
-    <GridRunnerShell>
-      <TitleScreen />
+    <GridRunnerShell
+      hideControls={isTitleScreen}
+      onDPadPress={game.handleDPadPress}
+      onDPadRelease={game.handleDPadRelease}
+    >
+      {game.screen === "title" && (
+        <TitleScreen
+          hasSave={game.hasSaveFile}
+          onNewGame={game.startGame}
+          onContinue={game.continueGame}
+        />
+      )}
+      {game.screen === "overworld" && (
+        <OverworldScreen
+          map={game.map}
+          playerPos={game.playerPos}
+          facing={game.facing}
+        />
+      )}
     </GridRunnerShell>
   );
 }

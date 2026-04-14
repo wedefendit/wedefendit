@@ -14,28 +14,57 @@ party without express written consent.
 
 import type { ReactNode } from "react";
 import { GameControls } from "./ui/hud/GameControls";
+import type { DPadDirection } from "./ui/hud/DPad";
+import type { ActionButton } from "./ui/hud/ActionButtons";
 
 type GridRunnerShellProps = Readonly<{
   children: ReactNode;
+  onDPadPress?: (dir: DPadDirection) => void;
+  onDPadRelease?: (dir: DPadDirection) => void;
+  onActionPress?: (btn: ActionButton) => void;
+  onActionRelease?: (btn: ActionButton) => void;
+  hideControls?: boolean;
 }>;
 
-/**
- * Top-level game frame container. Sits below the site nav inside the
- * Layout h-dvh flex column. The frame:
- *
- *   - fills available width on mobile (respecting safe-area insets)
- *   - caps at a max width on desktop, centered horizontally
- *   - never exceeds available height (no vertical scroll)
- *   - clips all overflow so the game world stays contained
- *
- * All game screens (title, overworld, battle, etc.) render inside
- * the frame. On desktop with extra horizontal room, future HUD
- * panels can be placed outside the frame in gr-root's remaining space.
- *
- * Mobile controls (d-pad + action buttons) sit at the bottom of the
- * frame as a fixed-height bar. The game viewport fills remaining space.
- */
-export function GridRunnerShell({ children }: GridRunnerShellProps) {
+const FONT_FACES = `
+@font-face {
+  font-family: 'Share Tech Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/share-tech-mono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/orbitron-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/orbitron-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/orbitron-900.woff2') format('woff2');
+}
+`;
+
+export function GridRunnerShell({
+  children,
+  onDPadPress,
+  onDPadRelease,
+  onActionPress,
+  onActionRelease,
+  hideControls,
+}: GridRunnerShellProps) {
   return (
     <main
       data-testid="gr-root"
@@ -46,17 +75,23 @@ export function GridRunnerShell({ children }: GridRunnerShellProps) {
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
+      <style>{FONT_FACES}</style>
       <section
         data-testid="gr-frame"
         aria-label="GRIDRUNNER game"
         className="relative mx-auto flex min-h-0 w-full max-w-[960px] flex-1 flex-col overflow-hidden"
       >
-        {/* Game viewport - fills available space above controls */}
         <div data-testid="gr-viewport" className="relative min-h-0 flex-1 flex flex-col overflow-hidden">
           {children}
         </div>
-        {/* Mobile controls - hidden on desktop (lg+) */}
-        <GameControls />
+        {!hideControls && (
+          <GameControls
+            onDPadPress={onDPadPress}
+            onDPadRelease={onDPadRelease}
+            onActionPress={onActionPress}
+            onActionRelease={onActionRelease}
+          />
+        )}
       </section>
     </main>
   );

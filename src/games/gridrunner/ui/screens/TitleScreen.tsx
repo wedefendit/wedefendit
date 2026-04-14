@@ -12,94 +12,120 @@ licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
 
-import { useEffect, useState } from "react";
+import { useState, type FormEvent } from "react";
+
+type TitleScreenProps = Readonly<{
+  hasSave: boolean;
+  onNewGame: (name: string) => void;
+  onContinue: () => void;
+}>;
 
 /**
- * Placeholder title screen. Will be replaced with name input,
- * new game / continue, and the full Tron aesthetic. For now it
- * proves the frame shell renders content correctly and shows
- * a loading state with a native <progress> element.
+ * Title screen with name input and New Game / Continue.
+ * Uses Orbitron for the title, Share Tech Mono for everything else.
  */
-export function TitleScreen() {
-  const [progress, setProgress] = useState(0);
+export function TitleScreen({ hasSave, onNewGame, onContinue }: TitleScreenProps) {
+  const [name, setName] = useState("");
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        // Randomized increment for an organic feel
-        return Math.min(prev + Math.random() * 8 + 2, 100);
-      });
-    }, 120);
-    return () => clearInterval(interval);
-  }, []);
+  function handleNewGame(e: FormEvent) {
+    e.preventDefault();
+    onNewGame(name.trim());
+  }
 
   return (
     <section
       data-testid="gr-title-screen"
       aria-label="GRIDRUNNER title"
-      className="flex flex-1 flex-col items-center justify-center gap-6 px-6"
+      className="flex flex-1 flex-col items-center justify-center gap-8 px-6"
       style={{ backgroundColor: "#0a0e1a" }}
     >
-      <header className="flex flex-col items-center gap-2">
+      <header className="flex flex-col items-center gap-3">
         <h1
-          className="text-center font-mono text-2xl font-bold tracking-widest sm:text-4xl"
-          style={{ color: "#00f0ff" }}
+          data-testid="gr-title"
+          className="text-center text-3xl font-black tracking-[0.2em] sm:text-5xl"
+          style={{ color: "#00f0ff", fontFamily: "'Orbitron', sans-serif" }}
         >
           GRIDRUNNER
         </h1>
+        <p
+          className="text-center text-xs tracking-widest sm:text-sm"
+          style={{
+            color: "#00f0ff",
+            opacity: 0.5,
+            fontFamily: "'Share Tech Mono', monospace",
+          }}
+        >
+          DEFEND THE GRID
+        </p>
       </header>
 
-      <div className="flex w-full max-w-xs flex-col items-center gap-2">
-        <label
-          htmlFor="gr-init-progress"
-          className="font-mono text-xs tracking-wide sm:text-sm"
-          style={{ color: "#00f0ff", opacity: 0.6 }}
-        >
-          {progress < 100 ? "INITIALIZING..." : "READY"}
-        </label>
-        <progress
-          id="gr-init-progress"
-          data-testid="gr-init-progress"
-          value={progress}
-          max={100}
-          className="gr-progress h-2 w-full"
-        >
-          {Math.round(progress)}%
-        </progress>
-      </div>
+      <div
+        className="flex w-full max-w-xs flex-col gap-4"
+        style={{ fontFamily: "'Share Tech Mono', monospace" }}
+      >
+        {/* Name input */}
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="gr-name-input"
+            className="text-xs uppercase tracking-wider"
+            style={{ color: "#00f0ff", opacity: 0.6 }}
+          >
+            Operator name
+          </label>
+          <input
+            id="gr-name-input"
+            data-testid="gr-name-input"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="OPERATOR"
+            maxLength={16}
+            autoComplete="off"
+            className="rounded-sm px-3 py-3 text-sm tracking-wider outline-none placeholder:opacity-30"
+            style={{
+              backgroundColor: "#0f1b2d",
+              border: "1px solid #1a3a4a",
+              color: "#00f0ff",
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          />
+        </div>
 
-      {/* Progress bar styling — uses native <progress> with
-          vendor pseudo-elements for cross-browser Tron aesthetic */}
-      <style>{`
-        .gr-progress {
-          appearance: none;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          border: 1px solid #1a3a4a;
-          border-radius: 2px;
-          background: #0a0e1a;
-          overflow: hidden;
-        }
-        .gr-progress::-webkit-progress-bar {
-          background: #0a0e1a;
-          border-radius: 2px;
-        }
-        .gr-progress::-webkit-progress-value {
-          background: #00f0ff;
-          box-shadow: 0 0 8px #00f0ff, 0 0 2px #00f0ff;
-          border-radius: 2px;
-          transition: width 0.12s ease-out;
-        }
-        .gr-progress::-moz-progress-bar {
-          background: #00f0ff;
-          box-shadow: 0 0 8px #00f0ff, 0 0 2px #00f0ff;
-          border-radius: 2px;
-        }
-      `}</style>
+        {/* Action buttons */}
+        <div className="flex flex-col gap-3">
+          <button
+            type="button"
+            data-testid="gr-new-game"
+            onClick={handleNewGame}
+            className="rounded-sm px-4 py-3 text-sm font-bold uppercase tracking-widest transition-colors active:brightness-150"
+            style={{
+              backgroundColor: "#0f1b2d",
+              border: "2px solid #00f0ff",
+              color: "#00f0ff",
+              boxShadow: "0 0 12px rgba(0, 240, 255, 0.15)",
+            }}
+          >
+            New Game
+          </button>
+
+          {hasSave && (
+            <button
+              type="button"
+              data-testid="gr-continue"
+              onClick={onContinue}
+              className="rounded-sm px-4 py-3 text-sm font-bold uppercase tracking-widest transition-colors active:brightness-150"
+              style={{
+                backgroundColor: "#0f1b2d",
+                border: "2px solid #ff00de",
+                color: "#ff00de",
+                boxShadow: "0 0 12px rgba(255, 0, 222, 0.15)",
+              }}
+            >
+              Continue
+            </button>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

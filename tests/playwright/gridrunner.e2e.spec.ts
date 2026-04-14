@@ -88,6 +88,13 @@ async function openGridRunner(page: Page) {
   await stabilize(page);
 }
 
+/** Start a new game from the title screen to reach the overworld. */
+async function startNewGame(page: Page) {
+  await openGridRunner(page);
+  await page.getByTestId("gr-new-game").click();
+  await expect(page.getByTestId("gr-overworld")).toBeVisible();
+}
+
 async function collectFrameMetrics(page: Page): Promise<FrameMetrics> {
   return page.evaluate(() => {
     const nav = document.querySelector("nav");
@@ -205,7 +212,9 @@ test.describe("GRIDRUNNER semantic HTML", () => {
     expect(frameLabel, "gr-frame should have an aria-label").toBeTruthy();
   });
 
-  test("title screen uses <h1> and native <progress>", async ({ page }) => {
+  test("title screen has <h1>, name input, and new game button", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await openGridRunner(page);
 
@@ -214,26 +223,20 @@ test.describe("GRIDRUNNER semantic HTML", () => {
     await expect(h1).toBeVisible();
     await expect(h1).toContainText("GRIDRUNNER");
 
-    // Loading bar is a native <progress>, not a styled div
-    const progress = page.getByTestId("gr-init-progress");
-    await expect(progress).toBeVisible();
-
-    const progressTag = await progress.evaluate((el) =>
-      el.tagName.toLowerCase(),
-    );
-    expect(
-      progressTag,
-      "Loading bar must be a native <progress> element, not a div",
-    ).toBe("progress");
-
-    // Progress should have max and value attributes
-    const max = await progress.getAttribute("max");
-    expect(max).toBe("100");
-
-    // Progress should have an associated label
-    const labelledBy = await progress.getAttribute("id");
-    const label = page.locator(`label[for="${labelledBy}"]`);
+    // Name input is a native <input> with associated <label>
+    const input = page.getByTestId("gr-name-input");
+    await expect(input).toBeVisible();
+    const inputTag = await input.evaluate((el) => el.tagName.toLowerCase());
+    expect(inputTag).toBe("input");
+    const inputId = await input.getAttribute("id");
+    const label = page.locator(`label[for="${inputId}"]`);
     await expect(label).toBeVisible();
+
+    // New Game button
+    const newGame = page.getByTestId("gr-new-game");
+    await expect(newGame).toBeVisible();
+    const btnTag = await newGame.evaluate((el) => el.tagName.toLowerCase());
+    expect(btnTag).toBe("button");
   });
 
   test("title screen section has aria-label", async ({ page }) => {
@@ -409,6 +412,56 @@ test.describe("GRIDRUNNER frame fills available space", () => {
 });
 
 /* ------------------------------------------------------------------ */
+/*  Tests: Map tiles are square (not stretched)                       */
+/* ------------------------------------------------------------------ */
+
+test.describe("GRIDRUNNER tile proportions", () => {
+  const TILE_VIEWPORTS = [
+    { width: 390, height: 844, label: "phone portrait" },
+    { width: 844, height: 390, label: "phone landscape" },
+    { width: 768, height: 1024, label: "tablet portrait" },
+    { width: 1024, height: 768, label: "tablet landscape" },
+    { width: 1280, height: 800, label: "desktop" },
+    { width: 1920, height: 1080, label: "desktop 1080p" },
+  ];
+
+  for (const vp of TILE_VIEWPORTS) {
+    test(`tiles are square on ${vp.label} (${vp.width}x${vp.height})`, async ({
+      page,
+    }, testInfo) => {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await startNewGame(page);
+
+      const tileSize = await page.evaluate(() => {
+        const map = document.querySelector('[data-testid="gr-map"]');
+        if (!map) return null;
+        // Measure first non-zero grid cell
+        const cells = Array.from(map.children) as HTMLElement[];
+        for (const cell of cells) {
+          const r = cell.getBoundingClientRect();
+          if (r.width > 1 && r.height > 1) {
+            return { w: r.width, h: r.height };
+          }
+        }
+        return null;
+      });
+
+      expect(tileSize, "Should find a measurable tile").not.toBeNull();
+      if (!tileSize) return;
+
+      const ratio = tileSize.w / tileSize.h;
+      expect(
+        ratio,
+        `Tile ratio ${ratio.toFixed(2)} (${tileSize.w.toFixed(1)}x${tileSize.h.toFixed(1)}) -- tiles should be square`,
+      ).toBeGreaterThan(0.8);
+      expect(ratio).toBeLessThan(1.2);
+
+      await attachScreenshot(page, testInfo, `tiles-${vp.width}x${vp.height}`);
+    });
+  }
+});
+
+/* ------------------------------------------------------------------ */
 /*  Tests: Touch targets (mobile)                                     */
 /* ------------------------------------------------------------------ */
 
@@ -471,9 +524,9 @@ test.describe("GRIDRUNNER touch targets", () => {
 
 test.describe("GRIDRUNNER mobile controls", () => {
   test("controls visible on phone, hidden on desktop", async ({ page }) => {
-    // Phone — visible
+    // Phone — visible (must be in overworld, not title screen)
     await page.setViewportSize({ width: 390, height: 844 });
-    await openGridRunner(page);
+    await startNewGame(page);
     await expect(page.getByTestId("gr-controls")).toBeVisible();
     await expect(page.getByTestId("gr-dpad")).toBeVisible();
     await expect(page.getByTestId("gr-action-buttons")).toBeVisible();
@@ -486,13 +539,13 @@ test.describe("GRIDRUNNER mobile controls", () => {
 
   test("controls visible in phone landscape", async ({ page }) => {
     await page.setViewportSize({ width: 844, height: 390 });
-    await openGridRunner(page);
+    await startNewGame(page);
     await expect(page.getByTestId("gr-controls")).toBeVisible();
   });
 
   test("d-pad has all four direction buttons", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openGridRunner(page);
+    await startNewGame(page);
 
     for (const dir of ["up", "down", "left", "right"]) {
       const btn = page.getByTestId(`gr-dpad-${dir}`);
@@ -508,7 +561,7 @@ test.describe("GRIDRUNNER mobile controls", () => {
 
   test("action buttons A and B are present with labels", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openGridRunner(page);
+    await startNewGame(page);
 
     const btnA = page.getByTestId("gr-btn-a");
     const btnB = page.getByTestId("gr-btn-b");
@@ -527,7 +580,7 @@ test.describe("GRIDRUNNER mobile controls", () => {
 
   test("d-pad uses <nav> with aria-label", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openGridRunner(page);
+    await startNewGame(page);
 
     const dpad = page.getByTestId("gr-dpad");
     const tag = await dpad.evaluate((el) => el.tagName.toLowerCase());
@@ -537,7 +590,7 @@ test.describe("GRIDRUNNER mobile controls", () => {
 
   test("action buttons group has role and label", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openGridRunner(page);
+    await startNewGame(page);
 
     const group = page.getByTestId("gr-action-buttons");
     expect(await group.getAttribute("role")).toBe("group");
@@ -548,7 +601,7 @@ test.describe("GRIDRUNNER mobile controls", () => {
     page,
   }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await openGridRunner(page);
+    await startNewGame(page);
 
     const metrics = await page.evaluate(() => {
       const frame = document.querySelector(
