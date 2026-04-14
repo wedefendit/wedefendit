@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Flame, Sparkles } from "lucide-react";
 import { useDigitalHouseController } from "./DigitalHouse.controller";
 import {
@@ -22,6 +23,15 @@ import {
 
 export function DigitalHouse() {
   const c = useDigitalHouseController();
+  const inventoryScrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (c.isComplete && inventoryScrollRef.current) {
+      inventoryScrollRef.current.scrollTo({
+        top: inventoryScrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [c.isComplete]);
 
   const scoreHud = (
     <DigitalHouseScoreHud
@@ -197,7 +207,7 @@ export function DigitalHouse() {
           data-testid="dh-main"
           className="dh-game-main relative flex min-h-0 w-full flex-1 items-start justify-center overflow-hidden px-4 py-3 xl:px-6 xl:py-4"
         >
-          <div className="my-auto flex min-h-0 w-full max-w-[1800px] items-start gap-4 xl:gap-5">
+          <div className="my-auto flex min-h-0 max-h-full w-full max-w-[1800px] items-start gap-4 xl:gap-5">
             <section
               data-testid="dh-house-panel"
               className="dh-house-panel relative flex min-h-0 flex-1 items-center justify-center self-stretch overflow-visible p-2 xl:p-3"
@@ -222,7 +232,10 @@ export function DigitalHouse() {
             >
               {scoreHud}
               {analysisCard}
-              <div className="min-h-0 flex-1 overflow-y-auto">
+              <div
+                ref={inventoryScrollRef}
+                className="min-h-0 flex-1 overflow-y-auto"
+              >
                 {inventoryCard}
               </div>
             </aside>

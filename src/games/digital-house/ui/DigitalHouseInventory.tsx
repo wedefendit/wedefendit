@@ -400,6 +400,7 @@ export function AfterActionReportButton({
     <button
       type="button"
       onClick={onOpen}
+      style={{ animation: "dh-dangerPulse 2s ease-in-out infinite" }}
       className={
         CARD +
         " group flex w-full items-center justify-between gap-4 p-4 text-left transition-transform hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-sky-50/80 dark:hover:border-sky-400/35 dark:hover:bg-slate-900"
