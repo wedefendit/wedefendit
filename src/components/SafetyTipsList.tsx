@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -31,8 +31,8 @@ export const SafetyTipsList: React.FC = () => {
           Start with the basics
         </h2>
         <p className="mt-3 text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-          These are the habits and warning signs we talk through most often
-          with local clients and community groups.
+          These are the habits and warning signs we talk through most often with
+          local clients and community groups.
         </p>
       </header>
 

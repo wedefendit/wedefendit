@@ -15,9 +15,7 @@ party without express written consent.
 export type DPadDirection = "up" | "down" | "left" | "right";
 
 type DPadProps = Readonly<{
-  /** Called on press. Wired to movement in a future phase. */
   onPress?: (direction: DPadDirection) => void;
-  /** Called on release. */
   onRelease?: (direction: DPadDirection) => void;
 }>;
 
@@ -45,12 +43,7 @@ export function DPad({ onPress, onRelease }: DPadProps) {
     <nav
       data-testid="gr-dpad"
       aria-label="Directional pad"
-      className="grid"
-      style={{
-        gridTemplateColumns: "repeat(3, 48px)",
-        gridTemplateRows: "repeat(3, 48px)",
-        gap: "2px",
-      }}
+      className="grid grid-cols-[repeat(3,48px)] grid-rows-[repeat(3,48px)] gap-0.5"
     >
       {(["up", "down", "left", "right"] as const).map((dir) => (
         <button
@@ -61,30 +54,15 @@ export function DPad({ onPress, onRelease }: DPadProps) {
           onPointerDown={() => onPress?.(dir)}
           onPointerUp={() => onRelease?.(dir)}
           onPointerCancel={() => onRelease?.(dir)}
-          className="flex items-center justify-center rounded-sm text-sm active:brightness-150"
-          style={{
-            gridArea: GRID_AREA[dir],
-            width: 48,
-            height: 48,
-            backgroundColor: "#0f1b2d",
-            border: "1px solid #1a3a4a",
-            color: "#00f0ff",
-            boxShadow: "inset 0 0 6px rgba(0, 240, 255, 0.08)",
-            touchAction: "none",
-          }}
+          className="flex h-12 w-12 touch-none items-center justify-center rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] text-sm text-[#00f0ff] shadow-[inset_0_0_6px_rgba(0,240,255,0.08)] active:brightness-150"
+          style={{ gridArea: GRID_AREA[dir] }}
         >
           {ARROW[dir]}
         </button>
       ))}
-      {/* Center node - decorative */}
       <div
-        aria-hidden
-        className="rounded-sm"
-        style={{
-          gridArea: "2 / 2 / 3 / 3",
-          backgroundColor: "#0a1220",
-          border: "1px solid #1a3a4a",
-        }}
+        aria-hidden="true"
+        className="rounded-sm border border-[#1a3a4a] bg-[#0a1220] [grid-area:2/2/3/3]"
       />
     </nav>
   );

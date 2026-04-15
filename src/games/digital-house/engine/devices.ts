@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -45,28 +45,32 @@ export const DEVICES: Device[] = [
     name: "Work laptop",
     shortName: "Laptop",
     category: "trusted",
-    description: "Your primary work machine. Handles sensitive accounts and data.",
+    description:
+      "Your primary work machine. Handles sensitive accounts and data.",
   },
   {
     id: "personal-phone",
     name: "Personal phone",
     shortName: "Phone",
     category: "trusted",
-    description: "Your daily driver with banking, email, and authenticator apps.",
+    description:
+      "Your daily driver with banking, email, and authenticator apps.",
   },
   {
     id: "tablet",
     name: "Tablet",
     shortName: "Tablet",
     category: "trusted",
-    description: "A personal device you use for reading, browsing, and light work.",
+    description:
+      "A personal device you use for reading, browsing, and light work.",
   },
   {
     id: "guest-phone",
     name: "Guest phone",
     shortName: "Guest",
     category: "guest",
-    description: "A visitor's device that only needs short-term internet access.",
+    description:
+      "A visitor's device that only needs short-term internet access.",
   },
   {
     id: "printer",
@@ -128,7 +132,11 @@ export function getDevice(id: DeviceId): Device {
   return DEVICE_BY_ID[id];
 }
 
-export const TRUSTED_DEVICE_IDS: DeviceId[] = ["work-laptop", "personal-phone", "tablet"];
+export const TRUSTED_DEVICE_IDS: DeviceId[] = [
+  "work-laptop",
+  "personal-phone",
+  "tablet",
+];
 
 export const ENTERTAINMENT_AND_CAMERA_IDS: DeviceId[] = [
   "smart-tv",

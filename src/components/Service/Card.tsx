@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -87,8 +87,18 @@ export function ServiceCard({
       <div className="border-t border-slate-200/70 pt-4 dark:border-slate-700/70">
         <span className="flex items-center gap-2 text-sm font-medium text-blue-700 transition-all group-hover:gap-3 group-hover:text-blue-800 dark:text-sky-300 dark:group-hover:text-sky-200">
           {cta || "Learn More"}
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </span>
       </div>

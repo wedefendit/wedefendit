@@ -52,12 +52,15 @@ export type TileKind =
   | "building"
   | "entry"
   | "locked"
-  | "spawn";
+  | "spawn"
+  | "boss";
 
 export interface MapTile {
   kind: TileKind;
   /** Building ID this tile leads to (for entry/locked tiles) */
   buildingId?: string;
+  /** Boss ID for boss tiles */
+  bossId?: string;
   /** Display label for building entrances */
   label?: string;
   walkable: boolean;

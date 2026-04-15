@@ -23,6 +23,20 @@ export const enemies: Record<string, EnemyDef> = {
     xpReward: 18,
     bitsReward: 8,
   },
+  hacktivist: {
+    id: "hacktivist",
+    name: "Hacktivist",
+    baseHp: 55,
+    speed: 7,
+    defense: 3,
+    moves: [
+      { name: "Deface", power: 15, accuracy: 88, weight: 35, description: "Defaces a public-facing site" },
+      { name: "Doxx Attempt", power: 20, accuracy: 78, weight: 30, description: "Leaks personal data" },
+      { name: "Manifesto", power: 0, accuracy: 100, weight: 35, description: "Buffs own power 10%" },
+    ],
+    xpReward: 28,
+    bitsReward: 12,
+  },
   "ransomware-bot": {
     id: "ransomware-bot",
     name: "Ransomware Bot",
@@ -40,12 +54,34 @@ export const enemies: Record<string, EnemyDef> = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Boss definitions (GDD §7.2)                                       */
+/* ------------------------------------------------------------------ */
+
+export const bosses: Record<string, EnemyDef> = {
+  lazarus: {
+    id: "lazarus",
+    name: "Lazarus Group",
+    baseHp: 200,
+    speed: 10,
+    defense: 5,
+    moves: [
+      { name: "Ransomware Deploy", power: 35, accuracy: 85, weight: 25, description: "Deploys ransomware across the network" },
+      { name: "Crypto Miner", power: 15, accuracy: 90, weight: 30, description: "Mines crypto, draining energy" },
+      { name: "Bank Heist", power: 25, accuracy: 88, weight: 25, description: "Wires funds to offshore accounts" },
+      { name: "Swift Exploit", power: 40, accuracy: 75, weight: 20, description: "Exploits the SWIFT banking network" },
+    ],
+    xpReward: 300,
+    bitsReward: 100,
+  },
+};
+
+/* ------------------------------------------------------------------ */
 /*  Zone configs (GDD §4.2, §7.4)                                    */
 /* ------------------------------------------------------------------ */
 
 export const zones: Record<string, ZoneConfig> = {
-  arcade: { encounterRate: 0.30, enemies: ["script-kiddie"] },
-  bank: { encounterRate: 0.30, enemies: ["script-kiddie", "ransomware-bot"] },
+  arcade: { encounterRate: 0.10, enemies: ["script-kiddie"] },
+  bank: { encounterRate: 0.12, enemies: ["script-kiddie", "hacktivist", "ransomware-bot"] },
 };
 
 /* ------------------------------------------------------------------ */

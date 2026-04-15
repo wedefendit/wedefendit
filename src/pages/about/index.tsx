@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -189,11 +189,11 @@ export default function About() {
             </p>
 
             <p className="text-lg mt-4 text-gray-700 dark:text-gray-300">
-              This business exists because too many people are expected to
-              trust devices and networks they were never given enough
-              information to judge. The goal is to solve the problem, reduce
-              avoidable risk, and leave people with technology that feels
-              easier to use and easier to trust.
+              This business exists because too many people are expected to trust
+              devices and networks they were never given enough information to
+              judge. The goal is to solve the problem, reduce avoidable risk,
+              and leave people with technology that feels easier to use and
+              easier to trust.
             </p>
           </section>
 

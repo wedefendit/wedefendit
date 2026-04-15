@@ -81,7 +81,7 @@ function starterTools(): ToolInstance[] {
 export function hasSave(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return window.localStorage.getItem(SAVE_KEY) !== null;
+    return localStorage.getItem(SAVE_KEY) !== null;
   } catch {
     return false;
   }
@@ -90,7 +90,7 @@ export function hasSave(): boolean {
 export function loadSave(): GridRunnerSave | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as GridRunnerSave;
     if (parsed.version !== SAVE_VERSION) return null;
@@ -103,7 +103,7 @@ export function loadSave(): GridRunnerSave | null {
 export function writeSave(save: GridRunnerSave): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
   } catch {
     // Quota or privacy mode
   }
@@ -112,7 +112,7 @@ export function writeSave(save: GridRunnerSave): void {
 export function deleteSave(): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(SAVE_KEY);
   } catch {
     // ignore
   }

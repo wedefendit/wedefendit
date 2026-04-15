@@ -409,8 +409,8 @@ test.describe("GRIDRUNNER frame fills available space", () => {
     expect(metrics.frame).not.toBeNull();
     if (!metrics.frame) return;
 
-    // Frame should not be full 1920px wide on a big monitor
-    expect(metrics.frame.width).toBeLessThan(1200);
+    // Frame should not exceed 640px max-width
+    expect(metrics.frame.width).toBeLessThanOrEqual(641);
 
     // But it should be a decent size, not tiny
     expect(metrics.frame.width).toBeGreaterThan(400);
@@ -479,13 +479,11 @@ test.describe("GRIDRUNNER tile proportions", () => {
     const gridInfo = await page.evaluate(() => {
       const map = document.querySelector('[data-testid="gr-map"]') as HTMLElement;
       if (!map) return null;
-      const style = map.style;
-      const cols = style.gridTemplateColumns;
-      const rows = style.gridTemplateRows;
+      const cls = map.className;
       return {
         cellCount: map.children.length,
-        colsDef: cols,
-        rowsDef: rows,
+        hasColClass: cls.includes("grid-cols-[repeat(16"),
+        hasRowClass: cls.includes("grid-rows-[repeat(12"),
         width: map.getBoundingClientRect().width,
         height: map.getBoundingClientRect().height,
       };
@@ -501,8 +499,8 @@ test.describe("GRIDRUNNER tile proportions", () => {
     ).toBe(192);
 
     // Grid template must use fixed viewport dimensions
-    expect(gridInfo.colsDef).toContain("repeat(16");
-    expect(gridInfo.rowsDef).toContain("repeat(12");
+    expect(gridInfo.hasColClass, "Grid should have 16-column Tailwind class").toBe(true);
+    expect(gridInfo.hasRowClass, "Grid should have 12-row Tailwind class").toBe(true);
 
     await attachScreenshot(page, testInfo, "fixed-viewport-grid");
   });
@@ -570,18 +568,25 @@ test.describe("GRIDRUNNER touch targets", () => {
 /* ------------------------------------------------------------------ */
 
 test.describe("GRIDRUNNER mobile controls", () => {
-  test("controls visible on phone, hidden on desktop", async ({ page }) => {
-    // Phone — visible (must be in overworld, not title screen)
+  test("controls visible on all screen sizes (Game Boy aesthetic)", async ({ page }) => {
+    // Phone
     await page.setViewportSize({ width: 390, height: 844 });
     await startNewGame(page);
     await expect(page.getByTestId("gr-controls")).toBeVisible();
     await expect(page.getByTestId("gr-dpad")).toBeVisible();
     await expect(page.getByTestId("gr-action-buttons")).toBeVisible();
 
-    // Desktop — hidden
+    // Desktop -- still visible (Game Boy frame)
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForTimeout(100);
-    await expect(page.getByTestId("gr-controls")).toBeHidden();
+    await expect(page.getByTestId("gr-controls")).toBeVisible();
+  });
+
+  test("controls hidden on title screen only", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openGridRunner(page);
+    // On title screen -- no controls
+    await expect(page.getByTestId("gr-controls")).toHaveCount(0);
   });
 
   test("controls visible in phone landscape", async ({ page }) => {

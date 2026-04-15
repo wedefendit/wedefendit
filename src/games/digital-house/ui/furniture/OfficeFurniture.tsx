@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -26,7 +26,8 @@ export function OfficeFurniture() {
           left: 16,
           width: 100,
           height: 30,
-          background: "linear-gradient(180deg,#7a6450 0%,#6b5744 60%,#5d4a38 100%)",
+          background:
+            "linear-gradient(180deg,#7a6450 0%,#6b5744 60%,#5d4a38 100%)",
           borderRadius: 3,
           boxShadow:
             "0 3px 0 #4a3c30, 0 6px 10px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
@@ -105,8 +106,10 @@ export function OfficeFurniture() {
           width: 22,
           height: 22,
           borderRadius: "50%",
-          background: "radial-gradient(circle at 35% 30%,#475569 0%,#334155 55%,#1e293b 100%)",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
+          background:
+            "radial-gradient(circle at 35% 30%,#475569 0%,#334155 55%,#1e293b 100%)",
+          boxShadow:
+            "0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
         }}
       />
       <div

@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -14,21 +14,19 @@ party without express written consent.
 
 @import "tailwindcss";
 @tailwind utilities;
-@custom-variant dark (&:where(.dark, .dark *)); 
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer utilities {
   .glow-hover {
     @apply hover:drop-shadow-[0_0_80px_rgba(59,130,246,0.4)] dark:hover:drop-shadow-[0_0_80px_rgba(14,165,233,0.3)] transition-all duration-300 ease-in-out;
   }
 
-  .glow{
+  .glow {
     @apply drop-shadow-[0_0_90px_rgba(59,130,246,0.36)] dark:drop-shadow-[0_0_80px_rgba(14,165,233,0.3)];
   }
-
 }
 
-
-*{
+* {
   scroll-behavior: smooth;
 }
 
@@ -41,7 +39,6 @@ party without express written consent.
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 /* style scroll bars */
 *::-webkit-scrollbar {

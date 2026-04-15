@@ -6,27 +6,21 @@ import type { BattleEnemy, BattleState, EnemyMove, PlayerState, ToolInstance, To
 import { pickEnemyMove } from "./enemies";
 
 /* ------------------------------------------------------------------ */
+/*  Log formatting                                                    */
+/* ------------------------------------------------------------------ */
+
+type LogTag = "SYS" | "ATK" | "HIT" | "MISS" | "DMG" | "HEAL" | "WIN" | "LOSS" | "WARN" | "RUN";
+
+function fmt(turn: number, tag: LogTag, msg: string): string {
+  const t = String(turn).padStart(2, "0");
+  return `[T${t}] [${tag}] ${msg}`;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Type effectiveness (GDD §8.4)                                     */
 /* ------------------------------------------------------------------ */
 
-const STRONG: Record<ToolType, ToolType> = {
-  recon: "persistence",
-  exploit: "defense",
-  defense: "exploit",
-  persistence: "recon",
-};
-
-const WEAK: Record<ToolType, ToolType> = {
-  recon: "defense",
-  exploit: "persistence",
-  defense: "recon",
-  persistence: "exploit",
-};
-
-function typeMultiplier(attackerType: ToolType, _defenderType?: ToolType): number {
-  // For random encounters, enemies don't have a tool type.
-  // Type effectiveness applies against boss weaknesses (future).
-  // For now, neutral.
+function typeMultiplier(_attackerType: ToolType, _defenderType?: ToolType): number {
   return 1.0;
 }
 
@@ -36,7 +30,7 @@ function typeMultiplier(attackerType: ToolType, _defenderType?: ToolType): numbe
 
 function calcPlayerDamage(
   tool: ToolInstance,
-  player: PlayerState,
+  _player: PlayerState,
   enemy: BattleEnemy,
 ): number {
   const base = tool.power * typeMultiplier(tool.type);
@@ -46,7 +40,7 @@ function calcPlayerDamage(
 
 function calcEnemyDamage(
   move: EnemyMove,
-  enemy: BattleEnemy,
+  _enemy: BattleEnemy,
   player: PlayerState,
 ): number {
   const base = move.power;
@@ -68,35 +62,32 @@ export function resolvePlayerTurn(
   player: PlayerState,
   battle: BattleState,
 ): TurnResult {
+  const turn = battle.turnCount;
   const log = [...battle.log];
   let updatedPlayer = { ...player };
   let updatedEnemy = { ...battle.enemy, hp: battle.enemy.hp };
 
-  // Check energy
   if (updatedPlayer.compute < tool.energyCost) {
-    log.push(`Not enough Compute to use ${tool.baseToolId.toUpperCase()}.`);
+    log.push(fmt(turn, "WARN", `Not enough Compute for ${tool.baseToolId.toUpperCase()}.`));
     return {
       state: { ...battle, log, phase: "player_turn" },
       player: updatedPlayer,
     };
   }
 
-  // Spend energy
   updatedPlayer = { ...updatedPlayer, compute: updatedPlayer.compute - tool.energyCost };
 
-  // Accuracy check
   const roll = Math.random() * 100;
   if (roll > tool.accuracy) {
-    log.push(`${tool.baseToolId.toUpperCase()} missed!`);
+    log.push(fmt(turn, "MISS", `${tool.baseToolId.toUpperCase()} missed.`));
   } else {
     const dmg = calcPlayerDamage(tool, updatedPlayer, updatedEnemy);
     updatedEnemy = { ...updatedEnemy, hp: Math.max(0, updatedEnemy.hp - dmg) };
-    log.push(`${tool.baseToolId.toUpperCase()} hit for ${dmg} damage.`);
+    log.push(fmt(turn, "HIT", `${tool.baseToolId.toUpperCase()} hit for ${dmg} damage.`));
   }
 
-  // Check win
   if (updatedEnemy.hp <= 0) {
-    log.push(`${updatedEnemy.def.name} defeated!`);
+    log.push(fmt(turn, "WIN", `${updatedEnemy.def.name} defeated.`));
     return {
       state: {
         ...battle,
@@ -110,7 +101,6 @@ export function resolvePlayerTurn(
     };
   }
 
-  // Enemy turn
   return resolveEnemyTurn(updatedPlayer, { ...battle, enemy: updatedEnemy, log });
 }
 
@@ -118,14 +108,14 @@ function resolveEnemyTurn(
   player: PlayerState,
   battle: BattleState,
 ): TurnResult {
+  const turn = battle.turnCount;
   const log = [...battle.log];
   let updatedPlayer = { ...player };
   const move = pickEnemyMove(battle.enemy);
 
-  // Special case: Rage Quit = heal
   if (move.name === "Rage Quit") {
     const healed = Math.min(battle.enemy.maxHp, battle.enemy.hp + 10);
-    log.push(`${battle.enemy.def.name} used ${move.name}. Healed 10 HP.`);
+    log.push(fmt(turn, "HEAL", `${battle.enemy.def.name} used ${move.name}. Restored 10 HP.`));
     return {
       state: {
         ...battle,
@@ -138,22 +128,35 @@ function resolveEnemyTurn(
     };
   }
 
-  // Accuracy check
+  if (move.name === "Manifesto") {
+    const healed = Math.min(battle.enemy.maxHp, battle.enemy.hp + 5);
+    log.push(fmt(turn, "WARN", `${battle.enemy.def.name} used ${move.name}. Power increased.`));
+    return {
+      state: {
+        ...battle,
+        enemy: { ...battle.enemy, hp: healed },
+        log,
+        phase: "player_turn",
+        turnCount: battle.turnCount + 1,
+      },
+      player: updatedPlayer,
+    };
+  }
+
   const roll = Math.random() * 100;
   if (roll > move.accuracy) {
-    log.push(`${battle.enemy.def.name} used ${move.name}... missed!`);
+    log.push(fmt(turn, "MISS", `${battle.enemy.def.name} used ${move.name}... missed.`));
   } else {
     const dmg = calcEnemyDamage(move, battle.enemy, updatedPlayer);
     updatedPlayer = {
       ...updatedPlayer,
       integrity: Math.max(0, updatedPlayer.integrity - dmg),
     };
-    log.push(`${battle.enemy.def.name} used ${move.name} for ${dmg} damage.`);
+    log.push(fmt(turn, "DMG", `${battle.enemy.def.name} used ${move.name} for ${dmg} damage.`));
   }
 
-  // Check lose
   if (updatedPlayer.integrity <= 0) {
-    log.push("System compromised. Connection lost.");
+    log.push(fmt(turn, "LOSS", "System compromised. Connection lost."));
     return {
       state: { ...battle, log, phase: "lost", turnCount: battle.turnCount + 1 },
       player: updatedPlayer,
@@ -166,7 +169,6 @@ function resolveEnemyTurn(
   };
 }
 
-/** Attempt to run from a non-boss encounter. */
 export function attemptRun(
   player: PlayerState,
   enemy: BattleEnemy,
@@ -175,12 +177,11 @@ export function attemptRun(
   return Math.random() * 100 < chance;
 }
 
-/** Create initial battle state from a spawned enemy. */
 export function createBattle(enemy: BattleEnemy): BattleState {
   return {
     enemy,
     phase: "player_turn",
-    log: [`THREAT DETECTED: ${enemy.def.name}`],
+    log: [`[T00] [SYS] THREAT DETECTED: ${enemy.def.name}`],
     turnCount: 1,
     xpEarned: 0,
     bitsEarned: 0,

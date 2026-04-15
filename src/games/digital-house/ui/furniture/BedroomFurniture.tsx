@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -41,8 +41,7 @@ export function BedroomFurniture() {
             left: 3,
             right: 3,
             bottom: 3,
-            background:
-              "linear-gradient(180deg,#ece4d2 0%,#dfd5be 100%)",
+            background: "linear-gradient(180deg,#ece4d2 0%,#dfd5be 100%)",
             borderRadius: 3,
             boxShadow: "inset 0 1px 2px rgba(255,255,255,0.35)",
           }}

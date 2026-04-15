@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -64,7 +64,8 @@ export const ROOMS: Room[] = [
   {
     id: "office",
     name: "Office",
-    description: "Trusted work zone. Where the laptop lives and the day job happens.",
+    description:
+      "Trusted work zone. Where the laptop lives and the day job happens.",
   },
   {
     id: "living-room",

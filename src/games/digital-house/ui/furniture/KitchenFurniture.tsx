@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -43,8 +43,7 @@ export function KitchenFurniture() {
           height: 12,
           background: "linear-gradient(180deg,#5d4a38,#4a3c30)",
           borderRadius: "0 0 2px 2px",
-          boxShadow:
-            "0 2px 0 #3d3226, inset 0 1px 0 rgba(255,255,255,0.06)",
+          boxShadow: "0 2px 0 #3d3226, inset 0 1px 0 rgba(255,255,255,0.06)",
         }}
       />
       {/* Cabinet door lines */}
@@ -77,11 +76,9 @@ export function KitchenFurniture() {
           left: 54,
           width: 24,
           height: 16,
-          background:
-            "linear-gradient(180deg,#b8bdc4,#868d96)",
+          background: "linear-gradient(180deg,#b8bdc4,#868d96)",
           borderRadius: 2,
-          boxShadow:
-            "0 1px 3px rgba(0,0,0,0.3), inset 0 0 0 1px #5a6068",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.3), inset 0 0 0 1px #5a6068",
         }}
       >
         {[
@@ -166,8 +163,7 @@ export function KitchenFurniture() {
           left: 24,
           width: 20,
           height: 12,
-          background:
-            "linear-gradient(180deg,#94a3b8,#64748b)",
+          background: "linear-gradient(180deg,#94a3b8,#64748b)",
           borderRadius: 2,
           boxShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
         }}

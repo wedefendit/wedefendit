@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -41,8 +41,7 @@ export function LivingRoomFurniture() {
               left: l,
               width: 28,
               height: 18,
-              background:
-                "linear-gradient(180deg,#a08a75 0%,#8b7865 100%)",
+              background: "linear-gradient(180deg,#a08a75 0%,#8b7865 100%)",
               borderRadius: 5,
               boxShadow:
                 "inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.2)",
@@ -136,8 +135,7 @@ export function LivingRoomFurniture() {
           left: 12,
           width: 16,
           height: 12,
-          background:
-            "linear-gradient(180deg,#d4a84b 0%,#b88838 100%)",
+          background: "linear-gradient(180deg,#d4a84b 0%,#b88838 100%)",
           borderRadius: "8px 8px 2px 2px",
           boxShadow:
             "0 0 18px rgba(212,168,75,0.55), inset 0 1px 0 rgba(255,255,255,0.2)",

@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -110,7 +110,7 @@ export const ElderlyScamsList: React.FC<ElderlyScamsListProps> = ({
                 </div>
               </article>
             );
-          }
+          },
         )}
       </div>
     </>

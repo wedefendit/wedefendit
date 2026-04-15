@@ -27,48 +27,74 @@ function HpBar({
 }: {
   current: number;
   max: number;
-  color: string;
+  color: "cyan" | "magenta" | "red";
   label: string;
 }) {
   const pct = Math.max(0, Math.min(100, (current / max) * 100));
+  const colorMap = {
+    cyan: { text: "text-[#00f0ff]", bar: "bg-[#00f0ff] shadow-[0_0_6px_#00f0ff]" },
+    magenta: { text: "text-[#ff00de]", bar: "bg-[#ff00de] shadow-[0_0_6px_#ff00de]" },
+    red: { text: "text-[#ff003c]", bar: "bg-[#ff003c] shadow-[0_0_6px_#ff003c]" },
+  };
+  const c = colorMap[color];
+
   return (
     <div className="flex items-center gap-2">
-      <span
-        className="shrink-0 text-xs"
-        style={{ color, fontFamily: "'Share Tech Mono', monospace", minWidth: 20 }}
-      >
+      <span className={`gr-font-mono shrink-0 min-w-[20px] text-xs ${c.text}`}>
         {label}
       </span>
       <div
-        className="relative flex-1 overflow-hidden rounded-sm"
+        className="relative h-2.5 flex-1 overflow-hidden rounded-sm border border-[#1a3a4a] bg-[#0d1520]"
         role="meter"
         aria-label={`${label} ${current} of ${max}`}
         aria-valuenow={current}
         aria-valuemin={0}
         aria-valuemax={max}
-        style={{ height: 10, backgroundColor: "#0d1520", border: "1px solid #1a3a4a" }}
       >
         <div
-          style={{
-            width: `${pct}%`,
-            height: "100%",
-            backgroundColor: color,
-            boxShadow: `0 0 6px ${color}`,
-            transition: "width 0.3s ease-out",
-          }}
+          className={`h-full transition-[width] duration-300 ease-out ${c.bar}`}
+          style={{ width: `${pct}%` }}
         />
       </div>
-      <span
-        className="shrink-0 text-xs tabular-nums"
-        style={{ color: "#8899aa", fontFamily: "'Share Tech Mono', monospace", minWidth: 50, textAlign: "right" }}
-      >
+      <span className="gr-font-mono shrink-0 min-w-[50px] text-right text-xs tabular-nums text-[#8899aa]">
         {current}/{max}
       </span>
     </div>
   );
 }
 
-function BattleLog({ log }: { log: string[] }) {
+const TAG_COLORS: Record<string, string> = {
+  SYS: "text-[#00f0ff]",
+  ATK: "text-[#00f0ff]",
+  HIT: "text-[#00ff41]",
+  MISS: "text-[#8899aa]",
+  DMG: "text-[#ff003c]",
+  HEAL: "text-[#ff00de]",
+  WIN: "text-[#00ff41]",
+  LOSS: "text-[#ff003c]",
+  WARN: "text-[#ff6b00]",
+  RUN: "text-[#ff6b00]",
+};
+
+function LogLine({ line }: Readonly<{ line: string }>) {
+  const tagMatch = line.match(/\[T\d+\]\s+\[(\w+)\]/);
+  const tag = tagMatch?.[1] ?? "";
+  const colorClass = TAG_COLORS[tag] ?? "text-[#6688aa]";
+
+  // Split into timestamp+tag prefix and message
+  const prefixEnd = line.indexOf("]", line.indexOf("]") + 1) + 1;
+  const prefix = line.slice(0, prefixEnd);
+  const message = line.slice(prefixEnd);
+
+  return (
+    <p className="py-0.5">
+      <span className="text-[#4a5568]">{prefix}</span>
+      <span className={colorClass}>{message}</span>
+    </p>
+  );
+}
+
+function BattleLog({ log }: Readonly<{ log: string[] }>) {
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,17 +103,10 @@ function BattleLog({ log }: { log: string[] }) {
   return (
     <div
       data-testid="gr-battle-log"
-      className="flex-1 min-h-0 overflow-y-auto rounded-sm p-2"
-      style={{
-        backgroundColor: "#060a12",
-        border: "1px solid #1a3a4a",
-        fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "clamp(9px, 1.5vw, 12px)",
-        color: "#6688aa",
-      }}
+      className="gr-font-mono flex-1 min-h-0 overflow-y-auto rounded-sm border border-[#1a3a4a] bg-[#060a12] p-2 text-[clamp(9px,1.5vw,12px)]"
     >
       {log.map((line, i) => (
-        <p key={i} className="py-0.5">{line}</p>
+        <LogLine key={i} line={line} />
       ))}
       <div ref={endRef} />
     </div>
@@ -114,73 +133,38 @@ export function BattleScreen({
     <section
       data-testid="gr-battle"
       aria-label="Battle"
-      className="flex flex-1 flex-col gap-2 overflow-hidden p-2 sm:p-3"
-      style={{ backgroundColor: "#0a0e1a" }}
+      className="flex flex-1 flex-col gap-2 overflow-hidden bg-[#0a0e1a] p-2 sm:p-3"
     >
       {/* Arena: player left, enemy right */}
       <div className="flex items-center justify-around py-2 sm:py-4">
-        {/* Player avatar */}
-        <div className="flex flex-col items-center gap-1">
-          <div
-            className="flex items-center justify-center rounded-sm"
-            style={{
-              width: 40,
-              height: 40,
-              backgroundColor: "#00f0ff",
-              boxShadow: "0 0 12px #00f0ff",
-              color: "#0a0e1a",
-              fontWeight: "bold",
-              fontSize: 16,
-            }}
-          >
+        <figure className="flex flex-col items-center gap-1">
+          <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#00f0ff] text-base font-bold text-[#0a0e1a] shadow-[0_0_12px_#00f0ff]">
             OP
           </div>
-          <span
-            className="text-xs"
-            style={{ color: "#00f0ff", fontFamily: "'Share Tech Mono', monospace" }}
-          >
+          <figcaption className="gr-font-mono text-xs text-[#00f0ff]">
             {playerName}
-          </span>
-        </div>
+          </figcaption>
+        </figure>
 
-        <span
-          className="text-lg font-bold"
-          style={{ color: "#1a3a4a", fontFamily: "'Orbitron', sans-serif" }}
-        >
+        <span className="gr-font-display text-lg font-bold text-[#1a3a4a]">
           VS
         </span>
 
-        {/* Enemy avatar */}
-        <div className="flex flex-col items-center gap-1">
-          <div
-            className="flex items-center justify-center rounded-sm"
-            style={{
-              width: 40,
-              height: 40,
-              backgroundColor: "#ff003c",
-              boxShadow: "0 0 12px #ff003c44",
-              color: "#0a0e1a",
-              fontWeight: "bold",
-              fontSize: 10,
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
-          >
+        <figure className="flex flex-col items-center gap-1">
+          <div className="gr-font-mono flex h-10 w-10 items-center justify-center rounded-sm bg-[#ff003c] text-[10px] font-bold text-[#0a0e1a] shadow-[0_0_12px_#ff003c44]">
             {battle.enemy.def.name.charAt(0).toUpperCase()}
           </div>
-          <span
-            className="text-xs"
-            style={{ color: "#ff003c", fontFamily: "'Share Tech Mono', monospace" }}
-          >
+          <figcaption className="gr-font-mono text-xs text-[#ff003c]">
             {battle.enemy.def.name}
-          </span>
-        </div>
+          </figcaption>
+        </figure>
       </div>
 
       {/* Status bars */}
       <div className="flex flex-col gap-1">
-        <HpBar current={player.integrity} max={player.maxIntegrity} color="#00f0ff" label="HP" />
-        <HpBar current={player.compute} max={player.maxCompute} color="#ff00de" label="EN" />
-        <HpBar current={battle.enemy.hp} max={battle.enemy.maxHp} color="#ff003c" label="THREAT" />
+        <HpBar current={player.integrity} max={player.maxIntegrity} color="cyan" label="HP" />
+        <HpBar current={player.compute} max={player.maxCompute} color="magenta" label="EN" />
+        <HpBar current={battle.enemy.hp} max={battle.enemy.maxHp} color="red" label="THREAT" />
       </div>
 
       {/* Battle log */}
@@ -201,13 +185,7 @@ export function BattleScreen({
                 data-testid={`gr-battle-tool-${i}`}
                 disabled={!isPlayerTurn || player.compute < tool.energyCost}
                 onClick={() => onUseTool(tool)}
-                className="flex-1 min-w-0 rounded-sm px-2 py-2.5 text-xs font-bold uppercase tracking-wider transition-opacity disabled:opacity-30"
-                style={{
-                  backgroundColor: "#0f1b2d",
-                  border: "1px solid #00f0ff",
-                  color: "#00f0ff",
-                  fontFamily: "'Share Tech Mono', monospace",
-                }}
+                className="gr-font-mono flex-1 min-w-0 rounded-sm border border-[#00f0ff] bg-[#0f1b2d] px-2 py-2.5 text-xs font-bold uppercase tracking-wider text-[#00f0ff] transition-opacity disabled:opacity-30"
               >
                 <span className="block truncate">{tool.baseToolId}</span>
                 <span className="block text-[9px] opacity-50">{tool.energyCost} EN</span>
@@ -219,13 +197,7 @@ export function BattleScreen({
             data-testid="gr-battle-run"
             disabled={!isPlayerTurn}
             onClick={onRun}
-            className="rounded-sm px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-opacity disabled:opacity-30"
-            style={{
-              backgroundColor: "#0f1b2d",
-              border: "1px solid #ff6b00",
-              color: "#ff6b00",
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
+            className="gr-font-mono rounded-sm border border-[#ff6b00] bg-[#0f1b2d] px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-[#ff6b00] transition-opacity disabled:opacity-30"
           >
             RUN
           </button>
@@ -236,26 +208,19 @@ export function BattleScreen({
       {isOver && (
         <div
           data-testid="gr-battle-result"
-          className="flex flex-col items-center gap-2 rounded-sm p-3"
-          style={{
-            backgroundColor: "#0f1b2d",
-            border: `2px solid ${battle.phase === "won" ? "#00ff41" : "#ff003c"}`,
-          }}
+          className={`flex flex-col items-center gap-2 rounded-sm border-2 bg-[#0f1b2d] p-3 ${
+            battle.phase === "won" ? "border-[#00ff41]" : "border-[#ff003c]"
+          }`}
         >
           <p
-            className="text-lg font-bold tracking-widest"
-            style={{
-              color: battle.phase === "won" ? "#00ff41" : "#ff003c",
-              fontFamily: "'Orbitron', sans-serif",
-            }}
+            className={`gr-font-display text-lg font-bold tracking-widest ${
+              battle.phase === "won" ? "text-[#00ff41]" : "text-[#ff003c]"
+            }`}
           >
             {battle.phase === "won" ? "THREAT NEUTRALIZED" : "SYSTEM COMPROMISED"}
           </p>
           {battle.phase === "won" && (
-            <p
-              className="text-xs"
-              style={{ color: "#00f0ff", fontFamily: "'Share Tech Mono', monospace" }}
-            >
+            <p className="gr-font-mono text-xs text-[#00f0ff]">
               +{battle.xpEarned} XP | +{battle.bitsEarned} Bits
             </p>
           )}
@@ -263,13 +228,7 @@ export function BattleScreen({
             type="button"
             data-testid="gr-battle-continue"
             onClick={onBattleEnd}
-            className="mt-1 rounded-sm px-6 py-2.5 text-sm font-bold uppercase tracking-widest"
-            style={{
-              backgroundColor: "#0f1b2d",
-              border: "2px solid #00f0ff",
-              color: "#00f0ff",
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
+            className="gr-font-mono mt-1 rounded-sm border-2 border-[#00f0ff] bg-[#0f1b2d] px-6 py-2.5 text-sm font-bold uppercase tracking-widest text-[#00f0ff]"
           >
             CONTINUE
           </button>

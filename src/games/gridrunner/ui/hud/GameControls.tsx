@@ -24,8 +24,9 @@ type GameControlsProps = Readonly<{
 
 /**
  * Bottom control bar: d-pad on the left, A/B buttons on the right.
- * Visible on mobile (below lg breakpoint), hidden on desktop where
- * keyboard controls are primary.
+ * Visible on ALL screen sizes -- the Game Boy frame aesthetic requires
+ * controls as part of the visual identity. On desktop they're clickable
+ * as secondary input alongside keyboard. Only hidden on title screen.
  */
 export function GameControls({
   onDPadPress,
@@ -37,11 +38,7 @@ export function GameControls({
     <footer
       data-testid="gr-controls"
       aria-label="Game controls"
-      className="flex shrink-0 items-center justify-between px-4 py-2 lg:hidden"
-      style={{
-        backgroundColor: "#080c16",
-        borderTop: "1px solid #1a3a4a",
-      }}
+      className="flex shrink-0 items-center justify-between border-t border-[#1a3a4a] bg-[#080c16] px-4 py-2"
     >
       <DPad onPress={onDPadPress} onRelease={onDPadRelease} />
       <ActionButtons onPress={onActionPress} onRelease={onActionRelease} />

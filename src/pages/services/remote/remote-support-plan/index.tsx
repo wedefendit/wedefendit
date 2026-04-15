@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -42,7 +42,8 @@ export default function RemoteSupportPlanPage() {
     },
     {
       question: "Can non-local clients enroll?",
-      answer: "No. Enrollment requires on-site verification in our service area.",
+      answer:
+        "No. Enrollment requires on-site verification in our service area.",
     },
   ];
 
@@ -194,9 +195,9 @@ export default function RemoteSupportPlanPage() {
             </h2>
             <p className="mt-2 text-gray-700 dark:text-gray-300">
               We use a private remote support environment for enrolled local
-              clients and approved devices. The point is simple: make
-              follow-up help faster and easier without turning remote access
-              into a free-for-all.
+              clients and approved devices. The point is simple: make follow-up
+              help faster and easier without turning remote access into a
+              free-for-all.
             </p>
             <p className="mt-2 text-gray-700 dark:text-gray-300">
               The plan covers the secure setup behind that access, including
@@ -425,9 +426,9 @@ export default function RemoteSupportPlanPage() {
               Who Is Eligible
             </h2>
             <p className="mt-2 text-gray-700 dark:text-gray-300">
-              This plan is for local clients in Ocala, Belleview, The
-              Villages, and nearby areas. Devices must be enrolled locally
-              before remote support is available.
+              This plan is for local clients in Ocala, Belleview, The Villages,
+              and nearby areas. Devices must be enrolled locally before remote
+              support is available.
             </p>
           </section>
 
@@ -525,18 +526,18 @@ export default function RemoteSupportPlanPage() {
             <div className="relative mt-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/76 p-6 text-center shadow-[0_16px_38px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-sky-400/18 dark:bg-slate-950/74 dark:shadow-[0_22px_48px_rgba(2,6,23,0.36)] dark:ring-white/5">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.06),transparent_54%)] dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.12),transparent_52%)]" />
               <div className="relative">
-              <p className="text-gray-900 dark:text-white mb-4">
-                Once enrolled, you can use remote sessions for
-                troubleshooting, malware cleanup, guided training, and
-                selected security or privacy work.
-              </p>
-              <Link
-                href="/services/remote"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-sky-600 hover:bg-sky-700 dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] text-white font-semibold transition-all shadow-md hover:shadow-lg"
-              >
-                View Remote Services
-                <ArrowRight className="w-5 h-5" aria-hidden="true" />
-              </Link>
+                <p className="text-gray-900 dark:text-white mb-4">
+                  Once enrolled, you can use remote sessions for
+                  troubleshooting, malware cleanup, guided training, and
+                  selected security or privacy work.
+                </p>
+                <Link
+                  href="/services/remote"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-sky-600 hover:bg-sky-700 dark:border dark:border-sky-400/18 dark:bg-sky-900/58 dark:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.14),transparent_62%)] dark:shadow-[0_14px_28px_rgba(2,132,199,0.18)] dark:ring-1 dark:ring-white/5 dark:backdrop-blur-sm dark:hover:-translate-y-0.5 dark:hover:border-sky-400/28 dark:hover:bg-sky-900/72 dark:hover:shadow-[0_18px_34px_rgba(2,132,199,0.24)] text-white font-semibold transition-all shadow-md hover:shadow-lg"
+                >
+                  View Remote Services
+                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                </Link>
               </div>
             </div>
           </section>
@@ -552,36 +553,36 @@ export default function RemoteSupportPlanPage() {
             <div className="relative mt-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/76 p-8 text-center shadow-[0_16px_38px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-md dark:border-sky-400/18 dark:bg-slate-950/74 dark:shadow-[0_22px_48px_rgba(2,6,23,0.36)] dark:ring-white/5">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.06),transparent_54%)] dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.12),transparent_52%)]" />
               <div className="relative">
-              <p className="text-lg mb-2 font-semibold text-gray-900 dark:text-white">
-                Get Started with Remote Support
-              </p>
-              <p className="text-sm mb-6 max-w-2xl mx-auto text-gray-700 dark:text-gray-300">
-                Initial on-site setup and device enrollment are handled locally
-                as part of getting the plan in place.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-200/80 bg-white/88 px-6 py-3 text-blue-700 font-semibold shadow-[0_10px_22px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-white dark:border-sky-400/20 dark:bg-slate-900/80 dark:text-sky-200 dark:shadow-[0_14px_28px_rgba(2,6,23,0.26)] dark:ring-white/5 dark:hover:border-sky-400/30 dark:hover:bg-slate-900"
-              >
-                Request Remote Setup
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <p className="text-lg mb-2 font-semibold text-gray-900 dark:text-white">
+                  Get Started with Remote Support
+                </p>
+                <p className="text-sm mb-6 max-w-2xl mx-auto text-gray-700 dark:text-gray-300">
+                  Initial on-site setup and device enrollment are handled
+                  locally as part of getting the plan in place.
+                </p>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200/80 bg-white/88 px-6 py-3 text-blue-700 font-semibold shadow-[0_10px_22px_rgba(15,23,42,0.08)] ring-1 ring-white/70 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-white dark:border-sky-400/20 dark:bg-slate-900/80 dark:text-sky-200 dark:shadow-[0_14px_28px_rgba(2,6,23,0.26)] dark:ring-white/5 dark:hover:border-sky-400/30 dark:hover:bg-slate-900"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
-              <p className="mt-4 text-xs text-gray-600 dark:text-gray-400">
-                * Within our local service area (Ocala, Belleview, The
-                Villages).
-              </p>
+                  Request Remote Setup
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </Link>
+                <p className="mt-4 text-xs text-gray-600 dark:text-gray-400">
+                  * Within our local service area (Ocala, Belleview, The
+                  Villages).
+                </p>
               </div>
             </div>
           </section>

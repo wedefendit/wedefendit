@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -31,7 +31,9 @@ type GameShellContextValue = {
   setDifficulty: (next: Difficulty) => void;
   resetCount: number;
   reset: () => void;
-  recordScore: (score: Omit<GameScore, "gameId" | "bestScore" | "completedAt">) => void;
+  recordScore: (
+    score: Omit<GameScore, "gameId" | "bestScore" | "completedAt">,
+  ) => void;
   awardBadge: (badge: Badge) => void;
   hasBadge: (badgeId: string) => boolean;
   bestScore: number | null;
@@ -217,7 +219,10 @@ export function GameShell({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <DifficultyPicker value={difficulty} onChange={onDifficultyChange} />
+            <DifficultyPicker
+              value={difficulty}
+              onChange={onDifficultyChange}
+            />
             <button
               type="button"
               onClick={onReset}

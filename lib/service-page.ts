@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -25,7 +25,7 @@ const TEMPLATES_DIR = path.join(process.cwd(), "data/services/slug-templates");
 
 export const CONSUMER_SERVICES_JSON = path.join(
   process.cwd(),
-  "data/services/services.json"
+  "data/services/services.json",
 );
 
 export function readServiceJson(filePath: string) {

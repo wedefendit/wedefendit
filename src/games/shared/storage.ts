@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -23,7 +23,9 @@ const EMPTY_STATE: GamesState = {
 };
 
 function isBrowser(): boolean {
-  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+  return (
+    typeof window !== "undefined" && typeof window.localStorage !== "undefined"
+  );
 }
 
 function cloneEmpty(): GamesState {
@@ -50,7 +52,8 @@ export function getState(): GamesState {
     const parsed = JSON.parse(raw) as Partial<GamesState>;
     return {
       badges: Array.isArray(parsed.badges) ? parsed.badges : [],
-      scores: parsed.scores && typeof parsed.scores === "object" ? parsed.scores : {},
+      scores:
+        parsed.scores && typeof parsed.scores === "object" ? parsed.scores : {},
       preferences: sanitizePreferences(parsed.preferences),
     };
   } catch {
@@ -83,7 +86,9 @@ export function getScore(gameId: string): GameScore | undefined {
 export function setScore(score: GameScore): GamesState {
   const state = getState();
   const existing = state.scores[score.gameId];
-  const bestScore = existing ? Math.max(existing.bestScore, score.score) : score.score;
+  const bestScore = existing
+    ? Math.max(existing.bestScore, score.score)
+    : score.score;
   const next: GamesState = {
     ...state,
     scores: {
@@ -128,13 +133,20 @@ export function clearBadges(): GamesState {
   return next;
 }
 
-export function getGamePreference<T = unknown>(gameId: string, key: string): T | undefined {
+export function getGamePreference<T = unknown>(
+  gameId: string,
+  key: string,
+): T | undefined {
   const prefs = getState().preferences[gameId];
   if (!prefs) return undefined;
   return prefs[key] as T | undefined;
 }
 
-export function setGamePreference(gameId: string, key: string, value: unknown): GamesState {
+export function setGamePreference(
+  gameId: string,
+  key: string,
+  value: unknown,
+): GamesState {
   const state = getState();
   const next: GamesState = {
     ...state,

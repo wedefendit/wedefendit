@@ -5,10 +5,12 @@ Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
 import type { GameMap } from "../../engine/types";
 import { overworldMap } from "./overworld";
 import { arcadeMap } from "./arcade";
+import { bankMap } from "./bank";
 
 export const maps: Record<string, GameMap> = {
   overworld: overworldMap,
   arcade: arcadeMap,
+  bank: bankMap,
 };
 
 export function getMap(id: string): GameMap | undefined {

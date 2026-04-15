@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -108,7 +108,12 @@ const ZONE_STYLES: Record<string, IconStyle> = {
   },
 };
 
-export type DeviceIconTone = "category" | "neutral" | "zone-main" | "zone-guest" | "zone-iot";
+export type DeviceIconTone =
+  | "category"
+  | "neutral"
+  | "zone-main"
+  | "zone-guest"
+  | "zone-iot";
 export type DeviceIconSize = "xs" | "sm" | "md" | "lg" | "tile";
 
 const SIZE: Record<
@@ -144,7 +149,7 @@ export function DeviceIcon({
     tone === "neutral"
       ? NEUTRAL_STYLE
       : tone.startsWith("zone-")
-        ? ZONE_STYLES[tone] ?? CATEGORY_STYLES[category]
+        ? (ZONE_STYLES[tone] ?? CATEGORY_STYLES[category])
         : CATEGORY_STYLES[category];
   const sizing = SIZE[size];
   return (

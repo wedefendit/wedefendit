@@ -26,7 +26,7 @@ type GridRunnerShellProps = Readonly<{
   hideControls?: boolean;
 }>;
 
-const FONT_FACES = `
+const GR_STYLES = `
 @font-face {
   font-family: 'Share Tech Mono';
   font-style: normal;
@@ -55,6 +55,22 @@ const FONT_FACES = `
   font-display: swap;
   src: url('/fonts/orbitron-900.woff2') format('woff2');
 }
+
+/* Utility classes for game fonts */
+.gr-font-mono { font-family: 'Share Tech Mono', monospace; }
+.gr-font-display { font-family: 'Orbitron', sans-serif; }
+
+/* Safe area padding for notched devices */
+.gr-safe-area {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@keyframes boss-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
 `;
 
 export function GridRunnerShell({
@@ -68,18 +84,13 @@ export function GridRunnerShell({
   return (
     <main
       data-testid="gr-root"
-      className="relative flex min-h-0 flex-1 flex-col items-center overflow-hidden"
-      style={{
-        paddingLeft: "env(safe-area-inset-left, 0px)",
-        paddingRight: "env(safe-area-inset-right, 0px)",
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      }}
+      className="gr-safe-area relative flex min-h-0 flex-1 flex-col items-center overflow-hidden"
     >
-      <style>{FONT_FACES}</style>
+      <style>{GR_STYLES}</style>
       <section
         data-testid="gr-frame"
         aria-label="GRIDRUNNER game"
-        className="relative mx-auto flex min-h-0 w-full max-w-[960px] flex-1 flex-col overflow-hidden"
+        className="relative mx-auto flex min-h-0 w-full max-w-[640px] flex-1 flex-col overflow-hidden"
       >
         <div data-testid="gr-viewport" className="relative min-h-0 flex-1 flex flex-col overflow-hidden">
           {children}

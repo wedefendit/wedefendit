@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -162,7 +162,8 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
   const sections = hasDYK ? rest : service.sections;
 
   const canonical = `https://www.wedefendit.com${service.url}`;
-  const metaTitle = service.metaTitle || `${service.title} | Defend I.T. Solutions`;
+  const metaTitle =
+    service.metaTitle || `${service.title} | Defend I.T. Solutions`;
   const metaDescription = service.metaDescription || service.description;
   const structuredGraph = [
     breadcrumbLd,
@@ -194,39 +195,39 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_54%)] dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),transparent_52%)]" />
             <div className="pointer-events-none absolute left-1/2 top-0 h-24 w-52 -translate-x-1/2 rounded-full bg-sky-300/25 blur-3xl dark:bg-sky-400/16" />
             <div className="relative space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-white/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-[0_8px_20px_rgba(56,189,248,0.12)] backdrop-blur-sm dark:border-sky-400/18 dark:bg-slate-900/70 dark:text-sky-300 dark:shadow-[0_12px_28px_rgba(2,132,199,0.16)] sm:px-4 sm:text-xs sm:tracking-[0.28em]">
-              {isRemote ? "Remote Service" : "Local Service"}
-            </div>
-
-            {service.icons && service.icons.length > 0 && (
-              <div className="flex flex-wrap items-center gap-3">
-                {service.icons.map((iconName, idx) => {
-                  const name = iconName
-                    .split("-")
-                    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-                    .join("");
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const LucideIcon = (Icons as any)[name];
-                  return LucideIcon ? (
-                    <div
-                      key={idx}
-                      className="flex h-12 w-12 items-center justify-center rounded-lg border border-sky-200/80 bg-sky-100/85 shadow-[0_8px_18px_rgba(59,130,246,0.12)] dark:border-sky-400/14 dark:bg-slate-800/88 dark:shadow-[0_10px_22px_rgba(2,132,199,0.14)]"
-                    >
-                      <LucideIcon className="w-6 h-6 text-blue-700 dark:text-sky-300" />
-                    </div>
-                  ) : null;
-                })}
+              <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-white/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-[0_8px_20px_rgba(56,189,248,0.12)] backdrop-blur-sm dark:border-sky-400/18 dark:bg-slate-900/70 dark:text-sky-300 dark:shadow-[0_12px_28px_rgba(2,132,199,0.16)] sm:px-4 sm:text-xs sm:tracking-[0.28em]">
+                {isRemote ? "Remote Service" : "Local Service"}
               </div>
-            )}
 
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold leading-tight text-slate-950 dark:text-white sm:text-4xl lg:text-[2.75rem]">
-                {service.title}
-              </h1>
-              <p className="text-base text-slate-600 dark:text-slate-300 sm:text-lg">
-                {service.headline}
-              </p>
-            </div>
+              {service.icons && service.icons.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3">
+                  {service.icons.map((iconName, idx) => {
+                    const name = iconName
+                      .split("-")
+                      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+                      .join("");
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const LucideIcon = (Icons as any)[name];
+                    return LucideIcon ? (
+                      <div
+                        key={idx}
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-sky-200/80 bg-sky-100/85 shadow-[0_8px_18px_rgba(59,130,246,0.12)] dark:border-sky-400/14 dark:bg-slate-800/88 dark:shadow-[0_10px_22px_rgba(2,132,199,0.14)]"
+                      >
+                        <LucideIcon className="w-6 h-6 text-blue-700 dark:text-sky-300" />
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold leading-tight text-slate-950 dark:text-white sm:text-4xl lg:text-[2.75rem]">
+                  {service.title}
+                </h1>
+                <p className="text-base text-slate-600 dark:text-slate-300 sm:text-lg">
+                  {service.headline}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -262,7 +263,9 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
               key={idx}
               className="pt-6 sm:pt-8 first:pt-0 border-t border-gray-200/60 dark:border-gray-700/60 first:border-t-0"
             >
-              <h2 className="text-xl font-semibold sm:text-2xl">{section.heading}</h2>
+              <h2 className="text-xl font-semibold sm:text-2xl">
+                {section.heading}
+              </h2>
 
               {section.paragraph &&
                 (Array.isArray(section.paragraph) ? (

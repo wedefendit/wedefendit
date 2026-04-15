@@ -18,6 +18,7 @@ import { useGridRunner } from "./hooks/useGridRunner";
 import { TitleScreen } from "./ui/screens/TitleScreen";
 import { OverworldScreen } from "./ui/screens/OverworldScreen";
 import { BattleScreen } from "./ui/screens/BattleScreen";
+import { PlayerHUD } from "./ui/hud/PlayerHUD";
 
 const ZONE_NAMES: Record<string, string> = {
   overworld: "CYBERSPACE -- SECTOR 01",
@@ -42,7 +43,7 @@ export function GridRunner() {
 
   return (
     <GridRunnerShell
-      hideControls={isTitleScreen || isBattle}
+      hideControls={isTitleScreen}
       onDPadPress={game.handleDPadPress}
       onDPadRelease={game.handleDPadRelease}
       onActionPress={(btn) => {
@@ -56,13 +57,21 @@ export function GridRunner() {
           onContinue={game.continueGame}
         />
       )}
-      {isMapScreen && (
-        <OverworldScreen
-          map={game.map}
-          playerPos={game.playerPos}
-          facing={game.facing}
-          zoneName={ZONE_NAMES[game.currentZone] ?? game.currentZone.toUpperCase()}
-        />
+      {isMapScreen && game.save && (
+        <>
+          <PlayerHUD
+            player={game.save.player}
+            playerName={game.save.playerName}
+            bits={game.save.bits}
+            zoneName={ZONE_NAMES[game.currentZone] ?? game.currentZone.toUpperCase()}
+          />
+          <OverworldScreen
+            map={game.map}
+            playerPos={game.playerPos}
+            facing={game.facing}
+            zoneName={ZONE_NAMES[game.currentZone] ?? game.currentZone.toUpperCase()}
+          />
+        </>
       )}
       {isBattle && game.battle && game.save && (
         <BattleScreen

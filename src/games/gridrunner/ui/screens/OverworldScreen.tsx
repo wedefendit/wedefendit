@@ -18,27 +18,23 @@ type OverworldScreenProps = Readonly<{
 }>;
 
 /* ------------------------------------------------------------------ */
-/*  Tile colors                                                       */
+/*  Tile class maps                                                   */
 /* ------------------------------------------------------------------ */
 
-const TILE_BG: Record<TileKind | "void", string> = {
-  ground: "#0a0e1a",
-  wall: "#0d1520",
-  building: "#111d30",
-  entry: "#0a1225",
-  locked: "#100d18",
-  spawn: "#0a0e1a",
-  void: "#06080f",
+const TILE_CLASSES: Record<TileKind | "void", string> = {
+  ground: "bg-[#0a0e1a] border-[#1a3a4a]",
+  wall: "bg-[#0d1520] border-[#1a2a38]",
+  building: "bg-[#111d30] border-[#00f0ff] shadow-[inset_0_0_6px_#00f0ff22]",
+  entry: "bg-[#0a1225] border-[#00ff41]",
+  locked: "bg-[#100d18] border-[#ff003c] shadow-[inset_0_0_6px_#ff003c22]",
+  spawn: "bg-[#0a0e1a] border-[#1a3a4a]",
+  boss: "bg-[#1a0a10] border-[#ff003c] shadow-[inset_0_0_10px_#ff003c44,0_0_8px_#ff003c33] animate-[boss-pulse_2s_ease-in-out_infinite]",
+  void: "bg-[#06080f] border-[#0c1018]",
 };
 
-const TILE_BORDER: Record<TileKind | "void", string> = {
-  ground: "#1a3a4a",
-  wall: "#1a2a38",
-  building: "#00f0ff",
-  entry: "#00ff41",
-  locked: "#ff003c",
-  spawn: "#1a3a4a",
-  void: "#0c1018",
+const LABEL_COLORS: Record<string, string> = {
+  entry: "text-[#00ff41]",
+  locked: "text-[#ff003c]",
 };
 
 const FACING_ARROW: Record<Direction, string> = {
@@ -52,10 +48,6 @@ const FACING_ARROW: Record<Direction, string> = {
 /*  Camera                                                            */
 /* ------------------------------------------------------------------ */
 
-/**
- * Compute the camera offset for maps larger than the viewport.
- * Centers on the player, clamped to map edges.
- */
 function cameraOffset(
   playerPos: Position,
   mapW: number,
@@ -68,12 +60,6 @@ function cameraOffset(
   return { x: cx, y: cy };
 }
 
-/**
- * Build the VP_W x VP_H grid of tiles to render.
- * - Maps smaller than viewport: centered with void fill.
- * - Maps equal to viewport: rendered 1:1.
- * - Maps larger than viewport: panned via camera offset.
- */
 function buildViewport(
   map: GameMap,
   playerPos: Position,
@@ -81,7 +67,6 @@ function buildViewport(
   const rows: { tile: MapTile | null; mapX: number; mapY: number }[][] = [];
 
   if (map.width <= VP_W && map.height <= VP_H) {
-    // Center the map, fill void around it
     const offsetX = Math.floor((VP_W - map.width) / 2);
     const offsetY = Math.floor((VP_H - map.height) / 2);
 
@@ -99,7 +84,6 @@ function buildViewport(
       rows.push(row);
     }
   } else {
-    // Pan camera
     const cam = cameraOffset(playerPos, map.width, map.height);
     for (let vy = 0; vy < VP_H; vy++) {
       const row: { tile: MapTile | null; mapX: number; mapY: number }[] = [];
@@ -125,33 +109,14 @@ function buildViewport(
 
 function TileCell({ tile }: { tile: MapTile | null }) {
   const kind = tile?.kind ?? "void";
-  const bg = TILE_BG[kind as keyof typeof TILE_BG] ?? TILE_BG.void;
-  const border = TILE_BORDER[kind as keyof typeof TILE_BORDER] ?? TILE_BORDER.void;
-
-  const showLabel =
-    tile?.label && (tile.kind === "entry" || tile.kind === "locked");
+  const tileClasses = TILE_CLASSES[kind as keyof typeof TILE_CLASSES] ?? TILE_CLASSES.void;
+  const showLabel = tile?.label && (tile.kind === "entry" || tile.kind === "locked");
+  const labelColor = tile ? (LABEL_COLORS[tile.kind] ?? "") : "";
 
   return (
-    <div
-      className="absolute inset-0 flex items-center justify-center"
-      style={{
-        backgroundColor: bg,
-        border: `1px solid ${border}`,
-        ...(tile && (tile.kind === "building" || tile.kind === "locked")
-          ? { boxShadow: `inset 0 0 6px ${border}22` }
-          : {}),
-      }}
-    >
+    <div className={`absolute inset-0 flex items-center justify-center border ${tileClasses}`}>
       {showLabel && (
-        <span
-          className="text-center leading-none"
-          style={{
-            fontSize: "clamp(5px, 1.2vw, 8px)",
-            color: border,
-            opacity: 0.7,
-            fontFamily: "'Share Tech Mono', monospace",
-          }}
-        >
+        <span className={`gr-font-mono text-center text-[clamp(5px,1.2vw,8px)] leading-none opacity-70 ${labelColor}`}>
           {tile!.kind === "locked" ? "LOCKED" : "ENTER"}
         </span>
       )}
@@ -165,27 +130,13 @@ function PlayerAvatar({ facing }: { facing: Direction }) {
       data-testid="gr-player"
       className="absolute inset-0 z-10 flex items-center justify-center"
     >
-      <div
-        className="flex items-center justify-center rounded-sm"
-        style={{
-          width: "70%",
-          height: "70%",
-          backgroundColor: "#00f0ff",
-          boxShadow: "0 0 8px #00f0ff, 0 0 3px #00f0ff",
-          color: "#0a0e1a",
-          fontSize: "clamp(6px, 1.5vw, 12px)",
-          fontWeight: "bold",
-        }}
-      >
+      <div className="flex h-[70%] w-[70%] items-center justify-center rounded-sm bg-[#00f0ff] text-[clamp(6px,1.5vw,12px)] font-bold text-[#0a0e1a] shadow-[0_0_8px_#00f0ff,0_0_3px_#00f0ff]">
         {FACING_ARROW[facing]}
       </div>
     </div>
   );
 }
 
-/**
- * Fit the largest VP_W:VP_H rectangle inside a container.
- */
 function fitGrid(cw: number, ch: number) {
   const ratio = VP_W / VP_H;
   const containerRatio = cw / ch;
@@ -201,11 +152,6 @@ function fitGrid(cw: number, ch: number) {
   }
 }
 
-/**
- * Map renderer. Always renders a fixed VP_W x VP_H grid.
- * Small maps are centered with void tiles. Large maps pan with the player.
- * Tile size is always consistent.
- */
 export function OverworldScreen({ map, playerPos, facing, zoneName }: OverworldScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [gridSize, setGridSize] = useState<{ w: number; h: number } | null>(null);
@@ -234,24 +180,12 @@ export function OverworldScreen({ map, playerPos, facing, zoneName }: OverworldS
     <section
       data-testid="gr-overworld"
       aria-label={zoneName ?? "Map"}
-      className="flex flex-1 flex-col overflow-hidden"
-      style={{ backgroundColor: "#06080f" }}
+      className="flex flex-1 flex-col overflow-hidden bg-[#06080f]"
     >
-      {/* Map label */}
-      <div
-        className="shrink-0 px-2 py-1 text-center"
-        style={{
-          fontFamily: "'Share Tech Mono', monospace",
-          fontSize: "clamp(8px, 1.5vw, 11px)",
-          color: "#00f0ff",
-          opacity: 0.5,
-          letterSpacing: "0.15em",
-        }}
-      >
+      <div className="gr-font-mono shrink-0 px-2 py-1 text-center text-[clamp(8px,1.5vw,11px)] tracking-[0.15em] text-[#00f0ff]/50">
         {zoneName ?? "CYBERSPACE"}
       </div>
 
-      {/* Fixed-size viewport grid */}
       <div
         ref={containerRef}
         className="flex flex-1 min-h-0 items-center justify-center overflow-hidden"
@@ -259,13 +193,8 @@ export function OverworldScreen({ map, playerPos, facing, zoneName }: OverworldS
         {gridSize && (
           <div
             data-testid="gr-map"
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${VP_W}, 1fr)`,
-              gridTemplateRows: `repeat(${VP_H}, 1fr)`,
-              width: gridSize.w,
-              height: gridSize.h,
-            }}
+            className="grid grid-cols-[repeat(16,1fr)] grid-rows-[repeat(12,1fr)]"
+            style={{ width: gridSize.w, height: gridSize.h }}
           >
             {viewport.flatMap((row, vy) =>
               row.map((cell, vx) => (

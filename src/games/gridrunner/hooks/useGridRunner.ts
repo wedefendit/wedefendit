@@ -7,7 +7,6 @@ import type {
   BattleState,
   GameScreen,
   GridRunnerSave,
-  PlayerState,
   Position,
   ToolInstance,
 } from "../engine/types";
@@ -16,6 +15,7 @@ import { move, tileAt, type Direction } from "../engine/movement";
 import { getMap } from "../data/maps";
 import { overworldMap } from "../data/maps/overworld";
 import {
+  bosses,
   pickRandomEnemy,
   shouldEncounter,
   spawnEnemy,
@@ -186,6 +186,35 @@ function reducer(state: GameState, action: Action): GameState {
           : {}),
       };
 
+      // Boss tile: start boss fight if level requirement met
+      const BOSS_MIN_LEVEL: Record<string, number> = {
+        lazarus: 5,
+      };
+
+      if (
+        state.screen === "building" &&
+        steppedTile?.kind === "boss" &&
+        steppedTile.bossId &&
+        state.save
+      ) {
+        const bossDef = bosses[steppedTile.bossId];
+        const minLevel = BOSS_MIN_LEVEL[steppedTile.bossId] ?? 1;
+
+        if (bossDef && state.save.player.level >= minLevel) {
+          const bossEnemy = {
+            def: bossDef,
+            hp: bossDef.baseHp,
+            maxHp: bossDef.baseHp,
+          };
+          return {
+            ...baseUpdate,
+            screen: "battle",
+            battle: createBattle(bossEnemy),
+          };
+        }
+        // Under-leveled: don't start fight, stay on tile
+      }
+
       // Encounter check: only inside buildings, only on ground tiles
       if (
         state.screen === "building" &&
@@ -281,6 +310,18 @@ function reducer(state: GameState, action: Action): GameState {
           player: p,
           bits: updatedSave.bits + state.battle.bitsEarned,
         };
+
+        // Track boss defeats
+        const bossId = state.battle.enemy.def.id;
+        if (
+          bosses[bossId] &&
+          !updatedSave.defeatedBosses.includes(bossId)
+        ) {
+          updatedSave = {
+            ...updatedSave,
+            defeatedBosses: [...updatedSave.defeatedBosses, bossId],
+          };
+        }
       } else {
         // Lost: respawn at building entrance, lose 10% bits
         const lostBits = Math.floor(updatedSave.bits * 0.1);
@@ -384,11 +425,11 @@ export function useGridRunner() {
       held.delete(e.key);
     }
 
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
+    globalThis.addEventListener("keydown", onKeyDown);
+    globalThis.addEventListener("keyup", onKeyUp);
     return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
+      globalThis.removeEventListener("keydown", onKeyDown);
+      globalThis.removeEventListener("keyup", onKeyUp);
     };
   }, [state.screen]);
 

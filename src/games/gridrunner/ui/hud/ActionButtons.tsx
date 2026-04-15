@@ -15,9 +15,7 @@ party without express written consent.
 export type ActionButton = "a" | "b";
 
 type ActionButtonsProps = Readonly<{
-  /** Called on press. Wired to game actions in a future phase. */
   onPress?: (button: ActionButton) => void;
-  /** Called on release. */
   onRelease?: (button: ActionButton) => void;
 }>;
 
@@ -32,10 +30,8 @@ export function ActionButtons({ onPress, onRelease }: ActionButtonsProps) {
       data-testid="gr-action-buttons"
       role="group"
       aria-label="Action buttons"
-      className="relative"
-      style={{ width: 110, height: 100 }}
+      className="relative h-[100px] w-[110px]"
     >
-      {/* B button - top left */}
       <button
         type="button"
         data-testid="gr-btn-b"
@@ -43,24 +39,11 @@ export function ActionButtons({ onPress, onRelease }: ActionButtonsProps) {
         onPointerDown={() => onPress?.("b")}
         onPointerUp={() => onRelease?.("b")}
         onPointerCancel={() => onRelease?.("b")}
-        className="absolute flex items-center justify-center rounded-full font-mono text-sm font-bold active:brightness-150"
-        style={{
-          top: 0,
-          left: 0,
-          width: 48,
-          height: 48,
-          backgroundColor: "#0f1b2d",
-          border: "2px solid #ff00de",
-          color: "#ff00de",
-          boxShadow:
-            "inset 0 0 8px rgba(255, 0, 222, 0.12), 0 0 4px rgba(255, 0, 222, 0.1)",
-          touchAction: "none",
-        }}
+        className="absolute left-0 top-0 flex h-12 w-12 touch-none items-center justify-center rounded-full border-2 border-[#ff00de] bg-[#0f1b2d] font-mono text-sm font-bold text-[#ff00de] shadow-[inset_0_0_8px_rgba(255,0,222,0.12),0_0_4px_rgba(255,0,222,0.1)] active:brightness-150"
       >
         B
       </button>
 
-      {/* A button - bottom right */}
       <button
         type="button"
         data-testid="gr-btn-a"
@@ -68,19 +51,7 @@ export function ActionButtons({ onPress, onRelease }: ActionButtonsProps) {
         onPointerDown={() => onPress?.("a")}
         onPointerUp={() => onRelease?.("a")}
         onPointerCancel={() => onRelease?.("a")}
-        className="absolute flex items-center justify-center rounded-full font-mono text-sm font-bold active:brightness-150"
-        style={{
-          bottom: 0,
-          right: 0,
-          width: 48,
-          height: 48,
-          backgroundColor: "#0f1b2d",
-          border: "2px solid #00f0ff",
-          color: "#00f0ff",
-          boxShadow:
-            "inset 0 0 8px rgba(0, 240, 255, 0.12), 0 0 4px rgba(0, 240, 255, 0.1)",
-          touchAction: "none",
-        }}
+        className="absolute bottom-0 right-0 flex h-12 w-12 touch-none items-center justify-center rounded-full border-2 border-[#00f0ff] bg-[#0f1b2d] font-mono text-sm font-bold text-[#00f0ff] shadow-[inset_0_0_8px_rgba(0,240,255,0.12),0_0_4px_rgba(0,240,255,0.1)] active:brightness-150"
       >
         A
       </button>
