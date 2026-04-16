@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import { useState } from "react";
@@ -31,10 +31,34 @@ const TABS: { id: TabId; label: string; available: boolean }[] = [
 /* ------------------------------------------------------------------ */
 
 const TYPE_CHART = [
-  { type: "Recon", strong: "Persistence (1.5x)", weak: "Defense (0.75x)", color: "text-[#00f0ff]", desc: "Scanning and information gathering. Know your target before you strike." },
-  { type: "Exploit", strong: "Defense (1.5x)", weak: "Persistence (0.75x)", color: "text-[#ff5c72]", desc: "Direct attacks that break through defenses. High risk, high reward." },
-  { type: "Defense", strong: "Exploit (1.5x)", weak: "Recon (0.75x)", color: "text-[#00ff41]", desc: "Shields and detection. Blocks incoming attacks and reveals threats." },
-  { type: "Persistence", strong: "Recon (1.5x)", weak: "Exploit (0.75x)", color: "text-[#ff00de]", desc: "Maintaining access. Slow damage over time that is hard to remove." },
+  {
+    type: "Recon",
+    strong: "Persistence (1.5x)",
+    weak: "Defense (0.75x)",
+    color: "text-[#00f0ff]",
+    desc: "Scanning and information gathering. Know your target before you strike.",
+  },
+  {
+    type: "Exploit",
+    strong: "Defense (1.5x)",
+    weak: "Persistence (0.75x)",
+    color: "text-[#ff5c72]",
+    desc: "Direct attacks that break through defenses. High risk, high reward.",
+  },
+  {
+    type: "Defense",
+    strong: "Exploit (1.5x)",
+    weak: "Recon (0.75x)",
+    color: "text-[#00ff41]",
+    desc: "Shields and detection. Blocks incoming attacks and reveals threats.",
+  },
+  {
+    type: "Persistence",
+    strong: "Recon (1.5x)",
+    weak: "Exploit (0.75x)",
+    color: "text-[#ff00de]",
+    desc: "Maintaining access. Slow damage over time that is hard to remove.",
+  },
 ];
 
 const TYPE_COLORS: Record<string, string> = {
@@ -48,13 +72,22 @@ const TYPE_COLORS: Record<string, string> = {
 /*  Tools tab -- education first, tap to expand                       */
 /* ------------------------------------------------------------------ */
 
-function ToolsTab({ equippedTools, inventory }: Readonly<{ equippedTools: (ToolInstance | null)[]; inventory: ToolInstance[] }>) {
+function ToolsTab({
+  equippedTools,
+  inventory,
+}: Readonly<{
+  equippedTools: (ToolInstance | null)[];
+  inventory: ToolInstance[];
+}>) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   // Deduplicate by baseToolId -- show each tool type once
   const seen = new Set<string>();
   const uniqueTools: ToolInstance[] = [];
-  for (const t of [...equippedTools.filter((t): t is ToolInstance => t !== null), ...inventory]) {
+  for (const t of [
+    ...equippedTools.filter((t): t is ToolInstance => t !== null),
+    ...inventory,
+  ]) {
     if (!seen.has(t.baseToolId)) {
       seen.add(t.baseToolId);
       uniqueTools.push(t);
@@ -62,13 +95,18 @@ function ToolsTab({ equippedTools, inventory }: Readonly<{ equippedTools: (ToolI
   }
 
   if (uniqueTools.length === 0) {
-    return <p className="text-sm text-[#aabbcc]">No tools discovered yet. Win battles to find tools.</p>;
+    return (
+      <p className="text-sm text-[#aabbcc]">
+        No tools discovered yet. Win battles to find tools.
+      </p>
+    );
   }
 
   return (
     <div className="flex flex-col gap-2">
       <p className="text-xs text-[#aabbcc]">
-        Tap a tool to learn what it does. These are real cybersecurity tools used by professionals.
+        Tap a tool to learn what it does. These are real cybersecurity tools
+        used by professionals.
       </p>
       {uniqueTools.map((tool) => {
         const info = getToolInfo(tool.baseToolId);
@@ -96,10 +134,14 @@ function ToolsTab({ equippedTools, inventory }: Readonly<{ equippedTools: (ToolI
             {isOpen && (
               <div className="mt-2 border-t border-[#1a3a4a] pt-2">
                 <p className="text-xs text-[#aabbcc]">
-                  {tool.type === "recon" && "Recon tools gather intelligence. In the real world, security teams use these to map networks and find weaknesses before attackers do. In battle, Recon is strong against Persistence but weak against Defense."}
-                  {tool.type === "exploit" && "Exploit tools attack directly. In the real world, penetration testers use these to prove a vulnerability is real, not theoretical. In battle, Exploit is strong against Defense but weak against Persistence."}
-                  {tool.type === "defense" && "Defense tools protect and detect. In the real world, these are the firewalls, intrusion detection systems, and malware scanners that guard every network. In battle, Defense is strong against Exploit but weak against Recon."}
-                  {tool.type === "persistence" && "Persistence tools maintain access over time. In the real world, attackers use these to stay hidden inside a network after breaking in. In battle, Persistence is strong against Recon but weak against Exploit."}
+                  {tool.type === "recon" &&
+                    "Recon tools gather intelligence. In the real world, security teams use these to map networks and find weaknesses before attackers do. In battle, Recon is strong against Persistence but weak against Defense."}
+                  {tool.type === "exploit" &&
+                    "Exploit tools attack directly. In the real world, penetration testers use these to prove a vulnerability is real, not theoretical. In battle, Exploit is strong against Defense but weak against Persistence."}
+                  {tool.type === "defense" &&
+                    "Defense tools protect and detect. In the real world, these are the firewalls, intrusion detection systems, and malware scanners that guard every network. In battle, Defense is strong against Exploit but weak against Recon."}
+                  {tool.type === "persistence" &&
+                    "Persistence tools maintain access over time. In the real world, attackers use these to stay hidden inside a network after breaking in. In battle, Persistence is strong against Recon but weak against Exploit."}
                 </p>
               </div>
             )}
@@ -120,7 +162,8 @@ function TypesTab() {
   return (
     <div className="flex flex-col gap-2">
       <p className="text-xs text-[#aabbcc]">
-        Every tool has a type. Match your type to the enemy weakness for bonus damage.
+        Every tool has a type. Match your type to the enemy weakness for bonus
+        damage.
       </p>
       {TYPE_CHART.map((row) => {
         const isOpen = expanded === row.type;
@@ -166,7 +209,11 @@ function LockedTab() {
 /*  Main Disc screen                                                  */
 /* ------------------------------------------------------------------ */
 
-export function DiscScreen({ onClose, equippedTools, inventory }: DiscScreenProps) {
+export function DiscScreen({
+  onClose,
+  equippedTools,
+  inventory,
+}: DiscScreenProps) {
   const [activeTab, setActiveTab] = useState<TabId>("tools");
 
   return (
@@ -189,7 +236,10 @@ export function DiscScreen({ onClose, equippedTools, inventory }: DiscScreenProp
       </header>
 
       {/* Tabs */}
-      <nav aria-label="Disc sections" className="flex shrink-0 border-b border-[#1a3a4a]">
+      <nav
+        aria-label="Disc sections"
+        className="flex shrink-0 border-b border-[#1a3a4a]"
+      >
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -214,9 +264,9 @@ export function DiscScreen({ onClose, equippedTools, inventory }: DiscScreenProp
           <ToolsTab equippedTools={equippedTools} inventory={inventory} />
         )}
         {activeTab === "types" && <TypesTab />}
-        {(activeTab === "threats" || activeTab === "killchain" || activeTab === "intel") && (
-          <LockedTab />
-        )}
+        {(activeTab === "threats" ||
+          activeTab === "killchain" ||
+          activeTab === "intel") && <LockedTab />}
       </div>
 
       <p className="gr-font-mono shrink-0 border-t border-[#1a3a4a] px-3 py-1.5 text-center text-xs text-[#aabbcc]">

@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import type { GameMap, Position } from "./types";
@@ -17,11 +17,7 @@ const DELTA: Record<Direction, Position> = {
  * Attempt to move in a direction. Returns the new position if the
  * target tile is walkable, otherwise returns the current position unchanged.
  */
-export function move(
-  pos: Position,
-  dir: Direction,
-  map: GameMap,
-): Position {
+export function move(pos: Position, dir: Direction, map: GameMap): Position {
   const d = DELTA[dir];
   const nx = pos.x + d.x;
   const ny = pos.y + d.y;

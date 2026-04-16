@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import { useEffect, useRef } from "react";
@@ -79,7 +79,9 @@ function HpBar({
 
   return (
     <div className="flex items-center gap-1.5">
-      <span className={`gr-font-mono shrink-0 text-xs ${c.text}`}>{label}</span>
+      <span className={`gr-font-mono shrink-0 text-xs font-semibold ${c.text}`}>
+        {label}
+      </span>
       <div
         className="relative h-2 flex-1 overflow-hidden rounded-sm border border-[#1a3a4a] bg-[#0d1520]"
         role="meter"
@@ -93,7 +95,7 @@ function HpBar({
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="gr-font-mono shrink-0 text-xs tabular-nums text-[#aabbcc]">
+      <span className="gr-font-mono shrink-0 text-xs font-medium tabular-nums text-[#d0d8e0]">
         {current}/{max}
       </span>
     </div>
@@ -110,8 +112,8 @@ function LogLine({ line }: Readonly<{ line: string }>) {
 
   return (
     <p className="py-0.5">
-      <span className="text-[#4a5568]">{prefix}</span>
-      <span className={colorClass}>{message}</span>
+      <span className="text-[#6688aa]">{prefix}</span>
+      <span className={`font-medium ${colorClass}`}>{message}</span>
     </p>
   );
 }
@@ -230,9 +232,9 @@ export function BattleScreen({
                   onClick={() => onUseTool(tool)}
                   className="gr-font-mono min-h-[44px] rounded-sm border border-[#00f0ff] bg-[#0f1b2d] px-2 py-1.5 text-center text-xs font-bold uppercase text-[#00f0ff] transition-opacity disabled:opacity-30"
                 >
-                  <span className="text-[#aabbcc]">[{i + 1}]</span>{" "}
+                  <span className="text-[#d0d8e0]">[{i + 1}]</span>{" "}
                   {tool.baseToolId}{" "}
-                  <span className="opacity-50">{tool.energyCost}EN</span>
+                  <span className="opacity-70">{tool.energyCost}EN</span>
                 </button>
               ) : null,
             )}
@@ -244,7 +246,7 @@ export function BattleScreen({
             onClick={onRun}
             className="gr-font-mono mt-1 min-h-[44px] w-full shrink-0 rounded-sm border border-[#ff6b00] bg-[#0f1b2d] px-2 py-1.5 text-center text-xs font-bold uppercase text-[#ff6b00] transition-opacity disabled:opacity-30"
           >
-            <span className="text-[#aabbcc]">[5]</span> RUN
+            <span className="text-[#d0d8e0]">[5]</span> RUN
           </button>
         </>
       )}
@@ -268,7 +270,7 @@ export function BattleScreen({
           </p>
           {battle.phase === "won" && (
             <div className="flex flex-col items-center gap-1">
-              <p className="gr-font-mono text-xs text-[#00f0ff]">
+              <p className="gr-font-mono text-xs font-semibold text-[#00f0ff]">
                 +{battle.xpEarned} XP | +{battle.bitsEarned} Bits
               </p>
               {battle.levelsGained > 0 && (
@@ -278,7 +280,7 @@ export function BattleScreen({
               )}
               {battle.lootDrop && (
                 <p
-                  className={`gr-font-mono text-xs ${RARITY_COLORS[battle.lootDrop.rarity]}`}
+                  className={`gr-font-mono text-xs font-semibold ${RARITY_COLORS[battle.lootDrop.rarity]}`}
                 >
                   LOOT: {toolDisplayName(battle.lootDrop)}
                 </p>
@@ -289,7 +291,7 @@ export function BattleScreen({
             type="button"
             data-testid="gr-battle-continue"
             onClick={onBattleEnd}
-            className="gr-font-mono mt-1 rounded-sm border-2 border-[#00f0ff] bg-[#0f1b2d] px-6 py-2 text-sm font-bold uppercase tracking-widest text-[#00f0ff]"
+            className="gr-font-mono mt-1 rounded-sm border-2 border-[#00f0ff] bg-[#0f1b2d] px-6 py-2 text-xs font-bold uppercase tracking-widest text-[#00f0ff]"
           >
             CONTINUE
           </button>

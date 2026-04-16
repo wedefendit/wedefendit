@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import type { Rarity, ToolInstance, ToolType } from "./types";
@@ -229,6 +229,37 @@ export function rollLootDrop(
 ): ToolInstance | null {
   if (!isBoss && Math.random() > 0.6) return null;
   return generateTool(playerLevel);
+}
+
+/** Create a specific Common-rarity tool with base stats (used by shop) */
+export function createCommonTool(baseId: string): ToolInstance | null {
+  const baseTool = BASE_TOOLS.find((t) => t.id === baseId);
+  if (!baseTool) return null;
+  instanceCounter += 1;
+  return {
+    id: `${baseTool.id}-${Date.now()}-${instanceCounter}`,
+    baseToolId: baseTool.id,
+    rarity: "common",
+    power: baseTool.basePower,
+    accuracy: baseTool.baseAccuracy,
+    energyCost: baseTool.baseEnergy,
+    prefix: null,
+    suffix: null,
+    type: baseTool.type,
+  };
+}
+
+/** Get full base tool definition (used by shop for display) */
+export function getBaseTool(baseId: string): {
+  id: string;
+  name: string;
+  type: ToolType;
+  basePower: number;
+  baseAccuracy: number;
+  baseEnergy: number;
+  description: string;
+} | null {
+  return BASE_TOOLS.find((t) => t.id === baseId) ?? null;
 }
 
 /* ------------------------------------------------------------------ */

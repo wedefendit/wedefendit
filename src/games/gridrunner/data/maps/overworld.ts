@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import type { GameMap, MapTile } from "../../engine/types";
@@ -19,8 +19,6 @@ function entry(id: string, label: string): MapTile {
 function locked(id: string, label: string): MapTile {
   return { kind: "locked", buildingId: id, label, walkable: false };
 }
-
-const S: MapTile = { kind: "spawn", walkable: true };
 
 const ARC = bld("arcade", "Arcade");
 const ARCe = entry("arcade", "Arcade");

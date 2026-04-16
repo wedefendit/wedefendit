@@ -1,10 +1,13 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import { GridRunnerShell } from "./GridRunnerShell";
+import { useCallback, useEffect, useRef } from "react";
 import { useForceDarkMode } from "./hooks/useForceDarkMode";
 import { useGridRunner } from "./hooks/useGridRunner";
+import { useAudio } from "./hooks/useAudio";
+import type { ToolInstance, ToolType } from "./engine/types";
 import { TitleScreen } from "./ui/screens/TitleScreen";
 import { OverworldScreen } from "./ui/screens/OverworldScreen";
 import { BattleScreen } from "./ui/screens/BattleScreen";
@@ -15,6 +18,7 @@ import { InventoryScreen } from "./ui/screens/InventoryScreen";
 import { OperatorScreen } from "./ui/screens/OperatorScreen";
 import { SaveScreen } from "./ui/screens/SaveScreen";
 import { SettingsScreen } from "./ui/screens/SettingsScreen";
+import { ShopScreen } from "./ui/screens/ShopScreen";
 
 const ZONE_NAMES: Record<string, string> = {
   overworld: "CYBERSPACE -- SECTOR 01",
@@ -23,6 +27,16 @@ const ZONE_NAMES: Record<string, string> = {
   hospital: "HOSPITAL -- HEALTHCARE",
   powerplant: "POWER PLANT -- CRITICAL INFRA",
   government: "GOV BUILDING -- ESPIONAGE",
+};
+
+const TOOL_SFX: Record<
+  ToolType,
+  "tool-recon" | "tool-exploit" | "tool-defense" | "tool-persistence"
+> = {
+  recon: "tool-recon",
+  exploit: "tool-exploit",
+  defense: "tool-defense",
+  persistence: "tool-persistence",
 };
 
 /**
@@ -37,7 +51,78 @@ export function GridRunner() {
   const isTitleScreen = game.screen === "title";
   const isBattle = game.screen === "battle";
   const isMapScreen = game.screen === "overworld" || game.screen === "building";
-  const zoneName = ZONE_NAMES[game.currentZone] ?? game.currentZone.toUpperCase();
+  const zoneName =
+    ZONE_NAMES[game.currentZone] ?? game.currentZone.toUpperCase();
+
+  const isBoss = game.battle?.isBoss ?? false;
+  const isPaused = game.overlay !== "none";
+  const audio = useAudio(game.screen, game.currentZone, isBoss, isPaused);
+
+  /* ---- SFX: step on move ---- */
+  const prevPosRef = useRef(game.playerPos);
+  useEffect(() => {
+    const prev = prevPosRef.current;
+    if (
+      isMapScreen &&
+      (prev.x !== game.playerPos.x || prev.y !== game.playerPos.y)
+    ) {
+      audio.sfx("step");
+    }
+    prevPosRef.current = game.playerPos;
+  }, [game.playerPos, isMapScreen, audio]);
+
+  /* ---- SFX: encounter trigger ---- */
+  const prevScreenRef = useRef(game.screen);
+  useEffect(() => {
+    if (prevScreenRef.current !== "battle" && game.screen === "battle") {
+      audio.sfx("encounter");
+    }
+    prevScreenRef.current = game.screen;
+  }, [game.screen, audio]);
+
+  /* ---- SFX: menu open/close ---- */
+  const prevOverlayRef = useRef(game.overlay);
+  useEffect(() => {
+    const prev = prevOverlayRef.current;
+    if (prev === "none" && game.overlay !== "none") {
+      audio.sfx("menu-open");
+    } else if (prev !== "none" && game.overlay === "none") {
+      audio.sfx("menu-close");
+    }
+    prevOverlayRef.current = game.overlay;
+  }, [game.overlay, audio]);
+
+  /* ---- SFX: battle log (hit/miss/critical) ---- */
+  const prevLogLenRef = useRef(0);
+  useEffect(() => {
+    if (!game.battle) {
+      prevLogLenRef.current = 0;
+      return;
+    }
+    const log = game.battle.log;
+    if (log.length <= prevLogLenRef.current) return;
+
+    for (let i = prevLogLenRef.current; i < log.length; i++) {
+      const entry = log[i];
+      if (entry.includes("[CRIT]")) {
+        audio.sfx("critical");
+      } else if (entry.includes("[HIT]")) {
+        audio.sfx("hit");
+      } else if (entry.includes("[MISS]")) {
+        audio.sfx("miss");
+      }
+    }
+    prevLogLenRef.current = log.length;
+  }, [game.battle?.log.length, game.battle, audio]);
+
+  /* ---- SFX: tool use wrapper ---- */
+  const handleUseTool = useCallback(
+    (tool: ToolInstance) => {
+      audio.sfx(TOOL_SFX[tool.type]);
+      game.handleUseTool(tool);
+    },
+    [audio, game],
+  );
 
   return (
     <GridRunnerShell
@@ -64,7 +149,7 @@ export function GridRunner() {
             player={game.save.player}
             playerName={game.save.playerName}
             bits={game.save.bits}
-            zoneName={zoneName}
+            trackName={audio.trackName}
           />
           <OverworldScreen
             map={game.map}
@@ -80,7 +165,7 @@ export function GridRunner() {
           player={game.save.player}
           playerName={game.save.playerName}
           equippedTools={game.save.equippedTools}
-          onUseTool={game.handleUseTool}
+          onUseTool={handleUseTool}
           onRun={game.handleRun}
           onBattleEnd={game.handleBattleEnd}
         />
@@ -127,7 +212,20 @@ export function GridRunner() {
         />
       )}
       {game.overlay === "settings" && (
-        <SettingsScreen onClose={game.handleCloseOverlay} />
+        <SettingsScreen
+          onClose={game.handleCloseOverlay}
+          audioSettings={audio.settings}
+          onAudioChange={audio.onSettingsChange}
+        />
+      )}
+      {game.overlay === "shop" && game.save && (
+        <ShopScreen
+          onClose={game.handleCloseOverlay}
+          player={game.save.player}
+          bits={game.save.bits}
+          inventoryFull={game.save.inventory.length >= 12}
+          onBuy={game.handleBuyTool}
+        />
       )}
     </GridRunnerShell>
   );

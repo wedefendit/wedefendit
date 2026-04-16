@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 /* ------------------------------------------------------------------ */
@@ -98,7 +98,12 @@ export interface GridRunnerSave {
 /*  Screen state machine                                              */
 /* ------------------------------------------------------------------ */
 
-export type GameScreen = "title" | "overworld" | "building" | "battle" | "intel";
+export type GameScreen =
+  | "title"
+  | "overworld"
+  | "building"
+  | "battle"
+  | "intel";
 
 /* ------------------------------------------------------------------ */
 /*  Enemy & Battle                                                    */

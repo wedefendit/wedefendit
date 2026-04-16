@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -94,9 +94,12 @@ export function GridRunnerShell({
       <section
         data-testid="gr-frame"
         aria-label="GRIDRUNNER game"
-        className="relative mx-auto flex min-h-0 w-full max-w-[640px] flex-1 flex-col overflow-hidden"
+        className="relative mx-auto flex min-h-0 w-full max-w-[640px] flex-1 flex-col overflow-hidden rounded-2xl border border-[#1a3a4a]"
       >
-        <div data-testid="gr-viewport" className="relative min-h-0 flex-1 flex flex-col overflow-hidden">
+        <div
+          data-testid="gr-viewport"
+          className="relative min-h-0 flex-1 flex flex-col overflow-hidden"
+        >
           {children}
         </div>
         {!hideControls && (

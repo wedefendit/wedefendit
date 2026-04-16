@@ -1,13 +1,23 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import type { GameMap, MapTile } from "../../engine/types";
 
 const G: MapTile = { kind: "ground", walkable: true };
 const W: MapTile = { kind: "wall", walkable: false };
-const EXIT: MapTile = { kind: "entry", buildingId: "overworld", label: "Exit", walkable: true };
-const BOSS: MapTile = { kind: "boss", bossId: "lazarus", label: "BOSS", walkable: true };
+const EXIT: MapTile = {
+  kind: "entry",
+  buildingId: "overworld",
+  label: "Exit",
+  walkable: true,
+};
+const BOSS: MapTile = {
+  kind: "boss",
+  bossId: "lazarus",
+  label: "BOSS",
+  walkable: true,
+};
 
 /** Vault decoration (non-walkable) */
 const VLT: MapTile = { kind: "building", label: "Vault", walkable: false };

@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import { useCallback, useEffect, useReducer, useRef } from "react";
@@ -21,6 +21,8 @@ import {
   spawnEnemy,
 } from "../engine/enemies";
 import { attemptRun, createBattle, resolvePlayerTurn } from "../engine/battle";
+import { createCommonTool } from "../engine/loot";
+import { SHOP_ITEMS } from "../engine/shop";
 
 /* ------------------------------------------------------------------ */
 /*  State                                                             */
@@ -42,7 +44,8 @@ interface GameState {
     | "inventory"
     | "operator"
     | "save"
-    | "settings";
+    | "settings"
+    | "shop";
   /** Where B/Close navigates back to. "none" closes entirely, "menu" goes back to menu. */
   overlayReturnTo: "none" | "menu";
 }
@@ -65,6 +68,8 @@ type Action =
   | { type: "CLOSE_OVERLAY" }
   | { type: "EQUIP_TOOL"; toolId: string; slotIndex: number }
   | { type: "SCRAP_TOOL"; toolId: string }
+  | { type: "BUY_TOOL"; baseToolId: string }
+  | { type: "OPEN_SHOP" }
   | { type: "MANUAL_SAVE" };
 
 function init(): GameState {
@@ -232,6 +237,15 @@ function reducer(state: GameState, action: Action): GameState {
         // Under-leveled: don't start fight, stay on tile
       }
 
+      // Shop tile: auto-open shop overlay
+      if (
+        state.screen === "building" &&
+        steppedTile?.kind === "building" &&
+        steppedTile.buildingId === "shop"
+      ) {
+        return { ...baseUpdate, overlay: "shop", overlayReturnTo: "none" };
+      }
+
       // Encounter check: only inside buildings, only on ground tiles
       if (
         state.screen === "building" &&
@@ -256,8 +270,33 @@ function reducer(state: GameState, action: Action): GameState {
       if (!currentMap) return state;
       const tile = tileAt(currentMap, state.playerPos);
       if (!tile) return state;
-      // Future: shop, save terminal, NPC interactions
+      if (tile.kind === "building" && tile.buildingId === "shop") {
+        return { ...state, overlay: "shop", overlayReturnTo: "none" };
+      }
       return state;
+    }
+
+    case "OPEN_SHOP": {
+      return { ...state, overlay: "shop", overlayReturnTo: "none" };
+    }
+
+    case "BUY_TOOL": {
+      if (!state.save) return state;
+      const item = SHOP_ITEMS.find((s) => s.baseToolId === action.baseToolId);
+      if (!item) return state;
+      const { player, inventory } = state.save;
+      if (player.level < item.minLevel) return state;
+      if (state.save.bits < item.price) return state;
+      if (inventory.length >= 12) return state;
+      const tool = createCommonTool(action.baseToolId);
+      if (!tool) return state;
+      const nextSave = {
+        ...state.save,
+        bits: state.save.bits - item.price,
+        inventory: [...inventory, tool],
+      };
+      writeSave(nextSave);
+      return { ...state, save: nextSave };
     }
 
     case "USE_TOOL": {
@@ -675,6 +714,14 @@ export function useGridRunner() {
     dispatch({ type: "MANUAL_SAVE" });
   }, []);
 
+  const handleBuyTool = useCallback((baseToolId: string) => {
+    dispatch({ type: "BUY_TOOL", baseToolId });
+  }, []);
+
+  const handleOpenShop = useCallback(() => {
+    dispatch({ type: "OPEN_SHOP" });
+  }, []);
+
   const currentMap = getMap(state.currentZone) ?? overworldMap;
   const currentTile = tileAt(currentMap, state.playerPos);
 
@@ -704,5 +751,7 @@ export function useGridRunner() {
     handleEquipTool,
     handleScrapTool,
     handleManualSave,
+    handleBuyTool,
+    handleOpenShop,
   };
 }

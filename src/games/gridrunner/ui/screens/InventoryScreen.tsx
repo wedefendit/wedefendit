@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import type { ToolInstance } from "../../engine/types";
@@ -30,11 +30,18 @@ const RARITY_BORDERS: Record<string, string> = {
 };
 
 const SCRAP_VALUES: Record<string, number> = {
-  common: 3, uncommon: 8, rare: 20, epic: 50, legendary: 120,
+  common: 3,
+  uncommon: 8,
+  rare: 20,
+  epic: 50,
+  legendary: 120,
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  recon: "Recon", exploit: "Exploit", defense: "Defense", persistence: "Persistence",
+  recon: "Recon",
+  exploit: "Exploit",
+  defense: "Defense",
+  persistence: "Persistence",
 };
 
 export function InventoryScreen({
@@ -72,22 +79,29 @@ export function InventoryScreen({
             <div
               key={tool?.id ?? `empty-${i}`}
               className={`rounded-sm border bg-[#0f1b2d] px-2.5 py-2 ${
-                tool ? RARITY_BORDERS[tool.rarity] : "border-dashed border-[#1a3a4a]"
+                tool
+                  ? RARITY_BORDERS[tool.rarity]
+                  : "border-dashed border-[#1a3a4a]"
               }`}
             >
               {tool ? (
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm font-bold ${RARITY_COLORS[tool.rarity]}`}>
+                    <span
+                      className={`text-sm font-bold ${RARITY_COLORS[tool.rarity]}`}
+                    >
                       Slot {i + 1}: {toolDisplayName(tool)}
                     </span>
                   </div>
                   <span className="text-xs text-[#aabbcc]">
-                    {TYPE_LABELS[tool.type]} -- Pwr {tool.power} / Acc {tool.accuracy}% / EN {tool.energyCost}
+                    {TYPE_LABELS[tool.type]} -- Pwr {tool.power} / Acc{" "}
+                    {tool.accuracy}% / EN {tool.energyCost}
                   </span>
                 </div>
               ) : (
-                <span className="text-xs text-[#4a5568]">Slot {i + 1} -- Empty</span>
+                <span className="text-xs text-[#4a5568]">
+                  Slot {i + 1} -- Empty
+                </span>
               )}
             </div>
           ))}
@@ -98,7 +112,9 @@ export function InventoryScreen({
           BACKPACK ({inventory.length})
         </h3>
         {inventory.length === 0 ? (
-          <p className="text-xs text-[#aabbcc]">No items. Win battles to collect loot.</p>
+          <p className="text-xs text-[#aabbcc]">
+            No items. Win battles to collect loot.
+          </p>
         ) : (
           <div className="flex flex-col gap-2">
             {inventory.map((tool) => (
@@ -107,11 +123,14 @@ export function InventoryScreen({
                 className={`rounded-sm border bg-[#0f1b2d] px-2.5 py-2 ${RARITY_BORDERS[tool.rarity]}`}
               >
                 <div className="flex flex-col gap-1">
-                  <span className={`text-sm font-bold ${RARITY_COLORS[tool.rarity]}`}>
+                  <span
+                    className={`text-sm font-bold ${RARITY_COLORS[tool.rarity]}`}
+                  >
                     {toolDisplayName(tool)}
                   </span>
                   <span className="text-xs text-[#aabbcc]">
-                    {TYPE_LABELS[tool.type]} -- Pwr {tool.power} / Acc {tool.accuracy}% / EN {tool.energyCost}
+                    {TYPE_LABELS[tool.type]} -- Pwr {tool.power} / Acc{" "}
+                    {tool.accuracy}% / EN {tool.energyCost}
                   </span>
                   {/* One-tap equip to any slot */}
                   <div className="flex flex-wrap gap-1 pt-1">

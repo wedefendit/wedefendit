@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 This software and its source code are the proprietary property of
 Defend I.T. Solutions LLC and are protected by United States and
@@ -33,17 +33,12 @@ const GRID_AREA: Record<DPadDirection, string> = {
   down: "3 / 2 / 4 / 3",
 };
 
-/**
- * Four-directional pad rendered as a 3x3 CSS grid cross.
- * Each arm is a native <button> meeting 44px minimum touch targets.
- * The center cell is decorative.
- */
 export function DPad({ onPress, onRelease }: DPadProps) {
   return (
     <nav
       data-testid="gr-dpad"
       aria-label="Directional pad"
-      className="grid grid-cols-[repeat(3,48px)] grid-rows-[repeat(3,48px)] gap-0.5"
+      className="grid grid-cols-[repeat(3,32px)] grid-rows-[repeat(3,32px)] gap-0.5 sm:grid-cols-[repeat(3,40px)] sm:grid-rows-[repeat(3,40px)] lg:grid-cols-[repeat(3,48px)] lg:grid-rows-[repeat(3,48px)]"
     >
       {(["up", "down", "left", "right"] as const).map((dir) => (
         <button
@@ -54,7 +49,7 @@ export function DPad({ onPress, onRelease }: DPadProps) {
           onPointerDown={() => onPress?.(dir)}
           onPointerUp={() => onRelease?.(dir)}
           onPointerCancel={() => onRelease?.(dir)}
-          className="flex h-12 w-12 touch-none items-center justify-center rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] text-sm text-[#00f0ff] shadow-[inset_0_0_6px_rgba(0,240,255,0.08)] active:brightness-150"
+          className="flex h-8 w-8 touch-none items-center justify-center rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] text-[10px] text-[#00f0ff] shadow-[inset_0_0_6px_rgba(0,240,255,0.08)] active:brightness-150 sm:h-10 sm:w-10 sm:text-xs lg:h-12 lg:w-12 lg:text-sm"
           style={{ gridArea: GRID_AREA[dir] }}
         >
           {ARROW[dir]}

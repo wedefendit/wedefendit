@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import type { GameMap, MapTile } from "../../engine/types";
@@ -8,13 +8,28 @@ const G: MapTile = { kind: "ground", walkable: true };
 const W: MapTile = { kind: "wall", walkable: false };
 
 /** Entry/exit tile -- walking here exits to overworld */
-const EXIT: MapTile = { kind: "entry", buildingId: "overworld", label: "Exit", walkable: true };
+const EXIT: MapTile = {
+  kind: "entry",
+  buildingId: "overworld",
+  label: "Exit",
+  walkable: true,
+};
 
 /** Shop NPC tile */
-const SHOP: MapTile = { kind: "building", buildingId: "shop", label: "Shop", walkable: true };
+const SHOP: MapTile = {
+  kind: "building",
+  buildingId: "shop",
+  label: "Shop",
+  walkable: true,
+};
 
 /** Save terminal tile */
-const SAVE: MapTile = { kind: "building", buildingId: "save", label: "Save", walkable: true };
+const SAVE: MapTile = {
+  kind: "building",
+  buildingId: "save",
+  label: "Save",
+  walkable: true,
+};
 
 /** Arcade machine decoration (non-walkable) */
 const ARC: MapTile = { kind: "building", label: "Arcade", walkable: false };

@@ -1,24 +1,56 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 type MenuOverlayProps = Readonly<{
   onClose: () => void;
-  onOpenOverlay: (target: "disc" | "inventory" | "operator" | "save" | "settings") => void;
+  onOpenOverlay: (
+    target: "disc" | "inventory" | "operator" | "save" | "settings",
+  ) => void;
   inBattle: boolean;
 }>;
 
 const MENU_ITEMS = [
-  { id: "disc", label: "DISC", desc: "Identity Disc encyclopedia", battleOk: true },
-  { id: "inventory", label: "INVENTORY", desc: "View and equip tools", battleOk: true },
-  { id: "operator", label: "OPERATOR", desc: "Stats, badges, level", battleOk: true },
+  {
+    id: "disc",
+    label: "DISC",
+    desc: "Identity Disc encyclopedia",
+    battleOk: true,
+  },
+  {
+    id: "inventory",
+    label: "INVENTORY",
+    desc: "View and equip tools",
+    battleOk: true,
+  },
+  {
+    id: "operator",
+    label: "OPERATOR",
+    desc: "Stats, badges, level",
+    battleOk: true,
+  },
   { id: "save", label: "SAVE", desc: "Save your progress", battleOk: false },
-  { id: "settings", label: "SETTINGS", desc: "Audio and controls", battleOk: false },
+  {
+    id: "settings",
+    label: "SETTINGS",
+    desc: "Audio and controls",
+    battleOk: true,
+  },
 ] as const;
 
-export function MenuOverlay({ onClose, onOpenOverlay, inBattle }: MenuOverlayProps) {
+export function MenuOverlay({
+  onClose,
+  onOpenOverlay,
+  inBattle,
+}: MenuOverlayProps) {
   function handleSelect(id: string) {
-    if (id === "disc" || id === "inventory" || id === "operator" || id === "save" || id === "settings") {
+    if (
+      id === "disc" ||
+      id === "inventory" ||
+      id === "operator" ||
+      id === "save" ||
+      id === "settings"
+    ) {
       onOpenOverlay(id);
     }
   }
@@ -55,6 +87,13 @@ export function MenuOverlay({ onClose, onOpenOverlay, inBattle }: MenuOverlayPro
         <p className="gr-font-mono mt-2 text-center text-xs text-[#aabbcc]">
           Press B to close
         </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="gr-font-mono mt-1 min-h-[44px] rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-3 py-2.5 text-sm font-bold tracking-widest text-[#aabbcc] active:brightness-150"
+        >
+          CLOSE
+        </button>
       </section>
     </div>
   );

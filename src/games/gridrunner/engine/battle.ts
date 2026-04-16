@@ -1,8 +1,15 @@
 /*
-Copyright © 2025 Defend I.T. Solutions LLC. All Rights Reserved.
+Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
-import type { BattleEnemy, BattleState, EnemyMove, PlayerState, ToolInstance, ToolType } from "./types";
+import type {
+  BattleEnemy,
+  BattleState,
+  EnemyMove,
+  PlayerState,
+  ToolInstance,
+  ToolType,
+} from "./types";
 import { pickEnemyMove } from "./enemies";
 import { rollLootDrop, toolDisplayName } from "./loot";
 
@@ -10,7 +17,17 @@ import { rollLootDrop, toolDisplayName } from "./loot";
 /*  Log formatting                                                    */
 /* ------------------------------------------------------------------ */
 
-type LogTag = "SYS" | "ATK" | "HIT" | "MISS" | "DMG" | "HEAL" | "WIN" | "LOSS" | "WARN" | "RUN";
+type LogTag =
+  | "SYS"
+  | "ATK"
+  | "HIT"
+  | "MISS"
+  | "DMG"
+  | "HEAL"
+  | "WIN"
+  | "LOSS"
+  | "WARN"
+  | "RUN";
 
 function fmt(turn: number, tag: LogTag, msg: string): string {
   const t = String(turn).padStart(2, "0");
@@ -29,9 +46,13 @@ const WEAK_AGAINST: Readonly<Record<ToolType, ToolType>> = {
   persistence: "exploit",
 };
 
-function typeMultiplier(attackerType: ToolType, enemyWeakness?: ToolType): number {
+function typeMultiplier(
+  attackerType: ToolType,
+  enemyWeakness?: ToolType,
+): number {
   if (enemyWeakness && attackerType === enemyWeakness) return 1.5;
-  if (enemyWeakness && WEAK_AGAINST[attackerType] === enemyWeakness) return 0.75;
+  if (enemyWeakness && WEAK_AGAINST[attackerType] === enemyWeakness)
+    return 0.75;
   return 1.0;
 }
 
@@ -79,14 +100,23 @@ export function resolvePlayerTurn(
   let updatedEnemy = { ...battle.enemy, hp: battle.enemy.hp };
 
   if (updatedPlayer.compute < tool.energyCost) {
-    log.push(fmt(turn, "WARN", `Not enough Compute for ${tool.baseToolId.toUpperCase()}.`));
+    log.push(
+      fmt(
+        turn,
+        "WARN",
+        `Not enough Compute for ${tool.baseToolId.toUpperCase()}.`,
+      ),
+    );
     return {
       state: { ...battle, log, phase: "player_turn" },
       player: updatedPlayer,
     };
   }
 
-  updatedPlayer = { ...updatedPlayer, compute: updatedPlayer.compute - tool.energyCost };
+  updatedPlayer = {
+    ...updatedPlayer,
+    compute: updatedPlayer.compute - tool.energyCost,
+  };
 
   const roll = Math.random() * 100;
   if (roll > tool.accuracy) {
@@ -94,7 +124,13 @@ export function resolvePlayerTurn(
   } else {
     const dmg = calcPlayerDamage(tool, updatedPlayer, updatedEnemy);
     updatedEnemy = { ...updatedEnemy, hp: Math.max(0, updatedEnemy.hp - dmg) };
-    log.push(fmt(turn, "HIT", `${tool.baseToolId.toUpperCase()} hit for ${dmg} damage.`));
+    log.push(
+      fmt(
+        turn,
+        "HIT",
+        `${tool.baseToolId.toUpperCase()} hit for ${dmg} damage.`,
+      ),
+    );
   }
 
   if (updatedEnemy.hp <= 0) {
@@ -103,7 +139,13 @@ export function resolvePlayerTurn(
     // Roll loot
     const loot = rollLootDrop(updatedPlayer.level, battle.isBoss);
     if (loot) {
-      log.push(fmt(turn, "SYS", `LOOT: ${toolDisplayName(loot)} (Pwr ${loot.power}, Acc ${loot.accuracy}%, EN ${loot.energyCost})`));
+      log.push(
+        fmt(
+          turn,
+          "SYS",
+          `LOOT: ${toolDisplayName(loot)} (Pwr ${loot.power}, Acc ${loot.accuracy}%, EN ${loot.energyCost})`,
+        ),
+      );
     }
 
     // Preview level-ups
@@ -117,7 +159,13 @@ export function resolvePlayerTurn(
       lvls += 1;
     }
     if (lvls > 0) {
-      log.push(fmt(turn, "SYS", `LEVEL UP: ${updatedPlayer.level} -> ${updatedPlayer.level + lvls}`));
+      log.push(
+        fmt(
+          turn,
+          "SYS",
+          `LEVEL UP: ${updatedPlayer.level} -> ${updatedPlayer.level + lvls}`,
+        ),
+      );
     }
 
     return {
@@ -135,7 +183,11 @@ export function resolvePlayerTurn(
     };
   }
 
-  return resolveEnemyTurn(updatedPlayer, { ...battle, enemy: updatedEnemy, log });
+  return resolveEnemyTurn(updatedPlayer, {
+    ...battle,
+    enemy: updatedEnemy,
+    log,
+  });
 }
 
 function resolveEnemyTurn(
@@ -149,7 +201,13 @@ function resolveEnemyTurn(
 
   if (move.name === "Rage Quit") {
     const healed = Math.min(battle.enemy.maxHp, battle.enemy.hp + 10);
-    log.push(fmt(turn, "HEAL", `${battle.enemy.def.name} used ${move.name}. Restored 10 HP.`));
+    log.push(
+      fmt(
+        turn,
+        "HEAL",
+        `${battle.enemy.def.name} used ${move.name}. Restored 10 HP.`,
+      ),
+    );
     return {
       state: {
         ...battle,
@@ -164,7 +222,13 @@ function resolveEnemyTurn(
 
   if (move.name === "Manifesto") {
     const healed = Math.min(battle.enemy.maxHp, battle.enemy.hp + 5);
-    log.push(fmt(turn, "WARN", `${battle.enemy.def.name} used ${move.name}. Power increased.`));
+    log.push(
+      fmt(
+        turn,
+        "WARN",
+        `${battle.enemy.def.name} used ${move.name}. Power increased.`,
+      ),
+    );
     return {
       state: {
         ...battle,
@@ -179,14 +243,26 @@ function resolveEnemyTurn(
 
   const roll = Math.random() * 100;
   if (roll > move.accuracy) {
-    log.push(fmt(turn, "MISS", `${battle.enemy.def.name} used ${move.name}... missed.`));
+    log.push(
+      fmt(
+        turn,
+        "MISS",
+        `${battle.enemy.def.name} used ${move.name}... missed.`,
+      ),
+    );
   } else {
     const dmg = calcEnemyDamage(move, battle.enemy, updatedPlayer);
     updatedPlayer = {
       ...updatedPlayer,
       integrity: Math.max(0, updatedPlayer.integrity - dmg),
     };
-    log.push(fmt(turn, "DMG", `${battle.enemy.def.name} used ${move.name} for ${dmg} damage.`));
+    log.push(
+      fmt(
+        turn,
+        "DMG",
+        `${battle.enemy.def.name} used ${move.name} for ${dmg} damage.`,
+      ),
+    );
   }
 
   if (updatedPlayer.integrity <= 0) {
@@ -198,15 +274,17 @@ function resolveEnemyTurn(
   }
 
   return {
-    state: { ...battle, log, phase: "player_turn", turnCount: battle.turnCount + 1 },
+    state: {
+      ...battle,
+      log,
+      phase: "player_turn",
+      turnCount: battle.turnCount + 1,
+    },
     player: updatedPlayer,
   };
 }
 
-export function attemptRun(
-  player: PlayerState,
-  enemy: BattleEnemy,
-): boolean {
+export function attemptRun(player: PlayerState, enemy: BattleEnemy): boolean {
   const chance = 50 + (player.bandwidth - enemy.def.speed) * 5;
   return Math.random() * 100 < chance;
 }
