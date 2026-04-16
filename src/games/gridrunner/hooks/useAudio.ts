@@ -33,8 +33,17 @@ export function useAudio(
   const [settings, setSettings] = useState<AudioSettings>(getSettings);
   const [isReady, setIsReady] = useState(false);
 
-  /* ---- Init on first user interaction ---- */
+  /* ---- Init: try on mount, fall back to first user interaction ---- */
   useEffect(() => {
+    /* Attempt immediate init — works if browser allows autoplay */
+    const running = initAudio();
+    if (running) {
+      setIsReady(true);
+      setSettings(getSettings());
+      return;
+    }
+
+    /* Browser blocked autoplay — wait for gesture */
     function handleInteraction() {
       if (isReady) return;
       initAudio();

@@ -2,6 +2,8 @@
 Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
+"use client";
+
 import { GridRunnerShell } from "./GridRunnerShell";
 import { useCallback, useEffect, useRef } from "react";
 import { useForceDarkMode } from "./hooks/useForceDarkMode";
@@ -29,10 +31,7 @@ const ZONE_NAMES: Record<string, string> = {
   government: "GOV BUILDING -- ESPIONAGE",
 };
 
-const TOOL_SFX: Record<
-  ToolType,
-  "tool-recon" | "tool-exploit" | "tool-defense" | "tool-persistence"
-> = {
+const TOOL_SFX: Record<ToolType, "tool-recon" | "tool-exploit" | "tool-defense" | "tool-persistence"> = {
   recon: "tool-recon",
   exploit: "tool-exploit",
   defense: "tool-defense",
@@ -62,10 +61,7 @@ export function GridRunner() {
   const prevPosRef = useRef(game.playerPos);
   useEffect(() => {
     const prev = prevPosRef.current;
-    if (
-      isMapScreen &&
-      (prev.x !== game.playerPos.x || prev.y !== game.playerPos.y)
-    ) {
+    if (isMapScreen && (prev.x !== game.playerPos.x || prev.y !== game.playerPos.y)) {
       audio.sfx("step");
     }
     prevPosRef.current = game.playerPos;

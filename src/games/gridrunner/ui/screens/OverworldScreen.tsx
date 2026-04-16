@@ -1,3 +1,5 @@
+"use client";
+
 /*
 Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */

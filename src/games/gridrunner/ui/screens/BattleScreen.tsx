@@ -2,6 +2,8 @@
 Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
+"use client";
+
 import { useEffect, useRef } from "react";
 import type {
   BattleState,
@@ -9,6 +11,8 @@ import type {
   ToolInstance,
 } from "../../engine/types";
 import { toolDisplayName } from "../../engine/loot";
+import { HpBar } from "../shared/HpBar";
+import { TAG_COLORS, RARITY_TEXT } from "../shared/theme";
 
 type BattleScreenProps = Readonly<{
   battle: BattleState;
@@ -21,86 +25,8 @@ type BattleScreenProps = Readonly<{
 }>;
 
 /* ------------------------------------------------------------------ */
-/*  Constants                                                         */
-/* ------------------------------------------------------------------ */
-
-const TAG_COLORS: Record<string, string> = {
-  SYS: "text-[#00f0ff]",
-  ATK: "text-[#00f0ff]",
-  HIT: "text-[#00ff41]",
-  MISS: "text-[#aabbcc]",
-  DMG: "text-[#ff003c]",
-  HEAL: "text-[#ff00de]",
-  WIN: "text-[#00ff41]",
-  LOSS: "text-[#ff003c]",
-  WARN: "text-[#ff6b00]",
-  RUN: "text-[#ff6b00]",
-};
-
-const RARITY_COLORS: Record<string, string> = {
-  common: "text-[#e0e0e0]",
-  uncommon: "text-[#00ff41]",
-  rare: "text-[#4da6ff]",
-  epic: "text-[#a855f7]",
-  legendary: "text-[#ff9500]",
-};
-
-/* ------------------------------------------------------------------ */
 /*  Sub-components                                                    */
 /* ------------------------------------------------------------------ */
-
-function HpBar({
-  current,
-  max,
-  color,
-  label,
-}: Readonly<{
-  current: number;
-  max: number;
-  color: "cyan" | "magenta" | "red";
-  label: string;
-}>) {
-  const pct = Math.max(0, Math.min(100, (current / max) * 100));
-  const colorMap = {
-    cyan: {
-      text: "text-[#00f0ff]",
-      bar: "bg-[#00f0ff] shadow-[0_0_4px_#00f0ff]",
-    },
-    magenta: {
-      text: "text-[#ff00de]",
-      bar: "bg-[#ff00de] shadow-[0_0_4px_#ff00de]",
-    },
-    red: {
-      text: "text-[#ff003c]",
-      bar: "bg-[#ff003c] shadow-[0_0_4px_#ff003c]",
-    },
-  };
-  const c = colorMap[color];
-
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className={`gr-font-mono shrink-0 text-xs font-semibold ${c.text}`}>
-        {label}
-      </span>
-      <div
-        className="relative h-2 flex-1 overflow-hidden rounded-sm border border-[#1a3a4a] bg-[#0d1520]"
-        role="meter"
-        aria-label={`${label} ${current} of ${max}`}
-        aria-valuenow={current}
-        aria-valuemin={0}
-        aria-valuemax={max}
-      >
-        <div
-          className={`h-full transition-[width] duration-300 ease-out ${c.bar}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className="gr-font-mono shrink-0 text-xs font-medium tabular-nums text-[#d0d8e0]">
-        {current}/{max}
-      </span>
-    </div>
-  );
-}
 
 function LogLine({ line }: Readonly<{ line: string }>) {
   const tagMatch = line.match(/\[T\d+\]\s+\[(\w+)\]/);
@@ -138,7 +64,7 @@ function BattleLog({ log }: Readonly<{ log: string[] }>) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Option A Battle Layout                                            */
+/*  Main screen                                                       */
 /* ------------------------------------------------------------------ */
 
 export function BattleScreen({
@@ -167,12 +93,7 @@ export function BattleScreen({
             <span className="gr-font-mono text-xs font-bold text-[#ff003c]">
               {battle.enemy.def.name}
             </span>
-            <HpBar
-              current={battle.enemy.hp}
-              max={battle.enemy.maxHp}
-              color="red"
-              label="HP"
-            />
+            <HpBar current={battle.enemy.hp} max={battle.enemy.maxHp} color="red" label="HP" />
           </div>
           <figure className="shrink-0">
             <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#ff003c] text-base font-bold text-[#0a0e1a] shadow-[0_0_12px_#ff003c44]">
@@ -195,18 +116,8 @@ export function BattleScreen({
             <span className="gr-font-mono text-xs font-bold text-[#00f0ff]">
               {playerName} Lv.{player.level}
             </span>
-            <HpBar
-              current={player.integrity}
-              max={player.maxIntegrity}
-              color="cyan"
-              label="HP"
-            />
-            <HpBar
-              current={player.compute}
-              max={player.maxCompute}
-              color="magenta"
-              label="EN"
-            />
+            <HpBar current={player.integrity} max={player.maxIntegrity} color="cyan" label="HP" />
+            <HpBar current={player.compute} max={player.maxCompute} color="magenta" label="EN" />
           </div>
         </div>
       </div>
@@ -274,13 +185,13 @@ export function BattleScreen({
                 +{battle.xpEarned} XP | +{battle.bitsEarned} Bits
               </p>
               {battle.levelsGained > 0 && (
-                <p className="gr-font-mono text-sm font-bold text-[#ff6b00]">
+                <p className="gr-font-mono text-xs font-bold text-[#ff6b00]">
                   LEVEL UP +{battle.levelsGained}
                 </p>
               )}
               {battle.lootDrop && (
                 <p
-                  className={`gr-font-mono text-xs font-semibold ${RARITY_COLORS[battle.lootDrop.rarity]}`}
+                  className={`gr-font-mono text-xs font-semibold ${RARITY_TEXT[battle.lootDrop.rarity]}`}
                 >
                   LOOT: {toolDisplayName(battle.lootDrop)}
                 </p>

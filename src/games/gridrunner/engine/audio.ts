@@ -48,9 +48,9 @@ const AUDIO_SETTINGS_KEY = "dis-gridrunner-audio";
 const CROSSFADE_MS = 1500;
 
 export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
-  masterVolume: 100,
-  musicVolume: 60,
-  sfxVolume: 65,
+  masterVolume: 75,
+  musicVolume: 45,
+  sfxVolume: 55,
   muted: false,
 };
 
@@ -283,9 +283,9 @@ let currentMusicSlot: MusicSlot | null = null;
 /*  Engine Lifecycle                                                  */
 /* ------------------------------------------------------------------ */
 
-export function initAudio(): void {
-  if (initialized) return;
-  if (typeof globalThis.AudioContext === "undefined") return;
+export function initAudio(): boolean {
+  if (initialized) return true;
+  if (typeof globalThis.AudioContext === "undefined") return false;
 
   ctx = new AudioContext();
   masterGain = ctx.createGain();
@@ -299,6 +299,7 @@ export function initAudio(): void {
   settings = loadAudioSettings();
   applyGains();
   initialized = true;
+  return ctx.state === "running";
 }
 
 export function destroyAudio(): void {
@@ -413,6 +414,11 @@ function stopMusic(): void {
   currentMusicSlot = null;
 }
 
+/** Start offset per slot (seconds). Title track skips the intro. */
+const SLOT_OFFSET: Partial<Record<MusicSlot, number>> = {
+  title: 5,
+};
+
 export function playMusic(slot: MusicSlot): void {
   if (!ctx || !musicGain || !initialized) return;
 
@@ -422,10 +428,10 @@ export function playMusic(slot: MusicSlot): void {
   if (!pool || pool.length === 0) return;
 
   const path = pickRandom(pool);
-  crossfadeTo(path, slot);
+  crossfadeTo(path, slot, SLOT_OFFSET[slot] ?? 0);
 }
 
-function crossfadeTo(path: string, slot: MusicSlot): void {
+function crossfadeTo(path: string, slot: MusicSlot, offset = 0): void {
   if (!ctx || !musicGain) return;
 
   const fadeSeconds = CROSSFADE_MS / 1000;
@@ -467,7 +473,7 @@ function crossfadeTo(path: string, slot: MusicSlot): void {
     source.buffer = buffer;
     source.loop = false;
     source.connect(gainNode);
-    source.start();
+    source.start(0, offset);
 
     source.onended = () => {
       if (currentMusicPath === path && currentMusicSlot === slot) {

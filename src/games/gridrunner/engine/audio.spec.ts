@@ -199,9 +199,9 @@ describe("MUSIC_MANIFEST", () => {
 
 describe("DEFAULT_AUDIO_SETTINGS", () => {
   it("has expected defaults", () => {
-    expect(DEFAULT_AUDIO_SETTINGS.masterVolume).toBe(100);
-    expect(DEFAULT_AUDIO_SETTINGS.musicVolume).toBe(40);
-    expect(DEFAULT_AUDIO_SETTINGS.sfxVolume).toBe(80);
+    expect(DEFAULT_AUDIO_SETTINGS.masterVolume).toBe(75);
+    expect(DEFAULT_AUDIO_SETTINGS.musicVolume).toBe(45);
+    expect(DEFAULT_AUDIO_SETTINGS.sfxVolume).toBe(55);
     expect(DEFAULT_AUDIO_SETTINGS.muted).toBe(false);
   });
 });
