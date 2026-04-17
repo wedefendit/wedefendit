@@ -88,6 +88,8 @@ export interface GridRunnerSave {
   currentPosition: Position;
   defeatedBosses: string[];
   completedTutorial: boolean;
+  /** Boss IDs whose post-battle intel report has been viewed. */
+  unlockedIntelEntries: string[];
   bits: number;
   credits: number;
   playTime: number;

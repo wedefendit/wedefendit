@@ -1069,6 +1069,168 @@ test.describe("GRIDRUNNER battle layout regression", () => {
 });
 
 /* ------------------------------------------------------------------ */
+/*  Intel report (post-battle boss briefing)                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Lazarus boss tile is at (11, 1) in the bank map. Park the player at
+ * (11, 2) with overpowered gear so one ArrowUp engages the boss and one
+ * NMAP click one-shots it.
+ */
+async function placePlayerAtLazarusDoor(
+  page: Page,
+  overrides: Record<string, unknown> = {},
+) {
+  await page.evaluate((ov) => {
+    const raw = localStorage.getItem("dis-gridrunner-save");
+    if (!raw) return;
+    const save = JSON.parse(raw);
+    save.currentZone = "bank";
+    save.currentPosition = { x: 11, y: 2 };
+    save.completedTutorial = true;
+    save.player.level = 5;
+    // Push xpToNext so the Lazarus XP reward (300) never crosses the
+    // threshold -- keeps the level-up overlay out of the way of the intel
+    // overlay assertions.
+    save.player.xp = 0;
+    save.player.xpToNext = 999999;
+    save.player.maxIntegrity = 9999;
+    save.player.integrity = 9999;
+    save.player.maxCompute = 9999;
+    save.player.compute = 9999;
+    save.player.firewall = 9999;
+    save.equippedTools = [
+      {
+        id: "test-onehit",
+        baseToolId: "metasploit",
+        rarity: "legendary",
+        power: 9999,
+        accuracy: 100,
+        energyCost: 1,
+        prefix: null,
+        suffix: null,
+        type: "exploit",
+      },
+      null,
+      null,
+      null,
+    ];
+    Object.assign(save, ov);
+    localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
+  }, overrides);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByTestId("gr-continue").click();
+  await page.waitForTimeout(300);
+}
+
+test.describe("GRIDRUNNER intel report", () => {
+  test("first Lazarus defeat shows the intel overlay with correct content", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+    await placePlayerAtLazarusDoor(page);
+
+    await page.keyboard.press("ArrowUp");
+    await expect(page.getByTestId("gr-battle")).toBeVisible();
+    await page.getByTestId("gr-battle-tool-0").click();
+
+    const cont = page.getByTestId("gr-battle-continue");
+    await expect(cont).toBeVisible();
+    await cont.click();
+
+    const intel = page.getByTestId("gr-intel-overlay");
+    await expect(intel).toBeVisible();
+    await expect(intel).toContainText(/Lazarus Group/i);
+    await expect(intel).toContainText(/North Korea/i);
+    await expect(intel).toContainText(/Financial/i);
+    await expect(intel).toContainText(/BACKGROUND/);
+    await expect(intel).toContainText(/KNOWN OPERATIONS/);
+    await expect(intel).toContainText(/WEAKNESS/);
+    await expect(intel).toContainText(/DEFENSE/i);
+    await expect(intel).toContainText(/BANK BUSTER/i);
+
+    await page.getByTestId("gr-intel-continue").click();
+    await expect(intel).toHaveCount(0);
+  });
+
+  test("intel overlay does not re-appear on a subsequent Lazarus defeat", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+    // Seed the save as though Lazarus was already defeated.
+    await placePlayerAtLazarusDoor(page, { defeatedBosses: ["lazarus"] });
+
+    await page.keyboard.press("ArrowUp");
+    await expect(page.getByTestId("gr-battle")).toBeVisible();
+    await page.getByTestId("gr-battle-tool-0").click();
+
+    await page.getByTestId("gr-battle-continue").click();
+
+    await expect(page.getByTestId("gr-intel-overlay")).toHaveCount(0);
+  });
+
+  test("chains level-up -> intel on a boss first-kill that also levels up", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+    // Seed xp one shy of threshold so the Lazarus XP reward causes a level-up,
+    // and defeatedBosses is still empty so intel queues behind it.
+    await placePlayerAtLazarusDoor(page, {
+      player: {
+        level: 5,
+        xp: 0,
+        xpToNext: 50,
+        integrity: 9999,
+        maxIntegrity: 9999,
+        compute: 9999,
+        maxCompute: 9999,
+        bandwidth: 10,
+        firewall: 9999,
+      },
+    });
+
+    await page.keyboard.press("ArrowUp");
+    await page.getByTestId("gr-battle-tool-0").click();
+    await page.getByTestId("gr-battle-continue").click();
+
+    // Level-up first
+    const levelup = page.getByTestId("gr-levelup-overlay");
+    await expect(levelup).toBeVisible();
+    await page.getByTestId("gr-levelup-continue").click();
+    await expect(levelup).toHaveCount(0);
+
+    // Intel next
+    const intel = page.getByTestId("gr-intel-overlay");
+    await expect(intel).toBeVisible();
+    await expect(intel).toContainText(/Lazarus Group/i);
+    await page.getByTestId("gr-intel-continue").click();
+    await expect(intel).toHaveCount(0);
+  });
+
+  test("persists bossId to save.unlockedIntelEntries on first kill", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+    await placePlayerAtLazarusDoor(page);
+
+    await page.keyboard.press("ArrowUp");
+    await page.getByTestId("gr-battle-tool-0").click();
+    await page.getByTestId("gr-battle-continue").click();
+    await page.getByTestId("gr-intel-continue").click();
+
+    const entries = await page.evaluate(() => {
+      const raw = localStorage.getItem("dis-gridrunner-save");
+      return raw ? JSON.parse(raw).unlockedIntelEntries : null;
+    });
+    expect(entries).toContain("lazarus");
+  });
+});
+
+/* ------------------------------------------------------------------ */
 /*  Tutorial encounter                                                */
 /* ------------------------------------------------------------------ */
 

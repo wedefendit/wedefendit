@@ -69,12 +69,16 @@ interface GameState {
     | "save"
     | "settings"
     | "shop"
-    | "level-up";
+    | "level-up"
+    | "intel";
   /** Where B/Close navigates back to. "none" closes entirely, "menu" goes back to menu. */
   overlayReturnTo: "none" | "menu";
   levelUpSummary: LevelUpSummary | null;
   /** 0 = inactive, 1-3 = active onboarding step. */
   tutorialStep: 0 | 1 | 2 | 3;
+  /** Boss ID queued for the post-battle intel report, or null. Used to
+   *  chain level-up -> intel when both trigger from the same BATTLE_END. */
+  pendingIntelBossId: string | null;
 }
 
 type Action =
@@ -87,6 +91,7 @@ type Action =
   | { type: "RUN" }
   | { type: "BATTLE_END" }
   | { type: "DISMISS_LEVELUP" }
+  | { type: "DISMISS_INTEL" }
   | { type: "ADVANCE_TUTORIAL" }
   | { type: "OPEN_MENU" }
   | { type: "OPEN_DISC" }
@@ -118,6 +123,7 @@ function init(): GameState {
     overlayReturnTo: "none",
     levelUpSummary: null,
     tutorialStep: 0,
+    pendingIntelBossId: null,
   };
 }
 
@@ -429,6 +435,8 @@ function reducer(state: GameState, action: Action): GameState {
       let updatedSave = { ...state.save };
       let levelUpSummary: LevelUpSummary | null = null;
 
+      let pendingIntelBossId: string | null = null;
+
       if (state.battle.phase === "won") {
         const lvl = processLevelUp(updatedSave.player, state.battle.xpEarned);
         const p = { ...lvl.player };
@@ -449,13 +457,20 @@ function reducer(state: GameState, action: Action): GameState {
           };
         }
 
-        // Track boss defeats
+        // Track boss defeats. First-kill of a known boss queues an intel
+        // report and unlocks the archive entry.
         const bossId = state.battle.enemy.def.id;
         if (bosses[bossId] && !updatedSave.defeatedBosses.includes(bossId)) {
           updatedSave = {
             ...updatedSave,
             defeatedBosses: [...updatedSave.defeatedBosses, bossId],
+            unlockedIntelEntries: updatedSave.unlockedIntelEntries.includes(
+              bossId,
+            )
+              ? updatedSave.unlockedIntelEntries
+              : [...updatedSave.unlockedIntelEntries, bossId],
           };
+          pendingIntelBossId = bossId;
         }
 
         // Add loot drop to inventory
@@ -488,21 +503,43 @@ function reducer(state: GameState, action: Action): GameState {
         };
       }
 
+      // Queue overlays: level-up first (if any), then intel (if any).
+      // DISMISS_LEVELUP hands off to intel if pending.
+      let nextOverlay: GameState["overlay"] = state.overlay;
+      if (levelUpSummary) nextOverlay = "level-up";
+      else if (pendingIntelBossId) nextOverlay = "intel";
+
       return {
         ...state,
         screen: "building",
         battle: null,
         save: updatedSave,
-        overlay: levelUpSummary ? "level-up" : state.overlay,
+        overlay: nextOverlay,
         levelUpSummary,
+        pendingIntelBossId,
       };
     }
 
     case "DISMISS_LEVELUP": {
+      // Chain into intel if a boss first-kill is queued.
+      const nextOverlay: GameState["overlay"] =
+        state.overlay === "level-up"
+          ? state.pendingIntelBossId
+            ? "intel"
+            : "none"
+          : state.overlay;
       return {
         ...state,
-        overlay: state.overlay === "level-up" ? "none" : state.overlay,
+        overlay: nextOverlay,
         levelUpSummary: null,
+      };
+    }
+
+    case "DISMISS_INTEL": {
+      return {
+        ...state,
+        overlay: state.overlay === "intel" ? "none" : state.overlay,
+        pendingIntelBossId: null,
       };
     }
 
@@ -850,6 +887,10 @@ export function useGridRunner() {
     dispatch({ type: "ADVANCE_TUTORIAL" });
   }, []);
 
+  const handleDismissIntel = useCallback(() => {
+    dispatch({ type: "DISMISS_INTEL" });
+  }, []);
+
   const currentMap = getMap(state.currentZone) ?? overworldMap;
   const currentTile = tileAt(currentMap, state.playerPos);
 
@@ -867,6 +908,7 @@ export function useGridRunner() {
     overlay: state.overlay,
     levelUpSummary: state.levelUpSummary,
     tutorialStep: state.tutorialStep,
+    pendingIntelBossId: state.pendingIntelBossId,
     startGame,
     continueGame,
     handleDPadPress,
@@ -888,5 +930,6 @@ export function useGridRunner() {
     handleDeleteSave,
     handleDismissLevelUp,
     handleAdvanceTutorial,
+    handleDismissIntel,
   };
 }

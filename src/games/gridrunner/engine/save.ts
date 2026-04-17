@@ -5,7 +5,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 import type { GridRunnerSave, PlayerState, SaveSummary, ToolInstance } from "./types";
 
 const SAVE_KEY = "dis-gridrunner-save";
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 2;
 
 /* ------------------------------------------------------------------ */
 /*  Default state factories                                           */
@@ -92,12 +92,35 @@ export function loadSave(): GridRunnerSave | null {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as GridRunnerSave;
-    if (parsed.version !== SAVE_VERSION) return null;
-    return parsed;
+    const parsed = JSON.parse(raw) as Partial<GridRunnerSave> & {
+      version?: number;
+    };
+    const migrated = migrateSave(parsed);
+    if (!migrated) return null;
+    return migrated;
   } catch {
     return null;
   }
+}
+
+/**
+ * Migrate older save shapes forward. Returns null if the save is beyond
+ * the latest known version (forward-incompatible).
+ */
+function migrateSave(
+  parsed: Partial<GridRunnerSave> & { version?: number },
+): GridRunnerSave | null {
+  if (typeof parsed.version !== "number") return null;
+  if (parsed.version > SAVE_VERSION) return null;
+
+  let save = parsed as GridRunnerSave;
+
+  // v1 -> v2: unlockedIntelEntries added. Backfill as empty array.
+  if (save.version === 1) {
+    save = { ...save, unlockedIntelEntries: [], version: 2 };
+  }
+
+  return save;
 }
 
 export function writeSave(save: GridRunnerSave): void {
@@ -130,6 +153,7 @@ export function createNewSave(playerName: string): GridRunnerSave {
     currentPosition: { x: 8, y: 10 },
     defeatedBosses: [],
     completedTutorial: false,
+    unlockedIntelEntries: [],
     bits: 0,
     credits: 0,
     playTime: 0,

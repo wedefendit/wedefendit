@@ -23,6 +23,7 @@ import { SaveScreen } from "./ui/screens/SaveScreen";
 import { SettingsScreen } from "./ui/screens/SettingsScreen";
 import { ShopScreen } from "./ui/screens/ShopScreen";
 import { LevelUpOverlay } from "./ui/screens/LevelUpOverlay";
+import { IntelReportScreen } from "./ui/screens/IntelReportScreen";
 import { ZONE_NAMES } from "./data/zones";
 
 const TOOL_SFX: Record<
@@ -257,6 +258,12 @@ export function GridRunner() {
           newLevel={game.levelUpSummary.newLevel}
           statDeltas={game.levelUpSummary.statDeltas}
           onContinue={game.handleDismissLevelUp}
+        />
+      )}
+      {game.overlay === "intel" && game.pendingIntelBossId && (
+        <IntelReportScreen
+          bossId={game.pendingIntelBossId}
+          onClose={game.handleDismissIntel}
         />
       )}
     </GridRunnerShell>
