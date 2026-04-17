@@ -2,7 +2,7 @@
 Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
-import type { GridRunnerSave, PlayerState, ToolInstance } from "./types";
+import type { GridRunnerSave, PlayerState, SaveSummary, ToolInstance } from "./types";
 
 const SAVE_KEY = "dis-gridrunner-save";
 const SAVE_VERSION = 1;
@@ -134,5 +134,21 @@ export function createNewSave(playerName: string): GridRunnerSave {
     credits: 0,
     playTime: 0,
     savedAt: new Date().toISOString(),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Save summary (lightweight read for boot screen)                   */
+/* ------------------------------------------------------------------ */
+
+export function loadSaveSummary(): SaveSummary | null {
+  const save = loadSave();
+  if (!save) return null;
+  return {
+    playerName: save.playerName,
+    level: save.player.level,
+    zone: save.currentZone,
+    savedAt: save.savedAt,
+    playTime: save.playTime,
   };
 }

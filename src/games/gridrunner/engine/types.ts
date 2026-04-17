@@ -94,11 +94,21 @@ export interface GridRunnerSave {
   savedAt: string;
 }
 
+/** Lightweight save summary for boot screen save slot display. */
+export interface SaveSummary {
+  playerName: string;
+  level: number;
+  zone: string;
+  savedAt: string;
+  playTime: number;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Screen state machine                                              */
 /* ------------------------------------------------------------------ */
 
 export type GameScreen =
+  | "boot"
   | "title"
   | "overworld"
   | "building"

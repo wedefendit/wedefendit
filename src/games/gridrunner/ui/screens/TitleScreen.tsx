@@ -5,17 +5,22 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import { useState, type FormEvent } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 
 type TitleScreenProps = Readonly<{
   hasSave: boolean;
   onNewGame: (name: string) => void;
   onContinue: () => void;
+  muted: boolean;
+  onMuteToggle: () => void;
 }>;
 
 export function TitleScreen({
   hasSave,
   onNewGame,
   onContinue,
+  muted,
+  onMuteToggle,
 }: TitleScreenProps) {
   const [name, setName] = useState("");
 
@@ -129,6 +134,25 @@ export function TitleScreen({
           </div>
         </div>
       </div>
+
+      {/* Mute toggle — bottom-right */}
+      <button
+        type="button"
+        data-testid="gr-mute-toggle"
+        aria-label={muted ? "Unmute audio" : "Mute audio"}
+        onClick={onMuteToggle}
+        className={`absolute bottom-4 right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border transition-colors active:brightness-150 ${
+          muted
+            ? "border-[#ff003c]/30 text-[#ff003c]/60"
+            : "border-[#1a3a4a] text-[#aabbcc]/40 hover:text-[#aabbcc]/70"
+        }`}
+      >
+        {muted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
+      </button>
     </section>
   );
 }

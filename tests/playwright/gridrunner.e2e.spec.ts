@@ -82,10 +82,21 @@ async function stabilize(page: Page) {
   });
 }
 
+/** Skip the DMG-style boot screen if it is showing. */
+async function skipBootScreen(page: Page) {
+  const boot = page.getByTestId("gr-boot-screen");
+  if (await boot.isVisible().catch(() => false)) {
+    await page.waitForTimeout(600);
+    await boot.click();
+    await boot.waitFor({ state: "hidden", timeout: 5000 });
+  }
+}
+
 async function openGridRunner(page: Page) {
   await page.goto(ROUTE, { waitUntil: "networkidle" });
   await expect(page.getByTestId("gr-root")).toBeVisible();
   await stabilize(page);
+  await skipBootScreen(page);
 }
 
 /** Start a new game from the title screen to reach the overworld. */

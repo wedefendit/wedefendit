@@ -117,6 +117,16 @@ const SAVE_DATA = JSON.stringify({
   savedAt: new Date().toISOString(),
 });
 
+/** Skip the DMG-style boot screen if it is showing. */
+async function skipBootScreen(page: Page) {
+  const boot = page.getByTestId("gr-boot-screen");
+  if (await boot.isVisible().catch(() => false)) {
+    await page.waitForTimeout(600);
+    await boot.click();
+    await boot.waitFor({ state: "hidden", timeout: 5000 });
+  }
+}
+
 async function loadOverworld(page: Page) {
   await page.goto(GR_URL);
   await page.getByTestId("gr-frame").waitFor({ state: "visible" });
@@ -126,6 +136,7 @@ async function loadOverworld(page: Page) {
   );
   await page.reload();
   await page.getByTestId("gr-frame").waitFor({ state: "visible" });
+  await skipBootScreen(page);
   const cont = page.getByText("CONTINUE");
   await cont.waitFor({ state: "visible", timeout: 5000 });
   await cont.click();

@@ -49,8 +49,8 @@ const CROSSFADE_MS = 1500;
 
 export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
   masterVolume: 75,
-  musicVolume: 45,
-  sfxVolume: 55,
+  musicVolume: 55,
+  sfxVolume: 60,
   muted: false,
 };
 
@@ -200,8 +200,8 @@ export function computeEffectiveGain(
   muted: boolean,
 ): number {
   if (muted) return 0;
-  const m = Math.min(Math.max(master, 0), 100) / 100;
-  const c = Math.min(Math.max(channel, 0), 100) / 100;
+  const m = toGain(master);
+  const c = toGain(channel);
   return m * c;
 }
 
@@ -319,23 +319,19 @@ export function destroyAudio(): void {
 /*  Gain Management                                                   */
 /* ------------------------------------------------------------------ */
 
+function toGain(value: number): number {
+  return (Math.min(Math.max(value, 0), 100) / 100) ** 2;
+}
+
 function applyGains(): void {
   if (!masterGain || !musicGain || !sfxGain) return;
   const t = ctx?.currentTime ?? 0;
   masterGain.gain.setValueAtTime(
-    settings.muted
-      ? 0
-      : Math.min(Math.max(settings.masterVolume, 0), 100) / 100,
+    settings.muted ? 0 : toGain(settings.masterVolume),
     t,
   );
-  musicGain.gain.setValueAtTime(
-    Math.min(Math.max(settings.musicVolume, 0), 100) / 100,
-    t,
-  );
-  sfxGain.gain.setValueAtTime(
-    Math.min(Math.max(settings.sfxVolume, 0), 100) / 100,
-    t,
-  );
+  musicGain.gain.setValueAtTime(toGain(settings.musicVolume), t);
+  sfxGain.gain.setValueAtTime(toGain(settings.sfxVolume), t);
 }
 
 export function updateSettings(next: AudioSettings): void {
@@ -506,9 +502,10 @@ export function resumeAudio(): void {
   if (!ctx || !musicGain) return;
   if (ctx.state === "suspended") {
     ctx.resume().catch(() => {});
+    applyGains();
   }
   const t = ctx.currentTime;
-  const target = Math.min(Math.max(settings.musicVolume, 0), 100) / 100;
+  const target = toGain(settings.musicVolume);
   musicGain.gain.setValueAtTime(musicGain.gain.value, t);
   musicGain.gain.linearRampToValueAtTime(target, t + 0.2);
 }

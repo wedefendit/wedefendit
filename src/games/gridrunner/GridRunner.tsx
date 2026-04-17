@@ -10,6 +10,7 @@ import { useForceDarkMode } from "./hooks/useForceDarkMode";
 import { useGridRunner } from "./hooks/useGridRunner";
 import { useAudio } from "./hooks/useAudio";
 import type { ToolInstance, ToolType } from "./engine/types";
+import { BootScreen } from "./ui/screens/BootScreen";
 import { TitleScreen } from "./ui/screens/TitleScreen";
 import { OverworldScreen } from "./ui/screens/OverworldScreen";
 import { BattleScreen } from "./ui/screens/BattleScreen";
@@ -31,7 +32,10 @@ const ZONE_NAMES: Record<string, string> = {
   government: "GOV BUILDING -- ESPIONAGE",
 };
 
-const TOOL_SFX: Record<ToolType, "tool-recon" | "tool-exploit" | "tool-defense" | "tool-persistence"> = {
+const TOOL_SFX: Record<
+  ToolType,
+  "tool-recon" | "tool-exploit" | "tool-defense" | "tool-persistence"
+> = {
   recon: "tool-recon",
   exploit: "tool-exploit",
   defense: "tool-defense",
@@ -40,13 +44,14 @@ const TOOL_SFX: Record<ToolType, "tool-recon" | "tool-exploit" | "tool-defense" 
 
 /**
  * Top-level GRIDRUNNER component. Manages the screen state machine:
- *   title -> overworld -> building -> battle -> intel
+ *   boot -> title -> overworld -> building -> battle -> intel
  * Overlays (menu, disc, inventory, operator, save, settings) render on top.
  */
 export function GridRunner() {
   useForceDarkMode();
   const game = useGridRunner();
 
+  const isBootScreen = game.screen === "boot";
   const isTitleScreen = game.screen === "title";
   const isBattle = game.screen === "battle";
   const isMapScreen = game.screen === "overworld" || game.screen === "building";
@@ -55,13 +60,21 @@ export function GridRunner() {
 
   const isBoss = game.battle?.isBoss ?? false;
   const isPaused = game.overlay !== "none";
-  const audio = useAudio(game.screen, game.currentZone, isBoss, isPaused);
+  const audio = useAudio(
+    isBootScreen ? "title" : game.screen,
+    game.currentZone,
+    isBoss,
+    isPaused,
+  );
 
   /* ---- SFX: step on move ---- */
   const prevPosRef = useRef(game.playerPos);
   useEffect(() => {
     const prev = prevPosRef.current;
-    if (isMapScreen && (prev.x !== game.playerPos.x || prev.y !== game.playerPos.y)) {
+    if (
+      isMapScreen &&
+      (prev.x !== game.playerPos.x || prev.y !== game.playerPos.y)
+    ) {
       audio.sfx("step");
     }
     prevPosRef.current = game.playerPos;
@@ -120,9 +133,19 @@ export function GridRunner() {
     [audio, game],
   );
 
+  /* ---- Title screen: mute toggle ---- */
+  const handleMuteToggle = useCallback(() => {
+    audio.onSettingsChange({ ...audio.settings, muted: !audio.settings.muted });
+  }, [audio]);
+
+  /* ---- Boot screen: chime ---- */
+  const handlePlayChime = useCallback(() => {
+    audio.sfx("level-up");
+  }, [audio]);
+
   return (
     <GridRunnerShell
-      hideControls={isTitleScreen}
+      hideControls={isBootScreen || isTitleScreen}
       onDPadPress={game.handleDPadPress}
       onDPadRelease={game.handleDPadRelease}
       onActionPress={(btn) => {
@@ -132,11 +155,21 @@ export function GridRunner() {
       onSelect={game.handleOpenDisc}
       onStart={game.handleOpenMenu}
     >
+      {isBootScreen && (
+        <BootScreen
+          saveSummary={game.saveSummary}
+          onBootDone={game.handleBootDone}
+          onDeleteSave={game.handleDeleteSave}
+          onPlayChime={handlePlayChime}
+        />
+      )}
       {isTitleScreen && (
         <TitleScreen
           hasSave={game.hasSaveFile}
           onNewGame={game.startGame}
           onContinue={game.continueGame}
+          muted={audio.settings.muted}
+          onMuteToggle={handleMuteToggle}
         />
       )}
       {isMapScreen && game.save && (

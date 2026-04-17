@@ -33,37 +33,29 @@ export function useAudio(
   const [settings, setSettings] = useState<AudioSettings>(getSettings);
   const [isReady, setIsReady] = useState(false);
 
-  /* ---- Init: try on mount, fall back to first user interaction ---- */
+  /* ---- Init: create AudioContext on mount, resume on first gesture ---- */
   useEffect(() => {
-    /* Attempt immediate init — works if browser allows autoplay */
-    const running = initAudio();
-    if (running) {
-      setIsReady(true);
-      setSettings(getSettings());
-      return;
+    initAudio();
+    setIsReady(true);
+    setSettings(getSettings());
+
+    function handleGesture() {
+      resumeAudio();
+      globalThis.removeEventListener("click", handleGesture);
+      globalThis.removeEventListener("keydown", handleGesture);
+      globalThis.removeEventListener("touchstart", handleGesture);
     }
 
-    /* Browser blocked autoplay — wait for gesture */
-    function handleInteraction() {
-      if (isReady) return;
-      initAudio();
-      setIsReady(true);
-      setSettings(getSettings());
-      globalThis.removeEventListener("click", handleInteraction);
-      globalThis.removeEventListener("keydown", handleInteraction);
-      globalThis.removeEventListener("touchstart", handleInteraction);
-    }
-
-    globalThis.addEventListener("click", handleInteraction);
-    globalThis.addEventListener("keydown", handleInteraction);
-    globalThis.addEventListener("touchstart", handleInteraction);
+    globalThis.addEventListener("click", handleGesture);
+    globalThis.addEventListener("keydown", handleGesture);
+    globalThis.addEventListener("touchstart", handleGesture);
 
     return () => {
-      globalThis.removeEventListener("click", handleInteraction);
-      globalThis.removeEventListener("keydown", handleInteraction);
-      globalThis.removeEventListener("touchstart", handleInteraction);
+      globalThis.removeEventListener("click", handleGesture);
+      globalThis.removeEventListener("keydown", handleGesture);
+      globalThis.removeEventListener("touchstart", handleGesture);
     };
-  }, [isReady]);
+  }, []);
 
   /* ---- Cleanup on unmount ---- */
   useEffect(() => {

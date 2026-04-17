@@ -8,9 +8,17 @@ import type {
   GameScreen,
   GridRunnerSave,
   Position,
+  SaveSummary,
   ToolInstance,
 } from "../engine/types";
-import { createNewSave, hasSave, loadSave, writeSave } from "../engine/save";
+import {
+  createNewSave,
+  deleteSave,
+  hasSave,
+  loadSave,
+  loadSaveSummary,
+  writeSave,
+} from "../engine/save";
 import { move, tileAt, type Direction } from "../engine/movement";
 import { getMap } from "../data/maps";
 import { overworldMap } from "../data/maps/overworld";
@@ -32,6 +40,7 @@ interface GameState {
   screen: GameScreen;
   save: GridRunnerSave | null;
   hasSaveFile: boolean;
+  saveSummary: SaveSummary | null;
   playerPos: Position;
   facing: Direction;
   currentZone: string;
@@ -70,13 +79,16 @@ type Action =
   | { type: "SCRAP_TOOL"; toolId: string }
   | { type: "BUY_TOOL"; baseToolId: string }
   | { type: "OPEN_SHOP" }
-  | { type: "MANUAL_SAVE" };
+  | { type: "MANUAL_SAVE" }
+  | { type: "BOOT_DONE" }
+  | { type: "DELETE_SAVE" };
 
 function init(): GameState {
   return {
-    screen: "title",
+    screen: "boot",
     save: null,
     hasSaveFile: false,
+    saveSummary: null,
     playerPos: overworldMap.spawn,
     facing: "down",
     currentZone: "overworld",
@@ -92,7 +104,24 @@ function reducer(state: GameState, action: Action): GameState {
 
   switch (action.type) {
     case "CHECK_SAVE":
-      return { ...state, hasSaveFile: hasSave() };
+      return {
+        ...state,
+        hasSaveFile: hasSave(),
+        saveSummary: loadSaveSummary(),
+      };
+
+    case "BOOT_DONE":
+      return { ...state, screen: "title" };
+
+    case "DELETE_SAVE": {
+      deleteSave();
+      return {
+        ...state,
+        hasSaveFile: false,
+        saveSummary: null,
+        save: null,
+      };
+    }
 
     case "NEW_GAME": {
       const save = createNewSave(action.name);
@@ -415,7 +444,7 @@ function reducer(state: GameState, action: Action): GameState {
     }
 
     case "OPEN_MENU": {
-      if (state.screen === "title") return state;
+      if (state.screen === "title" || state.screen === "boot") return state;
       if (state.overlay === "menu")
         return { ...state, overlay: "none", overlayReturnTo: "none" };
       return { ...state, overlay: "menu", overlayReturnTo: "none" };
@@ -423,7 +452,7 @@ function reducer(state: GameState, action: Action): GameState {
 
     case "OPEN_DISC": {
       // Direct access via SELECT -- B closes entirely
-      if (state.screen === "title") return state;
+      if (state.screen === "title" || state.screen === "boot") return state;
       if (state.overlay === "disc")
         return { ...state, overlay: "none", overlayReturnTo: "none" };
       return { ...state, overlay: "disc", overlayReturnTo: "none" };
@@ -431,7 +460,7 @@ function reducer(state: GameState, action: Action): GameState {
 
     case "OPEN_OVERLAY": {
       // Opened from menu -- B goes back to menu
-      if (state.screen === "title") return state;
+      if (state.screen === "title" || state.screen === "boot") return state;
       return { ...state, overlay: action.target, overlayReturnTo: "menu" };
     }
 
@@ -530,9 +559,9 @@ export function useGridRunner() {
     }
   }, [state.save, state.screen]);
 
-  // Keyboard controls -- always active except title screen
+  // Keyboard controls -- always active except title/boot screen
   useEffect(() => {
-    if (state.screen === "title") return;
+    if (state.screen === "title" || state.screen === "boot") return;
 
     const moveKeys: Record<string, Direction> = {
       ArrowUp: "up",
@@ -722,6 +751,14 @@ export function useGridRunner() {
     dispatch({ type: "OPEN_SHOP" });
   }, []);
 
+  const handleBootDone = useCallback(() => {
+    dispatch({ type: "BOOT_DONE" });
+  }, []);
+
+  const handleDeleteSave = useCallback(() => {
+    dispatch({ type: "DELETE_SAVE" });
+  }, []);
+
   const currentMap = getMap(state.currentZone) ?? overworldMap;
   const currentTile = tileAt(currentMap, state.playerPos);
 
@@ -729,6 +766,7 @@ export function useGridRunner() {
     screen: state.screen,
     save: state.save,
     hasSaveFile: state.hasSaveFile,
+    saveSummary: state.saveSummary,
     playerPos: state.playerPos,
     facing: state.facing,
     currentTile,
@@ -753,5 +791,7 @@ export function useGridRunner() {
     handleManualSave,
     handleBuyTool,
     handleOpenShop,
+    handleBootDone,
+    handleDeleteSave,
   };
 }
