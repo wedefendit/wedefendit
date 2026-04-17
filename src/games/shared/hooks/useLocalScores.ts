@@ -14,50 +14,63 @@ party without express written consent.
 
 import { useCallback, useEffect, useState } from "react";
 import * as storage from "../storage";
-import type { GameScore, GamesState } from "../types";
+import type { Badge, GameScore, GamesState } from "../types";
+
+const EMPTY_STATE: GamesState = { badges: [], scores: {}, preferences: {} };
 
 export function useLocalScores() {
-  const [state, setLocalState] = useState<GamesState>(() => storage.getState());
+  const [gamesState, setGamesState] = useState<GamesState>(EMPTY_STATE);
 
   useEffect(() => {
-    setLocalState(storage.getState());
+    let cancelled = false;
+    storage.getState().then((s) => {
+      if (!cancelled) setGamesState(s);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const recordScore = useCallback((score: GameScore) => {
-    const next = storage.setScore(score);
-    setLocalState(next);
+  const recordScore = useCallback(async (score: GameScore) => {
+    const next = await storage.setScore(score);
+    setGamesState(next);
     return next;
   }, []);
 
-  const earnBadge = useCallback((badgeId: string) => {
-    const next = storage.addBadge(badgeId);
-    setLocalState(next);
+  const earnBadge = useCallback(async (badge: Badge) => {
+    const next = await storage.addBadge({
+      id: badge.id,
+      gameId: badge.gameId,
+      tier: badge.tier,
+      earnedAt: new Date().toISOString(),
+    });
+    setGamesState(next);
     return next;
   }, []);
 
-  const clearGame = useCallback((gameId: string) => {
-    const next = storage.clearScore(gameId);
-    setLocalState(next);
+  const clearGame = useCallback(async (gameId: string) => {
+    const next = await storage.clearScore(gameId);
+    setGamesState(next);
     return next;
   }, []);
 
-  const clearAll = useCallback(() => {
-    storage.clearState();
-    setLocalState({ badges: [], scores: {}, preferences: {} });
+  const clearAll = useCallback(async () => {
+    await storage.clearState();
+    setGamesState(EMPTY_STATE);
   }, []);
 
   const hasBadge = useCallback(
-    (badgeId: string) => state.badges.includes(badgeId),
-    [state.badges],
+    (badgeId: string) => gamesState.badges.some((b) => b.id === badgeId),
+    [gamesState.badges],
   );
 
   const getScore = useCallback(
-    (gameId: string): GameScore | undefined => state.scores[gameId],
-    [state.scores],
+    (gameId: string): GameScore | undefined => gamesState.scores[gameId],
+    [gamesState.scores],
   );
 
   return {
-    state,
+    state: gamesState,
     recordScore,
     earnBadge,
     clearGame,

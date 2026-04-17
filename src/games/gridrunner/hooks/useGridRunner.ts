@@ -37,6 +37,8 @@ import {
 import { createCommonTool } from "../engine/loot";
 import { SHOP_ITEMS } from "../engine/shop";
 import { SCRAP_VALUES } from "../ui/shared/theme";
+import { badgesForTransition } from "../engine/badges";
+import { addBadge } from "../../shared/storage";
 
 /* ------------------------------------------------------------------ */
 /*  State                                                             */
@@ -578,6 +580,21 @@ export function useGridRunner() {
       writeSave(state.save);
     }
   }, [state.save, state.screen]);
+
+  // Badge grants -- compare current save to the previous snapshot and
+  // persist any newly earned badges to the shared dis-games-state store.
+  const prevSaveRef = useRef<GridRunnerSave | null>(null);
+  useEffect(() => {
+    const earned = badgesForTransition(
+      prevSaveRef.current,
+      state.save,
+      new Date().toISOString(),
+    );
+    prevSaveRef.current = state.save;
+    for (const badge of earned) {
+      void addBadge(badge);
+    }
+  }, [state.save]);
 
   // Keyboard controls -- always active except title/boot screen
   useEffect(() => {

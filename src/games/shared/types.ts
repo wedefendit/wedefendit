@@ -37,8 +37,15 @@ export type GameScore = {
 
 export type GamePreferences = Record<string, Record<string, unknown>>;
 
+export type EarnedBadge = {
+  id: string;
+  gameId: string;
+  tier: BadgeTier;
+  earnedAt: string; // ISO 8601 timestamp
+};
+
 export type GamesState = {
-  badges: string[];
+  badges: EarnedBadge[];
   scores: Record<string, GameScore>;
   preferences: GamePreferences;
 };

@@ -97,7 +97,7 @@ export function GameShell({
 
   const recordScore = useCallback(
     (score: Omit<GameScore, "gameId" | "bestScore" | "completedAt">) => {
-      scores.recordScore({
+      void scores.recordScore({
         ...score,
         gameId,
         bestScore: score.score,
@@ -110,8 +110,7 @@ export function GameShell({
   const awardBadge = useCallback(
     (badge: Badge) => {
       if (scores.hasBadge(badge.id)) return;
-      scores.earnBadge(badge.id);
-      setEarnedBadge(badge);
+      void scores.earnBadge(badge).then(() => setEarnedBadge(badge));
     },
     [scores],
   );

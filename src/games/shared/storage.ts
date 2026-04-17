@@ -12,7 +12,13 @@ licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
 party without express written consent.
 */
 
-import type { GamePreferences, GameScore, GamesState } from "./types";
+import type {
+  BadgeTier,
+  EarnedBadge,
+  GamePreferences,
+  GameScore,
+  GamesState,
+} from "./types";
 
 const STORAGE_KEY = "dis-games-state";
 
@@ -23,9 +29,7 @@ const EMPTY_STATE: GamesState = {
 };
 
 function isBrowser(): boolean {
-  return (
-    typeof window !== "undefined" && typeof window.localStorage !== "undefined"
-  );
+  return globalThis.localStorage !== undefined;
 }
 
 function cloneEmpty(): GamesState {
@@ -44,14 +48,42 @@ function sanitizePreferences(value: unknown): GamePreferences {
   );
 }
 
-export function getState(): GamesState {
+const VALID_TIERS: readonly BadgeTier[] = ["bronze", "silver", "gold"];
+
+function isBadgeTier(value: unknown): value is BadgeTier {
+  return typeof value === "string" && (VALID_TIERS as readonly string[]).includes(value);
+}
+
+function sanitizeBadges(value: unknown): EarnedBadge[] {
+  if (!Array.isArray(value)) return [];
+  const out: EarnedBadge[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object") continue;
+    const b = entry as Partial<EarnedBadge>;
+    if (typeof b.id !== "string" || !b.id) continue;
+    if (typeof b.gameId !== "string" || !b.gameId) continue;
+    if (!isBadgeTier(b.tier)) continue;
+    if (typeof b.earnedAt !== "string" || !b.earnedAt) continue;
+    out.push({
+      id: b.id,
+      gameId: b.gameId,
+      tier: b.tier,
+      earnedAt: b.earnedAt,
+    });
+  }
+  return out;
+}
+
+export async function getState(): Promise<GamesState> {
   if (!isBrowser()) return cloneEmpty();
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return cloneEmpty();
-    const parsed = JSON.parse(raw) as Partial<GamesState>;
+    const parsed = JSON.parse(raw) as Partial<GamesState> & {
+      badges?: unknown;
+    };
     return {
-      badges: Array.isArray(parsed.badges) ? parsed.badges : [],
+      badges: sanitizeBadges(parsed.badges),
       scores:
         parsed.scores && typeof parsed.scores === "object" ? parsed.scores : {},
       preferences: sanitizePreferences(parsed.preferences),
@@ -61,30 +93,33 @@ export function getState(): GamesState {
   }
 }
 
-export function setState(state: GamesState): void {
+export async function setState(state: GamesState): Promise<void> {
   if (!isBrowser()) return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
     // Quota or privacy mode — silently ignore. V1 is best-effort local only.
   }
 }
 
-export function clearState(): void {
+export async function clearState(): Promise<void> {
   if (!isBrowser()) return;
   try {
-    window.localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   } catch {
     // ignore
   }
 }
 
-export function getScore(gameId: string): GameScore | undefined {
-  return getState().scores[gameId];
+export async function getScore(
+  gameId: string,
+): Promise<GameScore | undefined> {
+  const state = await getState();
+  return state.scores[gameId];
 }
 
-export function setScore(score: GameScore): GamesState {
-  const state = getState();
+export async function setScore(score: GameScore): Promise<GamesState> {
+  const state = await getState();
   const existing = state.scores[score.gameId];
   const bestScore = existing
     ? Math.max(existing.bestScore, score.score)
@@ -96,58 +131,61 @@ export function setScore(score: GameScore): GamesState {
       [score.gameId]: { ...score, bestScore },
     },
   };
-  setState(next);
+  await setState(next);
   return next;
 }
 
-export function clearScore(gameId: string): GamesState {
-  const state = getState();
+export async function clearScore(gameId: string): Promise<GamesState> {
+  const state = await getState();
   if (!(gameId in state.scores)) return state;
   const { [gameId]: _removed, ...rest } = state.scores;
   void _removed;
   const next: GamesState = { ...state, scores: rest };
-  setState(next);
+  await setState(next);
   return next;
 }
 
-export function getBadges(): string[] {
-  return getState().badges;
+export async function getBadges(): Promise<EarnedBadge[]> {
+  const state = await getState();
+  return state.badges;
 }
 
-export function hasBadge(badgeId: string): boolean {
-  return getState().badges.includes(badgeId);
+export async function hasBadge(badgeId: string): Promise<boolean> {
+  const state = await getState();
+  return state.badges.some((b) => b.id === badgeId);
 }
 
-export function addBadge(badgeId: string): GamesState {
-  const state = getState();
-  if (state.badges.includes(badgeId)) return state;
-  const next: GamesState = { ...state, badges: [...state.badges, badgeId] };
-  setState(next);
+export async function addBadge(badge: EarnedBadge): Promise<GamesState> {
+  const state = await getState();
+  if (state.badges.some((b) => b.id === badge.id)) return state;
+  const next: GamesState = { ...state, badges: [...state.badges, badge] };
+  await setState(next);
   return next;
 }
 
-export function clearBadges(): GamesState {
-  const state = getState();
+export async function clearBadges(): Promise<GamesState> {
+  const state = await getState();
   const next: GamesState = { ...state, badges: [] };
-  setState(next);
+  await setState(next);
   return next;
 }
 
-export function getGamePreference<T = unknown>(
+export async function getGamePreference<T = unknown>(
   gameId: string,
   key: string,
-): T | undefined {
-  const prefs = getState().preferences[gameId];
+): Promise<T | undefined> {
+  const state = await getState();
+  const prefs = state.preferences[gameId];
   if (!prefs) return undefined;
   return prefs[key] as T | undefined;
 }
 
-export function setGamePreference(
+export async function setGamePreference(
   gameId: string,
   key: string,
   value: unknown,
-): GamesState {
-  const state = getState();
+): Promise<GamesState> {
+  const state = await getState();
   const next: GamesState = {
     ...state,
     preferences: {
@@ -158,12 +196,15 @@ export function setGamePreference(
       },
     },
   };
-  setState(next);
+  await setState(next);
   return next;
 }
 
-export function clearGamePreference(gameId: string, key: string): GamesState {
-  const state = getState();
+export async function clearGamePreference(
+  gameId: string,
+  key: string,
+): Promise<GamesState> {
+  const state = await getState();
   const existing = state.preferences[gameId];
   if (!existing || !(key in existing)) return state;
   const { [key]: _removed, ...rest } = existing;
@@ -172,7 +213,7 @@ export function clearGamePreference(gameId: string, key: string): GamesState {
   if (Object.keys(rest).length === 0) delete nextPreferences[gameId];
   else nextPreferences[gameId] = rest;
   const next: GamesState = { ...state, preferences: nextPreferences };
-  setState(next);
+  await setState(next);
   return next;
 }
 

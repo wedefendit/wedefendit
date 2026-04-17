@@ -673,26 +673,40 @@ export function useDigitalHouseController() {
 
   // NEW: Onboarding (replaces auto-help-modal)
   useEffect(() => {
-    const pref = getGamePreference<boolean>(
-      DIGITAL_HOUSE_GAME_ID,
-      ONBOARDING_PREF_KEY,
+    let cancelled = false;
+    let timer: ReturnType<typeof globalThis.setTimeout> | null = null;
+    getGamePreference<boolean>(DIGITAL_HOUSE_GAME_ID, ONBOARDING_PREF_KEY).then(
+      (pref) => {
+        if (cancelled) return;
+        if (pref === true) return; // user dismissed with "don't show again"
+        // Small delay so DOM is ready for spotlight measurement
+        timer = globalThis.setTimeout(() => setShowOnboarding(true), 400);
+      },
     );
-    if (pref === true) return; // user dismissed with "don't show again"
-    // Small delay so DOM is ready for spotlight measurement
-    const t = globalThis.setTimeout(() => setShowOnboarding(true), 400);
-    return () => globalThis.clearTimeout(t);
+    return () => {
+      cancelled = true;
+      if (timer) globalThis.clearTimeout(timer);
+    };
   }, []);
 
   const dismissOnboarding = useCallback((dontShowAgain: boolean) => {
     if (dontShowAgain)
-      setGamePreference(DIGITAL_HOUSE_GAME_ID, ONBOARDING_PREF_KEY, true);
+      void setGamePreference(
+        DIGITAL_HOUSE_GAME_ID,
+        ONBOARDING_PREF_KEY,
+        true,
+      );
     setShowOnboarding(false);
   }, []);
 
   const dismissHelp = useCallback((dontShowAgain: boolean) => {
     // Keep the old help pref for the help button
     if (dontShowAgain)
-      setGamePreference(DIGITAL_HOUSE_GAME_ID, ONBOARDING_PREF_KEY, true);
+      void setGamePreference(
+        DIGITAL_HOUSE_GAME_ID,
+        ONBOARDING_PREF_KEY,
+        true,
+      );
     setHelpOpen(false);
   }, []);
 
