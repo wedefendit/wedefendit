@@ -1069,6 +1069,104 @@ test.describe("GRIDRUNNER battle layout regression", () => {
 });
 
 /* ------------------------------------------------------------------ */
+/*  Tutorial encounter                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Arcade entry tile is at (3, 4) in the 16x12 overworld. Park the player at
+ * (3, 5) so one ArrowUp walks onto the entry tile.
+ */
+async function placePlayerAtArcadeDoor(
+  page: Page,
+  overrides: Record<string, unknown> = {},
+) {
+  await page.evaluate((ov) => {
+    const raw = localStorage.getItem("dis-gridrunner-save");
+    if (!raw) return;
+    const save = JSON.parse(raw);
+    save.currentZone = "overworld";
+    save.currentPosition = { x: 3, y: 5 };
+    Object.assign(save, ov);
+    localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
+  }, overrides);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByTestId("gr-continue").click();
+  await page.waitForTimeout(300);
+}
+
+async function walkIntoArcade(page: Page) {
+  await page.keyboard.press("ArrowUp");
+  await page.waitForTimeout(250);
+}
+
+test.describe("GRIDRUNNER tutorial encounter", () => {
+  test("first arcade entry spawns scripted Script Kiddie and shows tutorial steps", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+    await placePlayerAtArcadeDoor(page);
+
+    // completedTutorial is false on a fresh save.
+    // Walk into the arcade entry tile -> scripted Script Kiddie spawns,
+    // tutorial step 1 appears.
+    await walkIntoArcade(page);
+
+    const prompt = page.getByTestId("gr-tutorial-prompt");
+    await expect(prompt).toBeVisible({ timeout: 5000 });
+    await expect(prompt).toContainText(/select nmap/i);
+    await expect(page.getByTestId("gr-battle")).toBeVisible();
+    await expect(page.getByText("Script Kiddie", { exact: true })).toBeVisible();
+
+    // Non-NMAP tools must be disabled during step 1.
+    const nmapBtn = page.getByTestId("gr-battle-tool-0");
+    const metaBtn = page.getByTestId("gr-battle-tool-2");
+    await expect(nmapBtn).toBeEnabled();
+    await expect(metaBtn).toBeDisabled();
+
+    // Use NMAP -> step 2 appears.
+    await nmapBtn.click();
+    await expect(prompt).toContainText(/recon/i);
+
+    // Dismiss step 2 -> step 3 appears.
+    await page.getByTestId("gr-tutorial-dismiss").click();
+    await expect(prompt).toContainText(/battle log/i);
+
+    // Dismiss step 3 -> tutorial gone, all tools re-enabled.
+    await page.getByTestId("gr-tutorial-dismiss").click();
+    await expect(prompt).toHaveCount(0);
+  });
+
+  test("tutorial sets completedTutorial and does not re-appear on revisit", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+    await placePlayerAtArcadeDoor(page);
+    await walkIntoArcade(page);
+
+    // Fast-forward through the tutorial.
+    await page.getByTestId("gr-tutorial-prompt").waitFor();
+    await page.getByTestId("gr-battle-tool-0").click();
+    await page.getByTestId("gr-tutorial-dismiss").click();
+    await page.getByTestId("gr-tutorial-dismiss").click();
+
+    // Confirm the tutorial flag is persisted.
+    const completed = await page.evaluate(() => {
+      const raw = localStorage.getItem("dis-gridrunner-save");
+      return raw ? JSON.parse(raw).completedTutorial === true : false;
+    });
+    expect(completed).toBe(true);
+
+    // Reload and re-enter arcade. The tutorial must not show.
+    await placePlayerAtArcadeDoor(page);
+    await walkIntoArcade(page);
+
+    await expect(page.getByTestId("gr-tutorial-prompt")).toHaveCount(0);
+  });
+});
+
+/* ------------------------------------------------------------------ */
 /*  Save terminal interaction                                         */
 /* ------------------------------------------------------------------ */
 

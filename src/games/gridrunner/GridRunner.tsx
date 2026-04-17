@@ -190,6 +190,8 @@ export function GridRunner() {
           onUseTool={handleUseTool}
           onRun={game.handleRun}
           onBattleEnd={game.handleBattleEnd}
+          tutorialStep={game.tutorialStep}
+          onAdvanceTutorial={game.handleAdvanceTutorial}
         />
       )}
 

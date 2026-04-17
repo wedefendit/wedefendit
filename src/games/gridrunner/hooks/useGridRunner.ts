@@ -73,6 +73,8 @@ interface GameState {
   /** Where B/Close navigates back to. "none" closes entirely, "menu" goes back to menu. */
   overlayReturnTo: "none" | "menu";
   levelUpSummary: LevelUpSummary | null;
+  /** 0 = inactive, 1-3 = active onboarding step. */
+  tutorialStep: 0 | 1 | 2 | 3;
 }
 
 type Action =
@@ -85,6 +87,7 @@ type Action =
   | { type: "RUN" }
   | { type: "BATTLE_END" }
   | { type: "DISMISS_LEVELUP" }
+  | { type: "ADVANCE_TUTORIAL" }
   | { type: "OPEN_MENU" }
   | { type: "OPEN_DISC" }
   | {
@@ -114,6 +117,7 @@ function init(): GameState {
     overlay: "none",
     overlayReturnTo: "none",
     levelUpSummary: null,
+    tutorialStep: 0,
   };
 }
 
@@ -203,6 +207,29 @@ function reducer(state: GameState, action: Action): GameState {
                 currentPosition: buildingMap.spawn,
               }
             : null;
+
+          // First arcade entry with tutorial not yet complete: spawn a
+          // scripted Script Kiddie and kick off the 3-step tutorial.
+          if (
+            steppedTile.buildingId === "arcade" &&
+            updatedSave &&
+            !updatedSave.completedTutorial &&
+            state.tutorialStep === 0
+          ) {
+            const enemy = spawnEnemy("script-kiddie", updatedSave.player.level);
+            return {
+              ...state,
+              screen: "battle",
+              currentZone: "arcade",
+              playerPos: buildingMap.spawn,
+              overworldPos: state.playerPos,
+              facing: "up",
+              save: updatedSave,
+              battle: createBattle(enemy, false),
+              tutorialStep: 1,
+            };
+          }
+
           return {
             ...state,
             screen: "building",
@@ -360,10 +387,17 @@ function reducer(state: GameState, action: Action): GameState {
         state.battle,
       );
 
+      // Tutorial: using NMAP on step 1 advances to step 2.
+      const nextTutorialStep =
+        state.tutorialStep === 1 && action.tool.baseToolId === "nmap"
+          ? 2
+          : state.tutorialStep;
+
       return {
         ...state,
         battle: result.state,
         save: { ...state.save, player: result.player },
+        tutorialStep: nextTutorialStep,
       };
     }
 
@@ -472,6 +506,20 @@ function reducer(state: GameState, action: Action): GameState {
       };
     }
 
+    case "ADVANCE_TUTORIAL": {
+      if (state.tutorialStep === 2) {
+        return { ...state, tutorialStep: 3 };
+      }
+      if (state.tutorialStep === 3 && state.save) {
+        return {
+          ...state,
+          tutorialStep: 0,
+          save: { ...state.save, completedTutorial: true },
+        };
+      }
+      return state;
+    }
+
     case "OPEN_MENU": {
       if (state.screen === "title" || state.screen === "boot") return state;
       if (state.overlay === "menu")
@@ -571,15 +619,13 @@ export function useGridRunner() {
     dispatch({ type: "CHECK_SAVE" });
   }, []);
 
-  // Auto-save on position/zone change
+  // Auto-save on any save mutation (position, zone, boss defeats, tutorial).
+  // Battle state is tracked separately so this does not fire per-turn.
   useEffect(() => {
-    if (
-      state.save &&
-      (state.screen === "overworld" || state.screen === "building")
-    ) {
+    if (state.save) {
       writeSave(state.save);
     }
-  }, [state.save, state.screen]);
+  }, [state.save]);
 
   // Badge grants -- compare current save to the previous snapshot and
   // persist any newly earned badges to the shared dis-games-state store.
@@ -800,6 +846,10 @@ export function useGridRunner() {
     dispatch({ type: "DISMISS_LEVELUP" });
   }, []);
 
+  const handleAdvanceTutorial = useCallback(() => {
+    dispatch({ type: "ADVANCE_TUTORIAL" });
+  }, []);
+
   const currentMap = getMap(state.currentZone) ?? overworldMap;
   const currentTile = tileAt(currentMap, state.playerPos);
 
@@ -816,6 +866,7 @@ export function useGridRunner() {
     battle: state.battle,
     overlay: state.overlay,
     levelUpSummary: state.levelUpSummary,
+    tutorialStep: state.tutorialStep,
     startGame,
     continueGame,
     handleDPadPress,
@@ -836,5 +887,6 @@ export function useGridRunner() {
     handleBootDone,
     handleDeleteSave,
     handleDismissLevelUp,
+    handleAdvanceTutorial,
   };
 }

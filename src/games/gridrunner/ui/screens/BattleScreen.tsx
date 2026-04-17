@@ -13,6 +13,7 @@ import type {
 import { toolDisplayName } from "../../engine/loot";
 import { HpBar } from "../shared/HpBar";
 import { TAG_COLORS, RARITY_TEXT } from "../shared/theme";
+import { TutorialPrompt } from "./TutorialPrompt";
 
 type BattleScreenProps = Readonly<{
   battle: BattleState;
@@ -22,6 +23,9 @@ type BattleScreenProps = Readonly<{
   onUseTool: (tool: ToolInstance) => void;
   onRun: () => void;
   onBattleEnd: () => void;
+  /** 0 = no tutorial, 1-3 = active tutorial step. */
+  tutorialStep?: 0 | 1 | 2 | 3;
+  onAdvanceTutorial?: () => void;
 }>;
 
 /* ------------------------------------------------------------------ */
@@ -75,6 +79,8 @@ export function BattleScreen({
   onUseTool,
   onRun,
   onBattleEnd,
+  tutorialStep = 0,
+  onAdvanceTutorial,
 }: BattleScreenProps) {
   const isOver = battle.phase === "won" || battle.phase === "lost";
   const isPlayerTurn = battle.phase === "player_turn";
@@ -125,6 +131,16 @@ export function BattleScreen({
       {/* Compact log */}
       <BattleLog log={battle.log} />
 
+      {/* Tutorial prompt -- shows above the tool grid during onboarding */}
+      {tutorialStep > 0 && onAdvanceTutorial && (
+        <div className="pt-1">
+          <TutorialPrompt
+            step={tutorialStep as 1 | 2 | 3}
+            onDismiss={onAdvanceTutorial}
+          />
+        </div>
+      )}
+
       {/* Tools: 2x2 grid + RUN row */}
       {!isOver && (
         <>
@@ -133,13 +149,20 @@ export function BattleScreen({
             aria-label="Battle actions"
             className="grid shrink-0 grid-cols-2 gap-1 pt-1"
           >
-            {equippedTools.map((tool, i) =>
-              tool ? (
+            {equippedTools.map((tool, i) => {
+              if (!tool) return null;
+              const dimmed =
+                tutorialStep === 1 && tool.baseToolId !== "nmap";
+              return (
                 <button
                   key={tool.id}
                   type="button"
                   data-testid={`gr-battle-tool-${i}`}
-                  disabled={!isPlayerTurn || player.compute < tool.energyCost}
+                  disabled={
+                    !isPlayerTurn ||
+                    player.compute < tool.energyCost ||
+                    dimmed
+                  }
                   onClick={() => onUseTool(tool)}
                   className="gr-font-mono min-h-[44px] rounded-sm border border-[#00f0ff] bg-[#0f1b2d] px-2 py-1.5 text-center text-xs font-bold uppercase text-[#00f0ff] transition-opacity disabled:opacity-30"
                 >
@@ -147,8 +170,8 @@ export function BattleScreen({
                   {tool.baseToolId}{" "}
                   <span className="opacity-70">{tool.energyCost}EN</span>
                 </button>
-              ) : null,
-            )}
+              );
+            })}
           </nav>
           <button
             type="button"
