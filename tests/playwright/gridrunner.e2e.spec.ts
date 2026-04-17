@@ -1067,3 +1067,153 @@ test.describe("GRIDRUNNER battle layout regression", () => {
     ).toBeLessThanOrEqual(16);
   });
 });
+
+/* ------------------------------------------------------------------ */
+/*  Level-up overlay                                                  */
+/* ------------------------------------------------------------------ */
+
+async function enterBattleNearLevelUp(page: Page) {
+  await startNewGame(page);
+
+  await page.evaluate(() => {
+    const raw = localStorage.getItem("dis-gridrunner-save");
+    if (!raw) return;
+    const save = JSON.parse(raw);
+    save.currentZone = "arcade";
+    save.currentPosition = { x: 5, y: 3 };
+    // Park the player one XP shy of leveling and give them an instakill tool
+    // so a single enemy turn ends the battle and triggers the level-up flow.
+    save.player.xp = save.player.xpToNext - 1;
+    save.player.maxIntegrity = 9999;
+    save.player.integrity = 9999;
+    save.player.maxCompute = 9999;
+    save.player.compute = 9999;
+    save.player.firewall = 9999;
+    save.equippedTools = [
+      {
+        id: "test-onehit",
+        baseToolId: "metasploit",
+        rarity: "legendary",
+        power: 9999,
+        accuracy: 100,
+        energyCost: 1,
+        prefix: null,
+        suffix: null,
+        type: "exploit",
+      },
+      null,
+      null,
+      null,
+    ];
+    localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
+  });
+
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByTestId("gr-continue").click();
+  await page.waitForTimeout(300);
+
+  for (let i = 0; i < 300; i++) {
+    if (
+      await page
+        .getByTestId("gr-battle")
+        .isVisible()
+        .catch(() => false)
+    )
+      return;
+    const inRightPhase = Math.floor(i / 7) % 2 === 0;
+    await page.keyboard.press(inRightPhase ? "ArrowRight" : "ArrowLeft");
+    await page.waitForTimeout(30);
+  }
+  throw new Error("No battle triggered after 300 steps in arcade");
+}
+
+test.describe("GRIDRUNNER level-up overlay", () => {
+  test("appears after a winning battle that crosses the XP threshold", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await enterBattleNearLevelUp(page);
+
+    // One-hit the enemy with the seeded legendary tool
+    await page.getByTestId("gr-battle-tool-0").click();
+
+    // Battle result panel
+    const cont = page.getByTestId("gr-battle-continue");
+    await expect(cont).toBeVisible({ timeout: 5000 });
+    await cont.click();
+
+    // Level-up overlay
+    const overlay = page.getByTestId("gr-levelup-overlay");
+    await expect(overlay).toBeVisible();
+
+    // Old level was 1, new level should be 2 (xpToNext was 50, gave 18+ XP)
+    await expect(page.getByTestId("gr-levelup-old")).toHaveText("1");
+    await expect(page.getByTestId("gr-levelup-new")).toHaveText(/^[2-9]/);
+
+    // Continue dismisses
+    await page.getByTestId("gr-levelup-continue").click();
+    await expect(overlay).toHaveCount(0);
+  });
+
+  test("does not appear when XP gain stays below threshold", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startNewGame(page);
+
+    await page.evaluate(() => {
+      const raw = localStorage.getItem("dis-gridrunner-save");
+      if (!raw) return;
+      const save = JSON.parse(raw);
+      save.currentZone = "arcade";
+      save.currentPosition = { x: 5, y: 3 };
+      // Far from threshold; one battle won't level up
+      save.player.xp = 0;
+      save.player.xpToNext = 99999;
+      save.player.maxIntegrity = 9999;
+      save.player.integrity = 9999;
+      save.player.maxCompute = 9999;
+      save.player.compute = 9999;
+      save.player.firewall = 9999;
+      save.equippedTools = [
+        {
+          id: "test-onehit",
+          baseToolId: "metasploit",
+          rarity: "legendary",
+          power: 9999,
+          accuracy: 100,
+          energyCost: 1,
+          prefix: null,
+          suffix: null,
+          type: "exploit",
+        },
+        null,
+        null,
+        null,
+      ];
+      localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
+    });
+
+    await page.reload({ waitUntil: "networkidle" });
+    await page.getByTestId("gr-continue").click();
+    await page.waitForTimeout(300);
+
+    for (let i = 0; i < 300; i++) {
+      if (
+        await page
+          .getByTestId("gr-battle")
+          .isVisible()
+          .catch(() => false)
+      )
+        break;
+      const inRightPhase = Math.floor(i / 7) % 2 === 0;
+      await page.keyboard.press(inRightPhase ? "ArrowRight" : "ArrowLeft");
+      await page.waitForTimeout(30);
+    }
+
+    await page.getByTestId("gr-battle-tool-0").click();
+    await page.getByTestId("gr-battle-continue").click();
+
+    await expect(page.getByTestId("gr-levelup-overlay")).toHaveCount(0);
+  });
+});

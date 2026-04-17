@@ -284,6 +284,56 @@ function resolveEnemyTurn(
   };
 }
 
+/* ------------------------------------------------------------------ */
+/*  Level-up math                                                     */
+/* ------------------------------------------------------------------ */
+
+export type LevelUpResult = {
+  player: PlayerState;
+  levelsGained: number;
+  oldLevel: number;
+  newLevel: number;
+  statDeltas: { hp: number; en: number; spd: number; def: number };
+};
+
+const LEVEL_CAP = 20;
+
+export function processLevelUp(
+  player: PlayerState,
+  xpEarned: number,
+): LevelUpResult {
+  const oldLevel = player.level;
+  const oldMaxHp = player.maxIntegrity;
+  const oldMaxEn = player.maxCompute;
+  const oldSpd = player.bandwidth;
+  const oldDef = player.firewall;
+
+  const p = { ...player };
+  p.xp += xpEarned;
+  while (p.xp >= p.xpToNext && p.level < LEVEL_CAP) {
+    p.xp -= p.xpToNext;
+    p.level += 1;
+    p.maxIntegrity += 10;
+    p.maxCompute += 8;
+    p.bandwidth += 1;
+    p.firewall += 1;
+    p.xpToNext = Math.round(p.xpToNext * 1.5);
+  }
+
+  return {
+    player: p,
+    levelsGained: p.level - oldLevel,
+    oldLevel,
+    newLevel: p.level,
+    statDeltas: {
+      hp: p.maxIntegrity - oldMaxHp,
+      en: p.maxCompute - oldMaxEn,
+      spd: p.bandwidth - oldSpd,
+      def: p.firewall - oldDef,
+    },
+  };
+}
+
 export function attemptRun(player: PlayerState, enemy: BattleEnemy): boolean {
   const chance = 50 + (player.bandwidth - enemy.def.speed) * 5;
   return Math.random() * 100 < chance;

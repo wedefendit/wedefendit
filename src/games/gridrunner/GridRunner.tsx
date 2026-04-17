@@ -22,6 +22,7 @@ import { OperatorScreen } from "./ui/screens/OperatorScreen";
 import { SaveScreen } from "./ui/screens/SaveScreen";
 import { SettingsScreen } from "./ui/screens/SettingsScreen";
 import { ShopScreen } from "./ui/screens/ShopScreen";
+import { LevelUpOverlay } from "./ui/screens/LevelUpOverlay";
 import { ZONE_NAMES } from "./data/zones";
 
 const TOOL_SFX: Record<
@@ -246,6 +247,14 @@ export function GridRunner() {
           bits={game.save.bits}
           inventoryFull={game.save.inventory.length >= 12}
           onBuy={game.handleBuyTool}
+        />
+      )}
+      {game.overlay === "level-up" && game.levelUpSummary && (
+        <LevelUpOverlay
+          oldLevel={game.levelUpSummary.oldLevel}
+          newLevel={game.levelUpSummary.newLevel}
+          statDeltas={game.levelUpSummary.statDeltas}
+          onContinue={game.handleDismissLevelUp}
         />
       )}
     </GridRunnerShell>

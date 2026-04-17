@@ -28,7 +28,12 @@ import {
   shouldEncounter,
   spawnEnemy,
 } from "../engine/enemies";
-import { attemptRun, createBattle, resolvePlayerTurn } from "../engine/battle";
+import {
+  attemptRun,
+  createBattle,
+  processLevelUp,
+  resolvePlayerTurn,
+} from "../engine/battle";
 import { createCommonTool } from "../engine/loot";
 import { SHOP_ITEMS } from "../engine/shop";
 import { SCRAP_VALUES } from "../ui/shared/theme";
@@ -36,6 +41,12 @@ import { SCRAP_VALUES } from "../ui/shared/theme";
 /* ------------------------------------------------------------------ */
 /*  State                                                             */
 /* ------------------------------------------------------------------ */
+
+type LevelUpSummary = {
+  oldLevel: number;
+  newLevel: number;
+  statDeltas: { hp: number; en: number; spd: number; def: number };
+};
 
 interface GameState {
   screen: GameScreen;
@@ -55,9 +66,11 @@ interface GameState {
     | "operator"
     | "save"
     | "settings"
-    | "shop";
+    | "shop"
+    | "level-up";
   /** Where B/Close navigates back to. "none" closes entirely, "menu" goes back to menu. */
   overlayReturnTo: "none" | "menu";
+  levelUpSummary: LevelUpSummary | null;
 }
 
 type Action =
@@ -69,6 +82,7 @@ type Action =
   | { type: "USE_TOOL"; tool: ToolInstance }
   | { type: "RUN" }
   | { type: "BATTLE_END" }
+  | { type: "DISMISS_LEVELUP" }
   | { type: "OPEN_MENU" }
   | { type: "OPEN_DISC" }
   | {
@@ -97,6 +111,7 @@ function init(): GameState {
     battle: null,
     overlay: "none",
     overlayReturnTo: "none",
+    levelUpSummary: null,
   };
 }
 
@@ -373,21 +388,11 @@ function reducer(state: GameState, action: Action): GameState {
       if (!state.battle || !state.save) return state;
 
       let updatedSave = { ...state.save };
+      let levelUpSummary: LevelUpSummary | null = null;
 
       if (state.battle.phase === "won") {
-        // Award XP and bits
-        const p = { ...updatedSave.player };
-        p.xp += state.battle.xpEarned;
-        // Level up check
-        while (p.xp >= p.xpToNext && p.level < 20) {
-          p.xp -= p.xpToNext;
-          p.level += 1;
-          p.maxIntegrity += 10;
-          p.maxCompute += 8;
-          p.bandwidth += 1;
-          p.firewall += 1;
-          p.xpToNext = Math.round(p.xpToNext * 1.5);
-        }
+        const lvl = processLevelUp(updatedSave.player, state.battle.xpEarned);
+        const p = { ...lvl.player };
         // Restore HP/energy between battles
         p.integrity = p.maxIntegrity;
         p.compute = p.maxCompute;
@@ -396,6 +401,14 @@ function reducer(state: GameState, action: Action): GameState {
           player: p,
           bits: updatedSave.bits + state.battle.bitsEarned,
         };
+
+        if (lvl.levelsGained > 0) {
+          levelUpSummary = {
+            oldLevel: lvl.oldLevel,
+            newLevel: lvl.newLevel,
+            statDeltas: lvl.statDeltas,
+          };
+        }
 
         // Track boss defeats
         const bossId = state.battle.enemy.def.id;
@@ -441,6 +454,16 @@ function reducer(state: GameState, action: Action): GameState {
         screen: "building",
         battle: null,
         save: updatedSave,
+        overlay: levelUpSummary ? "level-up" : state.overlay,
+        levelUpSummary,
+      };
+    }
+
+    case "DISMISS_LEVELUP": {
+      return {
+        ...state,
+        overlay: state.overlay === "level-up" ? "none" : state.overlay,
+        levelUpSummary: null,
       };
     }
 
@@ -753,6 +776,10 @@ export function useGridRunner() {
     dispatch({ type: "DELETE_SAVE" });
   }, []);
 
+  const handleDismissLevelUp = useCallback(() => {
+    dispatch({ type: "DISMISS_LEVELUP" });
+  }, []);
+
   const currentMap = getMap(state.currentZone) ?? overworldMap;
   const currentTile = tileAt(currentMap, state.playerPos);
 
@@ -768,6 +795,7 @@ export function useGridRunner() {
     map: currentMap,
     battle: state.battle,
     overlay: state.overlay,
+    levelUpSummary: state.levelUpSummary,
     startGame,
     continueGame,
     handleDPadPress,
@@ -787,5 +815,6 @@ export function useGridRunner() {
     handleOpenShop,
     handleBootDone,
     handleDeleteSave,
+    handleDismissLevelUp,
   };
 }

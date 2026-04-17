@@ -3,7 +3,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
 import { describe, it, expect } from "vitest";
-import { resolvePlayerTurn, createBattle } from "./battle";
+import { resolvePlayerTurn, createBattle, processLevelUp } from "./battle";
 import { bosses } from "./enemies";
 import type { PlayerState, ToolInstance, BattleState } from "./types";
 
@@ -122,6 +122,77 @@ const STARTER_TOOLS: ToolInstance[] = [
     type: "defense",
   },
 ];
+
+describe("processLevelUp", () => {
+  function freshPlayer(): PlayerState {
+    return {
+      level: 1,
+      xp: 0,
+      xpToNext: 50,
+      integrity: 100,
+      maxIntegrity: 100,
+      compute: 60,
+      maxCompute: 60,
+      bandwidth: 10,
+      firewall: 5,
+    };
+  }
+
+  it("no XP gain returns same player and zero levels", () => {
+    const result = processLevelUp(freshPlayer(), 0);
+    expect(result.levelsGained).toBe(0);
+    expect(result.oldLevel).toBe(1);
+    expect(result.newLevel).toBe(1);
+    expect(result.statDeltas).toEqual({ hp: 0, en: 0, spd: 0, def: 0 });
+    expect(result.player.xp).toBe(0);
+  });
+
+  it("XP below threshold accrues but does not level", () => {
+    const result = processLevelUp(freshPlayer(), 30);
+    expect(result.levelsGained).toBe(0);
+    expect(result.player.xp).toBe(30);
+    expect(result.player.level).toBe(1);
+  });
+
+  it("XP at threshold levels exactly once with correct deltas", () => {
+    const result = processLevelUp(freshPlayer(), 50);
+    expect(result.levelsGained).toBe(1);
+    expect(result.oldLevel).toBe(1);
+    expect(result.newLevel).toBe(2);
+    expect(result.statDeltas).toEqual({ hp: 10, en: 8, spd: 1, def: 1 });
+    expect(result.player.xp).toBe(0);
+    expect(result.player.xpToNext).toBe(75);
+  });
+
+  it("excess XP carries into next level", () => {
+    const result = processLevelUp(freshPlayer(), 60);
+    expect(result.levelsGained).toBe(1);
+    expect(result.player.xp).toBe(10);
+    expect(result.player.level).toBe(2);
+  });
+
+  it("multi-level gain accumulates stat deltas", () => {
+    // 50 + 75 = 125 XP -> level 1 -> 3
+    const result = processLevelUp(freshPlayer(), 125);
+    expect(result.levelsGained).toBe(2);
+    expect(result.oldLevel).toBe(1);
+    expect(result.newLevel).toBe(3);
+    expect(result.statDeltas).toEqual({ hp: 20, en: 16, spd: 2, def: 2 });
+    expect(result.player.xp).toBe(0);
+  });
+
+  it("caps at level 20", () => {
+    const cappedPlayer: PlayerState = {
+      ...freshPlayer(),
+      level: 20,
+      xp: 0,
+      xpToNext: 999999,
+    };
+    const result = processLevelUp(cappedPlayer, 1000000);
+    expect(result.levelsGained).toBe(0);
+    expect(result.newLevel).toBe(20);
+  });
+});
 
 describe("Battle balance -- Lazarus must be beatable", () => {
   it("Lazarus boss exists with defense weakness", () => {
