@@ -7,6 +7,7 @@ import type {
   BattleState,
   GameScreen,
   GridRunnerSave,
+  OnboardingKey,
   PlayerState,
   Position,
   SaveSummary,
@@ -104,6 +105,11 @@ interface GameState {
   /** Boss ID queued for the post-battle intel report, or null. Used to
    *  chain level-up -> intel when both trigger from the same BATTLE_END. */
   pendingIntelBossId: string | null;
+  /** FIFO queue of onboarding keys to show. Front of queue is active. */
+  onboardingQueue: OnboardingKey[];
+  /** Deferred shop open: when shop onboarding is queued from a move onto
+   *  the shop tile, this holds "shop" so DISMISS_ONBOARDING can open it. */
+  pendingShopOpen: boolean;
 }
 
 type Action =
@@ -118,6 +124,7 @@ type Action =
   | { type: "DISMISS_LEVELUP" }
   | { type: "DISMISS_INTEL" }
   | { type: "ADVANCE_TUTORIAL" }
+  | { type: "DISMISS_ONBOARDING"; key: OnboardingKey }
   | { type: "REGEN_TICK" }
   | { type: "OPEN_MENU" }
   | { type: "OPEN_DISC" }
@@ -155,6 +162,8 @@ function init(): GameState {
     levelUpSummary: null,
     tutorialStep: 0,
     pendingIntelBossId: null,
+    onboardingQueue: [],
+    pendingShopOpen: false,
   };
 }
 
@@ -311,11 +320,36 @@ function reducer(state: GameState, action: Action): GameState {
           }
         : null;
 
+      // Boss-approach onboarding: queue if new position is 4-way adjacent
+      // to a boss tile and the flag is false. Only inside buildings.
+      let onboardingQueue = state.onboardingQueue;
+      if (
+        state.screen === "building" &&
+        state.save &&
+        !state.save.onboarding.boss &&
+        !onboardingQueue.includes("boss")
+      ) {
+        const neighbors: Position[] = [
+          { x: newPos.x, y: newPos.y - 1 },
+          { x: newPos.x, y: newPos.y + 1 },
+          { x: newPos.x - 1, y: newPos.y },
+          { x: newPos.x + 1, y: newPos.y },
+        ];
+        const nearBoss = neighbors.some((p) => {
+          const t = tileAt(currentMap, p);
+          return t?.kind === "boss";
+        });
+        if (nearBoss && steppedTile?.kind !== "boss") {
+          onboardingQueue = [...onboardingQueue, "boss"];
+        }
+      }
+
       const baseUpdate = {
         ...state,
         playerPos: newPos,
         facing: action.dir,
         save: updatedSave,
+        onboardingQueue,
         ...(state.currentZone === "overworld" ? { overworldPos: newPos } : {}),
       };
 
@@ -348,13 +382,23 @@ function reducer(state: GameState, action: Action): GameState {
         // Under-leveled: don't start fight, stay on tile
       }
 
-      // Shop tile: auto-open shop overlay
+      // Shop tile: if the shop onboarding has been seen, auto-open the
+      // shop overlay. If not, queue the onboarding and defer opening;
+      // DISMISS_ONBOARDING will open it after the prompt is acknowledged.
       if (
         state.screen === "building" &&
         steppedTile?.kind === "building" &&
-        steppedTile.buildingId === "shop"
+        steppedTile.buildingId === "shop" &&
+        state.save
       ) {
-        return { ...baseUpdate, overlay: "shop", overlayReturnTo: "none" };
+        if (state.save.onboarding.shop) {
+          return { ...baseUpdate, overlay: "shop", overlayReturnTo: "none" };
+        }
+        return {
+          ...baseUpdate,
+          onboardingQueue: [...onboardingQueue, "shop"],
+          pendingShopOpen: true,
+        };
       }
 
       // Encounter check: only inside buildings, only on ground tiles
@@ -390,11 +434,36 @@ function reducer(state: GameState, action: Action): GameState {
           save: { ...state.save, completedTutorial: true },
         };
       }
+      // Onboarding: A-press dismisses the active onboarding prompt,
+      // mirroring the "PRESS A" affordance in the prompt itself.
+      if (state.onboardingQueue.length > 0 && state.save) {
+        const key = state.onboardingQueue[0];
+        const nextQueue = state.onboardingQueue.slice(1);
+        const openShopNow = key === "shop" && state.pendingShopOpen;
+        return {
+          ...state,
+          save: {
+            ...state.save,
+            onboarding: { ...state.save.onboarding, [key]: true },
+          },
+          onboardingQueue: nextQueue,
+          pendingShopOpen: openShopNow ? false : state.pendingShopOpen,
+          overlay: openShopNow ? "shop" : state.overlay,
+          overlayReturnTo: openShopNow ? "none" : state.overlayReturnTo,
+        };
+      }
       if (!currentMap) return state;
       const tile = tileAt(currentMap, state.playerPos);
       if (!tile) return state;
-      if (tile.kind === "building" && tile.buildingId === "shop") {
-        return { ...state, overlay: "shop", overlayReturnTo: "none" };
+      if (tile.kind === "building" && tile.buildingId === "shop" && state.save) {
+        if (state.save.onboarding.shop) {
+          return { ...state, overlay: "shop", overlayReturnTo: "none" };
+        }
+        return {
+          ...state,
+          onboardingQueue: [...state.onboardingQueue, "shop"],
+          pendingShopOpen: true,
+        };
       }
       if (tile.kind === "building" && tile.buildingId === "save") {
         return { ...state, overlay: "save", overlayReturnTo: "none" };
@@ -523,7 +592,33 @@ function reducer(state: GameState, action: Action): GameState {
             inventory: [...updatedSave.inventory, state.battle.lootDrop],
           };
         }
-      } else {
+      }
+
+      // Queue onboarding prompts for first-time events. They render on the
+      // map after level-up / intel overlays have been dismissed.
+      const onboardingAdditions: OnboardingKey[] = [];
+      if (
+        state.battle.phase === "won" &&
+        state.battle.lootDrop &&
+        !updatedSave.onboarding.loot &&
+        !state.onboardingQueue.includes("loot")
+      ) {
+        onboardingAdditions.push("loot");
+      }
+      if (
+        state.battle.phase === "won" &&
+        pendingIntelBossId &&
+        !updatedSave.onboarding.disc &&
+        !state.onboardingQueue.includes("disc")
+      ) {
+        onboardingAdditions.push("disc");
+      }
+      const newOnboardingQueue =
+        onboardingAdditions.length > 0
+          ? [...state.onboardingQueue, ...onboardingAdditions]
+          : state.onboardingQueue;
+
+      if (state.battle.phase !== "won") {
         // Lost: respawn at building entrance, lose 10% bits
         const lostBits = Math.floor(updatedSave.bits * 0.1);
         const buildingMap = getMap(state.currentZone);
@@ -560,6 +655,7 @@ function reducer(state: GameState, action: Action): GameState {
         overlay: nextOverlay,
         levelUpSummary,
         pendingIntelBossId,
+        onboardingQueue: newOnboardingQueue,
       };
     }
 
@@ -583,6 +679,26 @@ function reducer(state: GameState, action: Action): GameState {
         ...state,
         overlay: state.overlay === "intel" ? "none" : state.overlay,
         pendingIntelBossId: null,
+      };
+    }
+
+    case "DISMISS_ONBOARDING": {
+      if (!state.save) return state;
+      if (state.onboardingQueue[0] !== action.key) return state;
+      const nextQueue = state.onboardingQueue.slice(1);
+      const nextSave = {
+        ...state.save,
+        onboarding: { ...state.save.onboarding, [action.key]: true },
+      };
+      // Shop onboarding was deferring the shop-open until dismiss.
+      const openShopNow = action.key === "shop" && state.pendingShopOpen;
+      return {
+        ...state,
+        save: nextSave,
+        onboardingQueue: nextQueue,
+        pendingShopOpen: openShopNow ? false : state.pendingShopOpen,
+        overlay: openShopNow ? "shop" : state.overlay,
+        overlayReturnTo: openShopNow ? "none" : state.overlayReturnTo,
       };
     }
 
@@ -1035,6 +1151,10 @@ export function useGridRunner() {
     dispatch({ type: "DISMISS_INTEL" });
   }, []);
 
+  const handleDismissOnboarding = useCallback((key: OnboardingKey) => {
+    dispatch({ type: "DISMISS_ONBOARDING", key });
+  }, []);
+
   const currentMap = getMap(state.currentZone) ?? overworldMap;
   const currentTile = tileAt(currentMap, state.playerPos);
 
@@ -1053,6 +1173,7 @@ export function useGridRunner() {
     levelUpSummary: state.levelUpSummary,
     tutorialStep: state.tutorialStep,
     pendingIntelBossId: state.pendingIntelBossId,
+    activeOnboarding: state.onboardingQueue[0] ?? null,
     startGame,
     continueGame,
     handleDPadPress,
@@ -1075,5 +1196,6 @@ export function useGridRunner() {
     handleDismissLevelUp,
     handleAdvanceTutorial,
     handleDismissIntel,
+    handleDismissOnboarding,
   };
 }

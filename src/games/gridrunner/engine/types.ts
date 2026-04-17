@@ -78,6 +78,15 @@ export interface GameMap {
 /*  Save                                                              */
 /* ------------------------------------------------------------------ */
 
+export type OnboardingKey = "loot" | "shop" | "disc" | "boss";
+
+export type OnboardingFlags = {
+  loot: boolean;
+  shop: boolean;
+  disc: boolean;
+  boss: boolean;
+};
+
 export interface GridRunnerSave {
   version: number;
   playerName: string;
@@ -90,6 +99,8 @@ export interface GridRunnerSave {
   completedTutorial: boolean;
   /** Boss IDs whose post-battle intel report has been viewed. */
   unlockedIntelEntries: string[];
+  /** Progressive-onboarding flags -- each fires once per save. */
+  onboarding: OnboardingFlags;
   bits: number;
   credits: number;
   playTime: number;

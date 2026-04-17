@@ -24,6 +24,14 @@ import { SettingsScreen } from "./ui/screens/SettingsScreen";
 import { ShopScreen } from "./ui/screens/ShopScreen";
 import { LevelUpOverlay } from "./ui/screens/LevelUpOverlay";
 import { IntelReportScreen } from "./ui/screens/IntelReportScreen";
+import { TutorialPrompt } from "./ui/screens/TutorialPrompt";
+
+const ONBOARDING_COPY: Record<string, string> = {
+  loot: "You found a new tool! Open your Inventory (press I) to equip it. Better tools mean more damage.",
+  shop: "Welcome to the shop. Spend Bits to buy new tools. Higher-level tools unlock as you level up.",
+  disc: "Your Identity Disc just updated. Press Shift+D to open it anytime. It records everything you learn.",
+  boss: "Warning: boss ahead. Make sure your tools are equipped and your HP is full before stepping on that tile.",
+};
 import { ZONE_NAMES } from "./data/zones";
 
 const TOOL_SFX: Record<
@@ -266,6 +274,20 @@ export function GridRunner() {
           onClose={game.handleDismissIntel}
         />
       )}
+      {game.activeOnboarding &&
+        game.overlay !== "level-up" &&
+        game.overlay !== "intel" && (
+          <div className="absolute inset-x-0 bottom-0 z-50 p-2">
+            <TutorialPrompt
+              message={ONBOARDING_COPY[game.activeOnboarding]}
+              onDismiss={() =>
+                game.handleDismissOnboarding(
+                  game.activeOnboarding as "loot" | "shop" | "disc" | "boss",
+                )
+              }
+            />
+          </div>
+        )}
     </GridRunnerShell>
   );
 }

@@ -5,7 +5,14 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 import type { GridRunnerSave, PlayerState, SaveSummary, ToolInstance } from "./types";
 
 const SAVE_KEY = "dis-gridrunner-save";
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
+
+const EMPTY_ONBOARDING = {
+  loot: false,
+  shop: false,
+  disc: false,
+  boss: false,
+};
 
 /* ------------------------------------------------------------------ */
 /*  Default state factories                                           */
@@ -120,6 +127,11 @@ function migrateSave(
     save = { ...save, unlockedIntelEntries: [], version: 2 };
   }
 
+  // v2 -> v3: onboarding flags added. Backfill all false.
+  if (save.version === 2) {
+    save = { ...save, onboarding: { ...EMPTY_ONBOARDING }, version: 3 };
+  }
+
   return save;
 }
 
@@ -154,6 +166,7 @@ export function createNewSave(playerName: string): GridRunnerSave {
     defeatedBosses: [],
     completedTutorial: false,
     unlockedIntelEntries: [],
+    onboarding: { ...EMPTY_ONBOARDING },
     bits: 0,
     credits: 0,
     playTime: 0,
