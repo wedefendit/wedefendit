@@ -5,7 +5,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 import type { GridRunnerSave, PlayerState, SaveSummary, ToolInstance } from "./types";
 
 const SAVE_KEY = "dis-gridrunner-save";
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 1;
 
 const EMPTY_ONBOARDING = {
   loot: false,
@@ -111,28 +111,16 @@ export function loadSave(): GridRunnerSave | null {
 }
 
 /**
- * Migrate older save shapes forward. Returns null if the save is beyond
- * the latest known version (forward-incompatible).
+ * Accept saves at the current version only. We're still in development --
+ * any save at a different version is rejected (fresh start). Reintroduce a
+ * forward migration ladder when we ship.
  */
 function migrateSave(
   parsed: Partial<GridRunnerSave> & { version?: number },
 ): GridRunnerSave | null {
   if (typeof parsed.version !== "number") return null;
-  if (parsed.version > SAVE_VERSION) return null;
-
-  let save = parsed as GridRunnerSave;
-
-  // v1 -> v2: unlockedIntelEntries added. Backfill as empty array.
-  if (save.version === 1) {
-    save = { ...save, unlockedIntelEntries: [], version: 2 };
-  }
-
-  // v2 -> v3: onboarding flags added. Backfill all false.
-  if (save.version === 2) {
-    save = { ...save, onboarding: { ...EMPTY_ONBOARDING }, version: 3 };
-  }
-
-  return save;
+  if (parsed.version !== SAVE_VERSION) return null;
+  return parsed as GridRunnerSave;
 }
 
 export function writeSave(save: GridRunnerSave): void {
@@ -161,7 +149,7 @@ export function createNewSave(playerName: string): GridRunnerSave {
     player: defaultPlayer(),
     inventory: [],
     equippedTools: [tools[0], tools[1], tools[2], tools[3]],
-    currentZone: "overworld",
+    currentZone: "sector-01",
     currentPosition: { x: 8, y: 10 },
     defeatedBosses: [],
     completedTutorial: false,

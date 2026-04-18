@@ -2,19 +2,10 @@
 Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
-import type { GameMap } from "../../engine/types";
-import { overworldMap } from "./overworld";
-import { arcadeMap } from "./arcade";
-import { bankMap } from "./bank";
-import { exchangeMap } from "./crypto-exchange";
+/**
+ * Legacy shim. Map data now lives in per-sector modules under
+ * `../sectors/*` and is aggregated by `../sectors/index.ts`. This shim
+ * preserves the `getMap` import path for any stray consumer.
+ */
 
-export const maps: Record<string, GameMap> = {
-  overworld: overworldMap,
-  arcade: arcadeMap,
-  bank: bankMap,
-  exchange: exchangeMap,
-};
-
-export function getMap(id: string): GameMap | undefined {
-  return maps[id];
-}
+export { getMap, maps } from "../sectors";

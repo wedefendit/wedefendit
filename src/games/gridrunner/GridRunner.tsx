@@ -33,7 +33,7 @@ const ONBOARDING_COPY: Record<string, string> = {
   disc: "Your Identity Disc just updated. Press Shift+D to open it anytime. It records everything you learn.",
   boss: "Warning: boss ahead. Make sure your tools are equipped and your HP is full before stepping on that tile.",
 };
-import { ZONE_NAMES } from "./data/zones";
+import { zoneNames } from "./data/sectors";
 
 const TOOL_SFX: Record<
   ToolType,
@@ -59,7 +59,7 @@ export function GridRunner() {
   const isBattle = game.screen === "battle";
   const isMapScreen = game.screen === "overworld" || game.screen === "building";
   const zoneName =
-    ZONE_NAMES[game.currentZone] ?? game.currentZone.toUpperCase();
+    zoneNames[game.currentZone] ?? game.currentZone.toUpperCase();
 
   const isBoss = game.battle?.isBoss ?? false;
   const isPaused = game.overlay !== "none";

@@ -27,7 +27,7 @@ function makeSave(
     },
     inventory: [],
     equippedTools: [null, null, null, null],
-    currentZone: "overworld",
+    currentZone: "sector-01",
     currentPosition: { x: 0, y: 0 },
     defeatedBosses: [],
     completedTutorial: false,

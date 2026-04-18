@@ -1,7 +1,11 @@
 // @ts-expect-error node works
 import fs from "node:fs";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { overworldMap } from "../../src/games/gridrunner/data/maps/overworld";
+import { sector01 } from "../../src/games/gridrunner/data/sectors/sector-01";
+
+// Playwright's page-side code runs in the browser; Node-side test setup can
+// read the static Sector 01 outdoor map directly for assertion helpers.
+const sector01OutdoorMap = sector01.maps["sector-01"];
 
 const ROUTE = "/awareness/gridrunner";
 
@@ -1482,7 +1486,7 @@ async function placePlayerAtArcadeDoor(
     const raw = localStorage.getItem("dis-gridrunner-save");
     if (!raw) return;
     const save = JSON.parse(raw);
-    save.currentZone = "overworld";
+    save.currentZone = "sector-01";
     // Sector 01 (60x40) v3: Arcade door is at (8, 6), directly adjacent to
     // building body `A` at (7, 6). Approach from south at (8, 7) where the
     // trace tile is `g` (walkable).
@@ -1771,10 +1775,10 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
     // Post-canvas, ENTER/LOCKED labels become painted pixels, not DOM text.
     // The contract (exactly 2 entry tiles + exactly 1 locked tile) is now
     // verified against the static map data imported from overworld.ts.
-    const entryCount = overworldMap.tiles
+    const entryCount = sector01OutdoorMap.tiles
       .flat()
       .filter((t) => t.kind === "entry").length;
-    const lockedCount = overworldMap.tiles
+    const lockedCount = sector01OutdoorMap.tiles
       .flat()
       .filter((t) => t.kind === "locked").length;
     expect(entryCount).toBe(2);
@@ -1793,7 +1797,7 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
     ).toBeVisible();
 
     // Sea presence is a map-data contract, not a rendering contract.
-    const seaCount = overworldMap.tiles
+    const seaCount = sector01OutdoorMap.tiles
       .flat()
       .filter((t) => t.kind === "sea").length;
     expect(seaCount).toBeGreaterThan(20);
@@ -1811,7 +1815,7 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
 
     // Building footprint is a map-data contract. Multi-tile means the
     // Arcade/Bank/Exchange bodies aren't single 1x1 placeholders.
-    const buildingCount = overworldMap.tiles
+    const buildingCount = sector01OutdoorMap.tiles
       .flat()
       .filter((t) => t.kind === "building").length;
     expect(buildingCount).toBeGreaterThanOrEqual(18);
@@ -1830,11 +1834,11 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      // Sector 01 (60x40): row 1 cols 1-5 are Digital Sea. Standing at (1, 1)
-      // with ArrowRight steps onto (2, 1) which is also sea, triggering an
+      save.currentZone = "sector-01";
+      // Sector 01 (60x40): row 13 cols 8-11 are Digital Sea. Standing at (8, 13)
+      // with ArrowRight steps onto (9, 13) which is also sea, triggering an
       // encounter roll on the sea tile.
-      save.currentPosition = { x: 1, y: 1 };
+      save.currentPosition = { x: 8, y: 13 };
       save.completedTutorial = true;
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
     });
@@ -1860,11 +1864,10 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      // Sector 01 (60x40): row 1 cols 1-5 are Digital Sea. Standing at (1, 1)
-      // with ArrowRight steps onto (2, 1) which is also sea, triggering an
-      // encounter roll on the sea tile.
-      save.currentPosition = { x: 1, y: 1 };
+      save.currentZone = "sector-01";
+      // Sector 01 (60x40): row 13 cols 8-11 are Digital Sea. Standing at
+      // (8, 13) with ArrowRight steps onto (9, 13) which is also sea.
+      save.currentPosition = { x: 8, y: 13 };
       save.completedTutorial = true;
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
     });
@@ -1923,11 +1926,11 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      // Sector 01 (60x40): row 8 is the main `g` backbone (cols 10-51). Seed
-      // at (15, 8) so 10 east steps + 10 west steps stay on the trace network
-      // (pure grid path, zero sea tiles) and can't roll encounters.
-      save.currentPosition = { x: 15, y: 8 };
+      save.currentZone = "sector-01";
+      // Sector 01 (60x40): row 11 is a pure `g` backbone (cols 1-44). Seed
+      // at (15, 11) so 10 east steps + 10 west steps stay on the trace
+      // network (pure grid path, zero sea tiles) and can't roll encounters.
+      save.currentPosition = { x: 15, y: 11 };
       save.completedTutorial = true;
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
     });
@@ -1969,9 +1972,9 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
+      save.currentZone = "sector-01";
       // (10, 9) is one of the new near-spawn sea patches.
-      save.currentPosition = { x: 10, y: 9 };
+      save.currentPosition = { x: 8, y: 13 };
       save.completedTutorial = true;
       save.player.xp = 0;
       save.player.xpToNext = 999999;
@@ -2013,13 +2016,13 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
     // Wait for the exit transition to unmount and return to overworld.
     await page.waitForTimeout(600);
 
-    // currentZone must still be "overworld" (not any building), proving the
+    // currentZone must still be "sector-01" (not any building), proving the
     // reducer returned the correct screen.
     const zone = await page.evaluate(() => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       return raw ? JSON.parse(raw).currentZone : null;
     });
-    expect(zone).toBe("overworld");
+    expect(zone).toBe("sector-01");
 
     // Walk off the sea patch onto the trace network. (11, 9) sea ->
     // ArrowDown to (11, 10). Row 11 col 11 is `g` (grid path). Step further
@@ -2027,20 +2030,20 @@ test.describe("GRIDRUNNER Sector 01 overworld", () => {
     // Math.random forced low.
     await page.keyboard.press("ArrowDown"); // (11, 10) - may be sea or ground
     await page.waitForTimeout(100);
-    // Force-step east across the row-8 backbone via a seeded jump so we
+    // Force-step east across the row-11 backbone via a seeded jump so we
     // don't accidentally hit other sea patches.
     await page.evaluate(() => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentPosition = { x: 20, y: 8 };
+      save.currentPosition = { x: 20, y: 11 };
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
     });
     await page.reload({ waitUntil: "networkidle" });
     await page.getByTestId("gr-continue").click();
     await page.waitForTimeout(300);
 
-    // 15 east steps on the row-8 `g` trunk. If the post-battle screen bug
+    // 15 east steps on the row-11 `g` trunk. If the post-battle screen bug
     // resurfaces, encounter guard treats g as ground-encounter-tile and
     // fires a battle. Locked contract: ZERO encounters on grid path.
     for (let i = 0; i < 15; i++) {
@@ -2150,14 +2153,14 @@ test.describe("GRIDRUNNER building entry contract", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await startNewGame(page);
 
-    // Sector 01 (60x40): Bank entry door is at (42, 6), approach from south at
-    // (42, 7). Both verified against the ASCII map.
+    // Sector 01 (60x40): Bank entry door is at (40, 8), approach from south at
+    // (40, 9). Both verified against the ASCII map.
     await page.evaluate(() => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      save.currentPosition = { x: 42, y: 7 };
+      save.currentZone = "sector-01";
+      save.currentPosition = { x: 40, y: 9 };
       save.completedTutorial = true;
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
     });
@@ -2181,14 +2184,14 @@ test.describe("GRIDRUNNER building entry contract", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await startNewGame(page);
 
-    // Sector 01 (60x40): Crypto Exchange locked door is at (46, 30), approach
-    // from west at (45, 30). Both verified against the ASCII map.
+    // Sector 01 (60x40): Crypto Exchange locked door is at (48, 29), approach
+    // from west at (47, 29). Both verified against the ASCII map.
     await page.evaluate(() => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      save.currentPosition = { x: 45, y: 30 };
+      save.currentZone = "sector-01";
+      save.currentPosition = { x: 47, y: 29 };
       save.completedTutorial = true;
       save.defeatedBosses = [];
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
@@ -2207,7 +2210,7 @@ test.describe("GRIDRUNNER building entry contract", () => {
     expect(
       zone,
       "Player should still be on overworld (door is LOCKED)",
-    ).toBe("overworld");
+    ).toBe("sector-01");
   });
 });
 
@@ -2264,7 +2267,7 @@ test.describe("GRIDRUNNER canvas renderer", () => {
     });
     await startNewGame(page);
 
-    // Seed the player on the row-8 `g` backbone (cols 10-51 are continuous
+    // Seed the player on the row-11 `g` backbone (cols 1-44 are continuous
     // grid path). Spawn (14, 10) has void immediately east/west, so the
     // camera-pan test cannot drive the camera from spawn -- it needs a
     // walkable east-bound trace to actually move.
@@ -2272,8 +2275,8 @@ test.describe("GRIDRUNNER canvas renderer", () => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      save.currentPosition = { x: 15, y: 8 };
+      save.currentZone = "sector-01";
+      save.currentPosition = { x: 15, y: 11 };
       save.completedTutorial = true;
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));
     });
@@ -2299,7 +2302,7 @@ test.describe("GRIDRUNNER canvas renderer", () => {
     expect(Number.isFinite(before.x)).toBe(true);
     expect(Number.isFinite(before.y)).toBe(true);
 
-    // Walk east 12 tiles along row 8 (all `g`). Camera target = player - vp/2,
+    // Walk east 12 tiles along row 11 (all `g`). Camera target = player - vp/2,
     // so after 12 east steps the camera advances meaningfully.
     for (let i = 0; i < 12; i++) {
       await page.keyboard.press("ArrowRight");
@@ -2331,7 +2334,7 @@ test.describe("GRIDRUNNER Sector 01 gameplay (M2)", () => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
+      save.currentZone = "sector-01";
       save.currentPosition = { x: 57, y: 34 };
       save.completedTutorial = true;
       save.defeatedBosses = [];
@@ -2349,7 +2352,7 @@ test.describe("GRIDRUNNER Sector 01 gameplay (M2)", () => {
       return raw ? JSON.parse(raw) : null;
     });
     expect(state?.currentPosition).toEqual({ x: 57, y: 34 });
-    expect(state?.currentZone).toBe("overworld");
+    expect(state?.currentZone).toBe("sector-01");
   });
 
   test("Crypto Exchange door auto-enters after Lazarus is defeated", async ({
@@ -2358,15 +2361,15 @@ test.describe("GRIDRUNNER Sector 01 gameplay (M2)", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await startNewGame(page);
 
-    // Sector 01 (60x40): Crypto Exchange locked door is at (46, 30),
-    // approach from west at (45, 30). With Lazarus in defeatedBosses, the
+    // Sector 01 (60x40): Crypto Exchange locked door is at (48, 29),
+    // approach from west at (47, 29). With Lazarus in defeatedBosses, the
     // reducer's unlock branch auto-enters the exchange zone.
     await page.evaluate(() => {
       const raw = localStorage.getItem("dis-gridrunner-save");
       if (!raw) return;
       const save = JSON.parse(raw);
-      save.currentZone = "overworld";
-      save.currentPosition = { x: 45, y: 30 };
+      save.currentZone = "sector-01";
+      save.currentPosition = { x: 47, y: 29 };
       save.completedTutorial = true;
       save.defeatedBosses = ["lazarus"];
       localStorage.setItem("dis-gridrunner-save", JSON.stringify(save));

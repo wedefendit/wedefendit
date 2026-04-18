@@ -6,7 +6,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SaveSummary } from "../../engine/types";
-import { ZONE_LABELS } from "../../data/zones";
+import { zoneLabels } from "../../data/sectors";
 import DefendItShieldLogo from "../../../../components/Icons/Logo/defendit-shield-logo";
 
 /* ------------------------------------------------------------------ */
@@ -158,7 +158,7 @@ export function BootScreen({
                 </span>
               </span>
               <span className="text-[10px] text-[#4a5568]">
-                {ZONE_LABELS[saveSummary.zone] ??
+                {zoneLabels[saveSummary.zone] ??
                   saveSummary.zone.toUpperCase()}
               </span>
             </div>

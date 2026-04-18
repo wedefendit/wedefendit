@@ -22,10 +22,16 @@ import {
   writeSave,
 } from "../engine/save";
 import { move, tileAt, type Direction } from "../engine/movement";
-import { getMap } from "../data/maps";
-import { overworldMap } from "../data/maps/overworld";
+import { bosses, getMap } from "../data/sectors";
+
+// Sector 01's outdoor map is the default surface the reducer falls back to
+// when a zone lookup misses (fresh init, unknown zone id). Resolving once at
+// module load avoids a lookup in the reducer hot path.
+const sector01Map = getMap("sector-01");
+if (!sector01Map) {
+  throw new Error("sector-01 map missing from registry");
+}
 import {
-  bosses,
   pickRandomEnemy,
   shouldEncounter,
   spawnEnemy,
@@ -164,10 +170,10 @@ function init(): GameState {
     save: null,
     hasSaveFile: false,
     saveSummary: null,
-    playerPos: overworldMap.spawn,
+    playerPos: sector01Map.spawn,
     facing: "down",
-    currentZone: "overworld",
-    overworldPos: overworldMap.spawn,
+    currentZone: "sector-01",
+    overworldPos: sector01Map.spawn,
     battle: null,
     overlay: "none",
     overlayReturnTo: "none",
@@ -216,7 +222,7 @@ function reducer(state: GameState, action: Action): GameState {
         hasSaveFile: true,
         playerPos: save.currentPosition,
         facing: "down",
-        currentZone: "overworld",
+        currentZone: "sector-01",
         overworldPos: save.currentPosition,
         battle: null,
       };
@@ -227,13 +233,13 @@ function reducer(state: GameState, action: Action): GameState {
       if (!save) return state;
       return {
         ...state,
-        screen: save.currentZone === "overworld" ? "overworld" : "building",
+        screen: save.currentZone === "sector-01" ? "overworld" : "building",
         save,
         playerPos: save.currentPosition,
         facing: "down",
         currentZone: save.currentZone,
         overworldPos:
-          save.currentZone === "overworld"
+          save.currentZone === "sector-01"
             ? save.currentPosition
             : state.overworldPos,
         battle: null,
@@ -355,19 +361,19 @@ function reducer(state: GameState, action: Action): GameState {
       if (
         state.screen === "building" &&
         steppedTile?.kind === "entry" &&
-        steppedTile.buildingId === "overworld"
+        steppedTile.buildingId === "sector-01"
       ) {
         const updatedSave = state.save
           ? {
               ...state.save,
-              currentZone: "overworld",
+              currentZone: "sector-01",
               currentPosition: state.overworldPos,
             }
           : null;
         return {
           ...state,
           screen: "overworld",
-          currentZone: "overworld",
+          currentZone: "sector-01",
           playerPos: state.overworldPos,
           facing: "down",
           save: updatedSave,
@@ -439,7 +445,7 @@ function reducer(state: GameState, action: Action): GameState {
         save: postLootSave,
         onboardingQueue,
         lootConsumed: postLootConsumed,
-        ...(state.currentZone === "overworld" ? { overworldPos: newPos } : {}),
+        ...(state.currentZone === "sector-01" ? { overworldPos: newPos } : {}),
       };
 
       // Boss tile: start boss fight if level requirement met
@@ -654,7 +660,7 @@ function reducer(state: GameState, action: Action): GameState {
         // not `building` -- otherwise the MOVE encounter guard misclassifies
         // overworld grid paths as building encounter floor tiles.
         const returnScreen: GameState["screen"] =
-          state.currentZone === "overworld" ? "overworld" : "building";
+          state.currentZone === "sector-01" ? "overworld" : "building";
         return {
           ...state,
           screen: returnScreen,
@@ -773,7 +779,7 @@ function reducer(state: GameState, action: Action): GameState {
       // every step across traces. This is the "encounters on path after
       // sea battle" bug the LOCKED CONTRACT forbids.
       const returnScreen: GameState["screen"] =
-        state.currentZone === "overworld" ? "overworld" : "building";
+        state.currentZone === "sector-01" ? "overworld" : "building";
 
       if (state.battle.phase !== "won") {
         // Lost: respawn at zone spawn, lose 10% bits.
@@ -1318,7 +1324,7 @@ export function useGridRunner() {
     dispatch({ type: "DISMISS_ONBOARDING", key });
   }, []);
 
-  const currentMap = getMap(state.currentZone) ?? overworldMap;
+  const currentMap = getMap(state.currentZone) ?? sector01Map;
   const currentTile = tileAt(currentMap, state.playerPos);
 
   return {

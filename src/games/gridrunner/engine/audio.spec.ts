@@ -101,11 +101,11 @@ describe("computeEffectiveGain", () => {
 
 describe("getMusicSlot", () => {
   it("returns title for title screen", () => {
-    expect(getMusicSlot("title", "overworld", false)).toBe("title");
+    expect(getMusicSlot("title", "sector-01", false)).toBe("title");
   });
 
   it("returns overworld for overworld screen", () => {
-    expect(getMusicSlot("overworld", "overworld", false)).toBe("overworld");
+    expect(getMusicSlot("overworld", "sector-01", false)).toBe("overworld");
   });
 
   it("returns interior-safe for arcade building", () => {

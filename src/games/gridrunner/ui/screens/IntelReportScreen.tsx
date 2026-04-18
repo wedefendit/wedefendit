@@ -4,7 +4,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 "use client";
 
-import { BADGES, BOSSES } from "../../data/bosses";
+import { badges, intel } from "../../data/sectors";
 import { Button } from "../shared/Button";
 import { OverlayShell } from "../shared/OverlayShell";
 
@@ -22,7 +22,7 @@ function SectionHeader({ children }: Readonly<{ children: string }>) {
 }
 
 export function IntelReportScreen({ bossId, onClose }: IntelReportScreenProps) {
-  const boss = BOSSES[bossId];
+  const boss = intel[bossId];
 
   if (!boss) {
     return (
@@ -38,7 +38,7 @@ export function IntelReportScreen({ bossId, onClose }: IntelReportScreenProps) {
     );
   }
 
-  const badge = BADGES.find((b) => b.id === boss.badgeId);
+  const badge = badges.find((b) => b.id === boss.badgeId);
 
   return (
     <OverlayShell

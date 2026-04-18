@@ -2,16 +2,11 @@
 Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 */
 
-export const ZONE_NAMES: Record<string, string> = {
-  overworld: "THE GRID",
-  arcade: "ARCADE",
-  bank: "BANK -- FINANCIAL SECTOR",
-  exchange: "CRYPTO EXCHANGE",
-};
+/**
+ * Legacy shim. Zone display names now live in per-sector modules (see
+ * `./sectors/sector-01.ts` `zoneNames` / `zoneLabels` exports). This file
+ * preserves the old uppercase import path for any consumer that still
+ * references `ZONE_NAMES` / `ZONE_LABELS`.
+ */
 
-export const ZONE_LABELS: Record<string, string> = {
-  overworld: "THE GRID",
-  arcade: "ARCADE",
-  bank: "BANK",
-  exchange: "EXCHANGE",
-};
+export { zoneNames as ZONE_NAMES, zoneLabels as ZONE_LABELS } from "./sectors";

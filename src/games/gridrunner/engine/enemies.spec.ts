@@ -25,9 +25,9 @@ describe("cryptominer enemy (GDD §7.1)", () => {
   });
 });
 
-describe("overworld zone config (Digital Sea)", () => {
+describe("sector-01 outdoor zone config (Digital Sea)", () => {
   it("is registered with the canonical enemy pool", () => {
-    const cfg = zones["overworld"];
+    const cfg = zones["sector-01"];
     expect(cfg).toBeDefined();
     expect(cfg.encounterRate).toBeGreaterThan(0);
     expect(cfg.encounterRate).toBeLessThan(1);

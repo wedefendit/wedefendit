@@ -4,7 +4,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 
 import type { EarnedBadge } from "../../shared/types";
 import type { GridRunnerSave } from "./types";
-import { BOSSES } from "../data/bosses";
+import { intel } from "../data/sectors";
 
 const GAME_ID = "gridrunner";
 
@@ -14,7 +14,7 @@ const GAME_ID = "gridrunner";
  * no I/O. The hook observes state changes and persists via storage.addBadge.
  *
  * Handles:
- *   - Boss first-kill badges (bossId in defeatedBosses maps to BOSSES[id].badgeId)
+ *   - Boss first-kill badges (bossId in defeatedBosses maps to intel[id].badgeId)
  *   - Tutorial completion (completedTutorial flips false -> true -> "grid-runner")
  */
 export function badgesForTransition(
@@ -28,7 +28,7 @@ export function badgesForTransition(
   const earned: EarnedBadge[] = [];
 
   for (const bossId of newlyDefeated) {
-    const boss = BOSSES[bossId];
+    const boss = intel[bossId];
     if (!boss) continue;
     earned.push({
       id: boss.badgeId,
