@@ -2607,3 +2607,113 @@ test.describe("GRIDRUNNER Sector 02 gate unlock (M4)", () => {
     expect(pos).toEqual({ x: 57, y: 34 });
   });
 });
+
+/* ------------------------------------------------------------------ */
+/*  M5 -- Full Sector 01 playthrough (V1 integration test)             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One long, linear test that creates a fresh character and plays through
+ * Sector 01 end-to-end: boot -> title -> new game -> arcade tutorial ->
+ * Bank/Lazarus -> Crypto Exchange/TraderTraitor -> Sector 02 gate overlay.
+ *
+ * Per-beat mechanics are covered elsewhere; this test proves the chain
+ * holds together. Between boss beats it re-seeds position + legendary
+ * loadout instead of walking the grid for stability (sea-tile RNG would
+ * make a pure-organic run flaky).
+ *
+ * Endpoint: the Sector 02 placeholder overlay. That is V1's finish line
+ * -- Sector 02 itself ships in a future release.
+ */
+test.describe("GRIDRUNNER Sector 01 full playthrough (M5)", () => {
+  test("fresh character plays through Sector 01 to the Sector 02 boundary", async ({
+    page,
+  }) => {
+    test.slow();
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    /* ---- 1. Fresh boot -> title -> new game ---- */
+    await startNewGame(page);
+
+    /* ---- 2. Arcade tutorial (scripted Script Kiddie, played for real) ---- */
+    await placePlayerAtArcadeDoor(page);
+    await walkIntoArcade(page);
+
+    const prompt = page.getByTestId("gr-tutorial-prompt");
+    await expect(prompt).toBeVisible({ timeout: 5000 });
+    await page.getByTestId("gr-battle-tool-0").click();     // step 1 -> 2
+    await page.getByTestId("gr-tutorial-dismiss").click();  // step 2 -> 3
+    await page.getByTestId("gr-tutorial-dismiss").click();  // step 3 -> done
+    await expect(prompt).toHaveCount(0);
+
+    const afterTutorial = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("dis-gridrunner-save") ?? "{}"),
+    );
+    expect(afterTutorial.completedTutorial).toBe(true);
+
+    /* ---- 3. Bank -- Lazarus boss ---- */
+    // placePlayerAtLazarusDoor reloads the page, which cleanly exits any
+    // mid-battle state left over from the tutorial and seeds legendary gear.
+    await placePlayerAtLazarusDoor(page);
+    await page.keyboard.press("ArrowUp");
+    await expect(page.getByTestId("gr-battle")).toBeVisible({ timeout: 3000 });
+    await page.getByTestId("gr-battle-tool-0").click();
+    await page.getByTestId("gr-battle-continue").click();
+
+    const lazarusIntel = page.getByTestId("gr-intel-overlay");
+    await expect(lazarusIntel).toBeVisible({ timeout: 5000 });
+    await expect(lazarusIntel).toContainText(/Lazarus/i);
+    await page.getByTestId("gr-intel-continue").click();
+    await expect(lazarusIntel).toHaveCount(0);
+    await expect(page.getByTestId("gr-overworld")).toBeVisible();
+
+    const afterLazarus = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("dis-gridrunner-save") ?? "{}"),
+    );
+    expect(afterLazarus.defeatedBosses).toContain("lazarus");
+
+    /* ---- 4. Crypto Exchange -- TraderTraitor mini-boss ---- */
+    // placePlayerAtTraderTraitorDoor seeds defeatedBosses=["lazarus"] +
+    // position (11,2) in the exchange interior, one tile south of the boss.
+    await placePlayerAtTraderTraitorDoor(page);
+    await page.keyboard.press("ArrowUp");
+    await expect(page.getByTestId("gr-battle")).toBeVisible({ timeout: 3000 });
+    await page.getByTestId("gr-battle-tool-0").click();
+    await page.getByTestId("gr-battle-continue").click();
+
+    const traderIntel = page.getByTestId("gr-intel-overlay");
+    await expect(traderIntel).toBeVisible({ timeout: 5000 });
+    await expect(traderIntel).toContainText(/TraderTraitor/i);
+    await page.getByTestId("gr-intel-continue").click();
+    await expect(traderIntel).toHaveCount(0);
+    await expect(page.getByTestId("gr-overworld")).toBeVisible();
+
+    const afterTrader = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("dis-gridrunner-save") ?? "{}"),
+    );
+    expect(afterTrader.defeatedBosses).toEqual(
+      expect.arrayContaining(["lazarus", "trader-traitor"]),
+    );
+
+    /* ---- 5. Sector 02 gate -- V1 finish line ---- */
+    await seedAtGate(page, ["lazarus", "trader-traitor"]);
+    await page.keyboard.press("ArrowRight");
+
+    const sectorOverlay = page.getByTestId("gr-sector-unlock-overlay");
+    await expect(sectorOverlay).toBeVisible({ timeout: 3000 });
+    await expect(sectorOverlay).toContainText(/Sector 02/i);
+
+    await page.getByTestId("gr-sector-unlock-continue").click();
+    await expect(sectorOverlay).toHaveCount(0);
+
+    /* ---- 6. Player backed off gate, Sector 01 fully cleared ---- */
+    const final = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("dis-gridrunner-save") ?? "{}"),
+    );
+    expect(final.currentPosition).toEqual({ x: 57, y: 34 });
+    expect(final.defeatedBosses).toEqual(
+      expect.arrayContaining(["lazarus", "trader-traitor"]),
+    );
+    expect(final.completedTutorial).toBe(true);
+  });
+});
