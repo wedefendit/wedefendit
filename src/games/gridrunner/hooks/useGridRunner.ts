@@ -5,6 +5,7 @@ Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import type {
   BattleState,
+  GameMap,
   GameScreen,
   GridRunnerSave,
   OnboardingKey,
@@ -27,10 +28,11 @@ import { bosses, getMap } from "../data/sectors";
 // Sector 01's outdoor map is the default surface the reducer falls back to
 // when a zone lookup misses (fresh init, unknown zone id). Resolving once at
 // module load avoids a lookup in the reducer hot path.
-const sector01Map = getMap("sector-01");
-if (!sector01Map) {
-  throw new Error("sector-01 map missing from registry");
-}
+const sector01Map: GameMap = (() => {
+  const m = getMap("sector-01");
+  if (!m) throw new Error("sector-01 map missing from registry");
+  return m;
+})();
 import {
   pickRandomEnemy,
   shouldEncounter,
