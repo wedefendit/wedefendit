@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 
-const SITE_KEY = "6LdvjZgsAAAAAEyZKwovF8I5A8UgMtofJEgVNk2m";
+const SITE_KEY = "6LfvzMEsAAAAACyzkpFbs-35xE6jRYengttmVunn";
 const SCRIPT_ID = "recaptcha-v3";
 
 export function useRecaptcha() {
@@ -21,9 +21,7 @@ export function useRecaptcha() {
         return;
       }
       g.ready(() => {
-        g.execute(SITE_KEY, { action })
-          .then(resolve)
-          .catch(reject);
+        g.execute(SITE_KEY, { action }).then(resolve).catch(reject);
       });
     });
   }, []);
