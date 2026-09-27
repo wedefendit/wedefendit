@@ -74,7 +74,7 @@ export default function Terms() {
           These terms and conditions (the &quot;Terms and Conditions&quot;)
           govern the use of <strong>www.wedefendit.com</strong> (the
           &quot;Site&quot;). This Site is owned and operated by Defend I.T.
-          Solutions LLC. It is a service-based business website offering IT
+          Solutions, LLC. It is a service-based business website offering IT
           support, cybersecurity services, and a security appliance for
           residential and small business clients.
         </p>
@@ -95,7 +95,7 @@ export default function Terms() {
         </h2>
         <p>
           All content published and made available on our Site is the property
-          of Defend I.T. Solutions LLC and the Site&apos;s creators. This
+          of Defend I.T. Solutions, LLC and the Site&apos;s creators. This
           includes but is not limited to images, text, logos, documents,
           downloadable files and anything that contributes to the composition of
           our Site.
@@ -132,13 +132,46 @@ export default function Terms() {
           Limitation of Liability
         </h2>
         <p>
-          Defend I.T. Solutions LLC and affiliates are not liable for any
+          Defend I.T. Solutions, LLC and affiliates are not liable for any
           claims, damages, or expenses arising from your use of the Site.
+        </p>
+
+        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+          Service Warranty
+        </h2>
+        <p>
+          We offer a warranty on parts and labor related to the specific repair
+          performed, with the period varying by the type of service:
+        </p>
+        <ul className="list-disc ml-6 my-2">
+          <li>
+            <strong>Hardware Repairs (90 Days):</strong> New parts installed are
+            warrantied against defects for ninety (90) days.
+          </li>
+          <li>
+            <strong>General Service &amp; Repairs (30 Days):</strong> Most
+            standard repairs and services are warrantied for thirty (30) days.
+          </li>
+          <li>
+            <strong>Virus &amp; Software Repair (14 Days):</strong> Due to the
+            nature of software, virus and malware removal services are
+            warrantied for fourteen (14) days.
+          </li>
+        </ul>
+        <p>
+          <strong>Warranty Exclusions:</strong> This warranty does not cover
+          issues that are unrelated to the original service, new damage caused
+          by the customer (e.g., drops, spills), or new software issues (like
+          subsequent virus infections) that occur after the device is returned.
+        </p>
+        <p>
+          The Computer Services Agreement signed for your service governs if it
+          differs from this summary.
         </p>
 
         <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">Indemnity</h2>
         <p>
-          You agree to indemnify and hold harmless Defend I.T. Solutions LLC and
+          You agree to indemnify and hold harmless Defend I.T. Solutions, LLC and
           affiliates from claims and liabilities arising from your use of the
           Site or violation of these Terms.
         </p>
@@ -177,10 +210,6 @@ export default function Terms() {
           <li>
             <strong>Security Notice:</strong> Unauthorized access attempts will
             result in legal action.
-          </li>
-          <li>
-            <strong>No Warranty:</strong> Services are provided “as is” with no
-            warranties or guarantees.
           </li>
           <li>
             <strong>Third-Party Links:</strong> We are not responsible for
@@ -233,7 +262,7 @@ export default function Terms() {
           )}
         </p>
         <p className="text-left mt-8">
-          <strong>Effective Date:</strong> 13th day of May, 2026
+          <strong>Effective Date:</strong> 27th day of September, 2026
         </p>
       </LegalPage>
     </>

@@ -53,7 +53,7 @@ export default function Privacy() {
 
       <p className="mb-6">
         www.wedefendit.com (the &quot;Site&quot;) is owned and operated by
-        Defend I.T. Solutions&trade; LLC.
+        Defend I.T. Solutions&trade;, LLC.
         <br />
         <br />
         Contact:{" "}

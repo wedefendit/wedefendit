@@ -26,7 +26,7 @@ export default function SigintPrivacy() {
 
         <p className="mb-6">
           www.wedefendit.com/sigint (the &quot;Site&quot;) is owned and operated
-          by Defend I.T. Solutions&trade; LLC.
+          by Defend I.T. Solutions&trade;, LLC.
           <br />
           <br />
           Contact:{" "}
@@ -384,7 +384,7 @@ export default function SigintPrivacy() {
         </p>
         <p className="mt-2">
           This website and waiting list are provided &quot;as is&quot; without
-          warranties of any kind. Defend I.T. Solutions LLC shall not be liable
+          warranties of any kind. Defend I.T. Solutions, LLC shall not be liable
           for any damages arising from the use of this website or the waiting
           list sign-up process.
         </p>

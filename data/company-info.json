@@ -47,8 +47,8 @@
   },
 
   "copy": [
-    "© {{year}} Defend I.T. Solutions LLC. All rights reserved.",
-    "Defend I.T.™, Defend I.T. Solutions™, DISNet™, DISecureLink™, and DIS Connect™ are trademarks of Defend I.T. Solutions LLC."
+    "© {{year}} Defend I.T. Solutions, LLC. All rights reserved.",
+    "Defend I.T.™, Defend I.T. Solutions™, DISNet™, DISecureLink™, and DIS Connect™ are trademarks of Defend I.T. Solutions, LLC."
   ],
   "copy_start_year": 2026
 }
