@@ -15,7 +15,7 @@
   "dependencies": {
     "leaflet": "1.9.4",
     "lucide-react": "0.511.0",
-    "next": "16.2.7",
+    "next": "16.3.5",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -32,9 +32,13 @@
     "happy-dom": "20.9.0",
     "tailwindcss": "4.1.7",
     "typescript": "5.8.3",
-    "vitest": "4.1.4"
+    "vitest": "4.1.11"
   },
   "overrides": {
-    "postcss": "8.5.15"
+    "postcss": "8.5.23"
+  },
+  "allowScripts": {
+    "@tailwindcss/oxide@4.1.7": true,
+    "unrs-resolver@1.7.2": true
   }
 }

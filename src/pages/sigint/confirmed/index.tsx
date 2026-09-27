@@ -2,7 +2,7 @@ import { Check, Globe, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Meta, PageContainer } from "@/components";
 
-const DEMO_URL = "https://sigint-5154d935429b.herokuapp.com";
+const DEMO_URL = "https://sigint.atropeano.com";
 
 export default function ConfirmedPage() {
   return (
