@@ -1,29 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
-/**
- * ============================================================================
- * SECTOR 01 -- The Outer Grid
- * ============================================================================
- *
- * This file is the single source of truth for Sector 01. One TS file per
- * sector, no spaghetti. When Sector 02 ships, author `sector-02.ts` with the
- * same shape and register it in `./index.ts`.
- *
- * Contains:
- *   - Outdoor map (the 60x40 ASCII grid + parser)
- *   - Three interior maps: Arcade (hub), Bank (Lazarus gym), Crypto Exchange
- *     (TraderTraitor mini-boss)
- *   - Enemy stat blocks (cross-sector enemies live here until Sector 02
- *     needs them; then we lift into a shared module)
- *   - Boss stat blocks (Lazarus, TraderTraitor)
- *   - Zone configs (encounter rate + enemy pool per zone)
- *   - Intel dossier text for both bosses
- *   - Badge definitions (V1 ships all five here because Sector 01 IS V1)
- *   - Zone display names (long + short)
- */
-
 import type {
   EnemyDef,
   GameMap,
@@ -33,9 +7,80 @@ import type {
 } from "../../engine/types";
 import type { BadgeDef, BossEntry, SectorModule } from "./types";
 
-/* ------------------------------------------------------------------ */
-/*  OUTDOOR MAP -- Sector 01 ASCII grid                               */
-/* ------------------------------------------------------------------ */
+export enum SectorZoneId {
+  Sector01 = "sector-01",
+  Arcade = "arcade",
+  Bank = "bank",
+  Exchange = "exchange",
+}
+
+enum MapCharacter {
+  Boundary = "#",
+  Void = ".",
+  Grid = "g",
+  Sea = "~",
+  Spawn = "S",
+  Gate = "G",
+  ArcadeBody = "A",
+  ArcadeEntry = "a",
+  BankBody = "B",
+  BankEntry = "b",
+  ExchangeBody = "X",
+  ExchangeEntry = "x",
+  DecorBody = "D",
+  DecorFacade = "d",
+}
+
+const UNKNOWN_MAP_CHARACTER_MESSAGE = "Unknown map character";
+const GROUND_KIND: TileKind = "ground";
+
+class UnknownMapCharacterError extends Error {
+  readonly character: string;
+
+  constructor(character: string) {
+    super(`${UNKNOWN_MAP_CHARACTER_MESSAGE}: "${character}"`);
+    this.name = "UnknownMapCharacterError";
+    this.character = character;
+  }
+}
+
+function createMap(
+  id: string,
+  size: Readonly<{ width: number; height: number }>,
+  tiles: MapTile[][],
+  spawn: Readonly<{ x: number; y: number }>,
+): GameMap {
+  return { id, ...size, tiles, spawn };
+}
+
+function createTile(kind: TileKind, walkable: boolean): MapTile {
+  return { kind, walkable };
+}
+
+function createLabeledTile(
+  kind: TileKind,
+  label: string,
+  walkable: boolean,
+): MapTile {
+  return { kind, label, walkable };
+}
+
+function createFeatureTile(
+  kind: TileKind,
+  buildingId: string,
+  label: string,
+  walkable: boolean,
+): MapTile {
+  return { kind, buildingId, label, walkable };
+}
+
+function createBossTile(bossId: string): MapTile {
+  return { kind: "boss", bossId, label: "BOSS", walkable: true };
+}
+
+function createGroundTile(encounter: boolean): MapTile {
+  return { kind: GROUND_KIND, walkable: true, encounter };
+}
 
 const SECTOR_01_ASCII = [
   "############################################################",
@@ -82,134 +127,144 @@ const SECTOR_01_ASCII = [
 
 const OUTDOOR_WIDTH = 60;
 const OUTDOOR_HEIGHT = 40;
+const DECOR_NEIGHBOR_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+];
 
-/**
- * ASCII character → TileKind.
- *   `#`  wall (boundary)
- *   `.`  void (non-walkable empty space between traces)
- *   `g`  grid path trunk (walkable, no encounter)
- *   `~`  Digital Sea tile (walkable, rolls encounter)
- *   `S`  player spawn
- *   `G`  Sector 02 gate (blocks movement, no label)
- *   `A` Arcade body / `a` Arcade door
- *   `B` Bank body / `b` Bank door
- *   `X` Crypto Exchange body / `x` Crypto locked door
- *   `D` decorative building body / `d` decorative facade (fake door)
- */
 function kindFor(ch: string): TileKind {
   switch (ch) {
-    case "#":
-    case ".":
+    case MapCharacter.Boundary:
+    case MapCharacter.Void:
       return "wall";
-    case "g":
+    case MapCharacter.Grid:
       return "ground";
-    case "~":
+    case MapCharacter.Sea:
       return "sea";
-    case "S":
+    case MapCharacter.Spawn:
       return "spawn";
-    case "G":
+    case MapCharacter.Gate:
       return "gate";
-    case "A":
-    case "B":
-    case "X":
-    case "D":
+    case MapCharacter.ArcadeBody:
+    case MapCharacter.BankBody:
+    case MapCharacter.ExchangeBody:
+    case MapCharacter.DecorBody:
       return "building";
-    case "a":
-    case "b":
+    case MapCharacter.ArcadeEntry:
+    case MapCharacter.BankEntry:
       return "entry";
-    case "x":
+    case MapCharacter.ExchangeEntry:
       return "locked";
-    case "d":
+    case MapCharacter.DecorFacade:
       return "facade";
     default:
-      throw new Error(`Unknown map character: "${ch}"`);
+      throw new UnknownMapCharacterError(ch);
   }
 }
 
 function isDecor(ch: string): boolean {
-  return ch === "D" || ch === "d";
+  return (
+    ch === MapCharacter.DecorBody || ch === MapCharacter.DecorFacade
+  );
 }
 
-/**
- * Flood-fill to assign a shared `buildingId` to every contiguous run of
- * decorative tiles ({D, d}). Components are numbered in row-major discovery
- * order as `decor-01`, `decor-02`, ... for debugging.
- */
-function assignDecorIds(grid: string[][]): string[][] {
-  const ids: string[][] = Array.from({ length: OUTDOOR_HEIGHT }, () =>
-    new Array<string>(OUTDOOR_WIDTH).fill(""),
+function createDecorIdGrid(): string[][] {
+  return Array.from({ length: OUTDOOR_HEIGHT }, () =>
+    Array.from({ length: OUTDOOR_WIDTH }, () => ""),
   );
+}
+
+function isUnassignedDecor(
+  grid: string[][],
+  ids: string[][],
+  x: number,
+  y: number,
+): boolean {
+  if (x < 0 || x >= OUTDOOR_WIDTH) return false;
+  if (y < 0 || y >= OUTDOOR_HEIGHT) return false;
+  return isDecor(grid[y][x]) && ids[y][x] === "";
+}
+
+function fillDecorComponent(
+  grid: string[][],
+  ids: string[][],
+  start: readonly [number, number],
+  id: string,
+): void {
+  const queue: Array<readonly [number, number]> = [start];
+  ids[start[1]][start[0]] = id;
+  for (const [x, y] of queue) {
+    for (const [dx, dy] of DECOR_NEIGHBOR_OFFSETS) {
+      const nextX = x + dx;
+      const nextY = y + dy;
+      if (!isUnassignedDecor(grid, ids, nextX, nextY)) continue;
+      ids[nextY][nextX] = id;
+      queue.push([nextX, nextY]);
+    }
+  }
+}
+
+function assignDecorIds(grid: string[][]): string[][] {
+  const ids = createDecorIdGrid();
   let counter = 0;
 
   for (let y = 0; y < OUTDOOR_HEIGHT; y++) {
     for (let x = 0; x < OUTDOOR_WIDTH; x++) {
-      if (!isDecor(grid[y][x]) || ids[y][x] !== "") continue;
-
+      if (!isUnassignedDecor(grid, ids, x, y)) continue;
       counter++;
       const id = `decor-${String(counter).padStart(2, "0")}`;
-      const queue: [number, number][] = [[x, y]];
-      ids[y][x] = id;
-      while (queue.length > 0) {
-        const [cx, cy] = queue.shift() as [number, number];
-        for (const [dx, dy] of [
-          [1, 0],
-          [-1, 0],
-          [0, 1],
-          [0, -1],
-        ]) {
-          const nx = cx + dx;
-          const ny = cy + dy;
-          if (nx < 0 || nx >= OUTDOOR_WIDTH) continue;
-          if (ny < 0 || ny >= OUTDOOR_HEIGHT) continue;
-          if (!isDecor(grid[ny][nx]) || ids[ny][nx] !== "") continue;
-          ids[ny][nx] = id;
-          queue.push([nx, ny]);
-        }
-      }
+      fillDecorComponent(grid, ids, [x, y], id);
     }
   }
 
   return ids;
 }
 
-/**
- * Convert a character plus its decor id into a fully-populated MapTile.
- * Gate tiles intentionally have no label per the Sector 02 gate contract
- * (looks like a dead-end trace until the M4 unlock ships).
- */
 function buildTile(ch: string, decorId: string): MapTile {
   const kind = kindFor(ch);
   switch (ch) {
-    case "A":
-      return { kind, walkable: false, buildingId: "arcade" };
-    case "a":
-      return { kind, walkable: true, buildingId: "arcade", label: "Arcade" };
-    case "B":
-      return { kind, walkable: false, buildingId: "bank" };
-    case "b":
-      return { kind, walkable: true, buildingId: "bank", label: "Bank" };
-    case "X":
-      return { kind, walkable: false, buildingId: "exchange" };
-    case "x":
+    case MapCharacter.ArcadeBody:
+      return { kind, walkable: false, buildingId: SectorZoneId.Arcade };
+    case MapCharacter.ArcadeEntry:
+      return {
+        kind,
+        walkable: true,
+        buildingId: SectorZoneId.Arcade,
+        label: "Arcade",
+      };
+    case MapCharacter.BankBody:
+      return { kind, walkable: false, buildingId: SectorZoneId.Bank };
+    case MapCharacter.BankEntry:
+      return {
+        kind,
+        walkable: true,
+        buildingId: SectorZoneId.Bank,
+        label: "Bank",
+      };
+    case MapCharacter.ExchangeBody:
+      return { kind, walkable: false, buildingId: SectorZoneId.Exchange };
+    case MapCharacter.ExchangeEntry:
       return {
         kind,
         walkable: false,
-        buildingId: "exchange",
+        buildingId: SectorZoneId.Exchange,
         label: "Crypto Exchange",
       };
-    case "D":
-    case "d":
+    case MapCharacter.DecorBody:
+    case MapCharacter.DecorFacade:
       return { kind, walkable: false, buildingId: decorId };
-    case "G":
-    case "#":
-    case ".":
+    case MapCharacter.Gate:
+    case MapCharacter.Boundary:
+    case MapCharacter.Void:
       return { kind, walkable: false };
-    case "g":
-    case "~":
-    case "S":
+    case MapCharacter.Grid:
+    case MapCharacter.Sea:
+    case MapCharacter.Spawn:
       return { kind, walkable: true };
     default:
-      throw new Error(`Unknown map character: "${ch}"`);
+      throw new UnknownMapCharacterError(ch);
   }
 }
 
@@ -240,147 +295,108 @@ function parseOutdoorMap(rows: readonly string[]): MapTile[][] {
   return tiles;
 }
 
-const outdoorMap: GameMap = {
-  id: "sector-01",
-  width: OUTDOOR_WIDTH,
-  height: OUTDOOR_HEIGHT,
-  tiles: parseOutdoorMap(SECTOR_01_ASCII),
-  spawn: { x: 14, y: 10 },
-};
+const outdoorMap = createMap(
+  SectorZoneId.Sector01,
+  { width: OUTDOOR_WIDTH, height: OUTDOOR_HEIGHT },
+  parseOutdoorMap(SECTOR_01_ASCII),
+  { x: 14, y: 10 },
+);
 
-/* ------------------------------------------------------------------ */
-/*  INTERIOR MAPS -- typed tile factories                             */
-/* ------------------------------------------------------------------ */
 
-// Shared interior tile factories. Kept local to this file since interior
-// layouts are sector-specific.
-const WALL: MapTile = { kind: "wall", walkable: false };
-const GROUND: MapTile = { kind: "ground", walkable: true };
-const EXIT_TILE: MapTile = {
-  kind: "entry",
-  buildingId: "sector-01", // exit returns the player to Sector 01's outdoor zone
-  label: "Exit",
-  walkable: true,
-};
+const WALL = createTile("wall", false);
+const GROUND = createTile(GROUND_KIND, true);
+const EXIT_TILE = createFeatureTile(
+  "entry",
+  SectorZoneId.Sector01,
+  "Exit",
+  true,
+);
 
-/* ---------- Arcade (12x10) ---------- */
 
-const ARC: MapTile = { kind: "building", label: "Arcade", walkable: false };
-const SHOP: MapTile = {
-  kind: "building",
-  buildingId: "shop",
-  label: "Shop",
-  walkable: true,
-};
-const SAVE_TILE: MapTile = {
-  kind: "building",
-  buildingId: "save",
-  label: "Save",
-  walkable: true,
-};
+const ARC = createLabeledTile("building", "Arcade", false);
+const SHOP = createFeatureTile("building", "shop", "Shop", true);
+const SAVE_TILE = createFeatureTile("building", "save", "Save", true);
 
 // prettier-ignore
 const arcadeTiles: MapTile[][] = [
-  /* row 0 */ [WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL  ],
-  /* row 1 */ [WALL,   ARC,    ARC,    GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, ARC,    ARC,    WALL  ],
-  /* row 2 */ [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
-  /* row 3 */ [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
-  /* row 4 */ [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, SHOP,   GROUND, WALL  ],
-  /* row 5 */ [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
-  /* row 6 */ [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, SAVE_TILE, GROUND, WALL  ],
-  /* row 7 */ [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
-  /* row 8 */ [WALL,   GROUND, GROUND, GROUND, GROUND, EXIT_TILE, EXIT_TILE, GROUND, GROUND, GROUND, GROUND, WALL  ],
-  /* row 9 */ [WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL  ],
+  [WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL  ],
+  [WALL,   ARC,    ARC,    GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, ARC,    ARC,    WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, SHOP,   GROUND, WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, SAVE_TILE, GROUND, WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL  ],
+  [WALL,   GROUND, GROUND, GROUND, GROUND, EXIT_TILE, EXIT_TILE, GROUND, GROUND, GROUND, GROUND, WALL  ],
+  [WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL,   WALL  ],
 ];
 
-const arcadeMap: GameMap = {
-  id: "arcade",
-  width: 12,
-  height: 10,
-  tiles: arcadeTiles,
-  spawn: { x: 5, y: 7 },
-};
+const arcadeMap = createMap(
+  SectorZoneId.Arcade,
+  { width: 12, height: 10 },
+  arcadeTiles,
+  { x: 5, y: 7 },
+);
 
-/* ---------- Bank (14x10) -- Lazarus gym ---------- */
 
-const VLT: MapTile = { kind: "building", label: "Vault", walkable: false };
-const TRM: MapTile = { kind: "building", label: "Terminal", walkable: false };
-const LAZARUS: MapTile = {
-  kind: "boss",
-  bossId: "lazarus",
-  label: "BOSS",
-  walkable: true,
-};
+const VLT = createLabeledTile("building", "Vault", false);
+const TRM = createLabeledTile("building", "Terminal", false);
+const LAZARUS = createBossTile("lazarus");
 
 // prettier-ignore
 const bankTiles: MapTile[][] = [
-  /* row 0 */ [WALL, WALL,   WALL,   WALL,   WALL,   WALL, WALL, WALL,   WALL,   WALL, WALL, WALL,    WALL,   WALL],
-  /* row 1 */ [WALL, TRM,    GROUND, GROUND, GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, LAZARUS, GROUND, WALL],
-  /* row 2 */ [WALL, GROUND, GROUND, GROUND, GROUND, WALL, WALL, GROUND, GROUND, VLT,    VLT,    GROUND,  GROUND, WALL],
-  /* row 3 */ [WALL, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL],
-  /* row 4 */ [WALL, GROUND, GROUND, TRM,    GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND, WALL],
-  /* row 5 */ [WALL, GROUND, GROUND, GROUND, GROUND, WALL, WALL, GROUND, VLT,    GROUND, GROUND, VLT,     GROUND, WALL],
-  /* row 6 */ [WALL, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL],
-  /* row 7 */ [WALL, GROUND, GROUND, GROUND, GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND, WALL],
-  /* row 8 */ [WALL, EXIT_TILE, EXIT_TILE, GROUND, GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL],
-  /* row 9 */ [WALL, WALL,   WALL,   WALL,   WALL,   WALL, WALL, WALL,   WALL,   WALL, WALL, WALL,    WALL,   WALL],
+  [WALL, WALL,   WALL,   WALL,   WALL,   WALL, WALL, WALL,   WALL,   WALL, WALL, WALL,    WALL,   WALL],
+  [WALL, TRM,    GROUND, GROUND, GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, LAZARUS, GROUND, WALL],
+  [WALL, GROUND, GROUND, GROUND, GROUND, WALL, WALL, GROUND, GROUND, VLT,    VLT,    GROUND,  GROUND, WALL],
+  [WALL, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL],
+  [WALL, GROUND, GROUND, TRM,    GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND, WALL],
+  [WALL, GROUND, GROUND, GROUND, GROUND, WALL, WALL, GROUND, VLT,    GROUND, GROUND, VLT,     GROUND, WALL],
+  [WALL, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL],
+  [WALL, GROUND, GROUND, GROUND, GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND, WALL],
+  [WALL, EXIT_TILE, EXIT_TILE, GROUND, GROUND, WALL, WALL, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, WALL],
+  [WALL, WALL,   WALL,   WALL,   WALL,   WALL, WALL, WALL,   WALL,   WALL, WALL, WALL,    WALL,   WALL],
 ];
 
-const bankMap: GameMap = {
-  id: "bank",
-  width: 14,
-  height: 10,
-  tiles: bankTiles,
-  spawn: { x: 2, y: 7 },
-};
+const bankMap = createMap(
+  SectorZoneId.Bank,
+  { width: 14, height: 10 },
+  bankTiles,
+  { x: 2, y: 7 },
+);
 
-/* ---------- Crypto Exchange (14x10) -- TraderTraitor mini-boss ---------- */
 
-const ENCOUNTER: MapTile = {
-  kind: "ground",
-  walkable: true,
-  encounter: true,
-};
-const SAFE: MapTile = { kind: "ground", walkable: true, encounter: false };
+const ENCOUNTER = createGroundTile(true);
+const SAFE = createGroundTile(false);
 const LOOT: MapTile = {
   kind: "ground",
   walkable: true,
   encounter: false,
   loot: true,
 };
-const VAULT: MapTile = { kind: "building", label: "Vault", walkable: false };
-const TRADER_TRAITOR: MapTile = {
-  kind: "boss",
-  bossId: "trader-traitor",
-  label: "BOSS",
-  walkable: true,
-};
+const VAULT = createLabeledTile("building", "Vault", false);
+const TRADER_TRAITOR = createBossTile("trader-traitor");
 
 // prettier-ignore
 const exchangeTiles: MapTile[][] = [
-  /* row 0 */ [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL,   WALL,  WALL,            WALL, WALL],
-  /* row 1 */ [WALL, SAFE, SAFE, SAFE, SAFE, WALL, WALL, SAFE, SAFE, VAULT,  VAULT, TRADER_TRAITOR, SAFE, WALL],
-  /* row 2 */ [WALL, SAFE, SAFE, ENCOUNTER, SAFE, WALL, WALL, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
-  /* row 3 */ [WALL, SAFE, ENCOUNTER, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
-  /* row 4 */ [WALL, SAFE, SAFE, SAFE, SAFE, WALL, WALL, SAFE, SAFE, SAFE, LOOT, SAFE, SAFE, WALL],
-  /* row 5 */ [WALL, SAFE, SAFE, ENCOUNTER, SAFE, WALL, WALL, SAFE, SAFE, ENCOUNTER, SAFE, SAFE, SAFE, WALL],
-  /* row 6 */ [WALL, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
-  /* row 7 */ [WALL, SAFE, ENCOUNTER, SAFE, SAFE, WALL, WALL, SAFE, SAFE, SAFE, ENCOUNTER, SAFE, SAFE, WALL],
-  /* row 8 */ [WALL, EXIT_TILE, EXIT_TILE, SAFE, SAFE, WALL, WALL, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
-  /* row 9 */ [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL,   WALL,  WALL,            WALL, WALL],
+  [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL,   WALL,  WALL,            WALL, WALL],
+  [WALL, SAFE, SAFE, SAFE, SAFE, WALL, WALL, SAFE, SAFE, VAULT,  VAULT, TRADER_TRAITOR, SAFE, WALL],
+  [WALL, SAFE, SAFE, ENCOUNTER, SAFE, WALL, WALL, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
+  [WALL, SAFE, ENCOUNTER, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
+  [WALL, SAFE, SAFE, SAFE, SAFE, WALL, WALL, SAFE, SAFE, SAFE, LOOT, SAFE, SAFE, WALL],
+  [WALL, SAFE, SAFE, ENCOUNTER, SAFE, WALL, WALL, SAFE, SAFE, ENCOUNTER, SAFE, SAFE, SAFE, WALL],
+  [WALL, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
+  [WALL, SAFE, ENCOUNTER, SAFE, SAFE, WALL, WALL, SAFE, SAFE, SAFE, ENCOUNTER, SAFE, SAFE, WALL],
+  [WALL, EXIT_TILE, EXIT_TILE, SAFE, SAFE, WALL, WALL, SAFE, SAFE, SAFE, SAFE, SAFE, SAFE, WALL],
+  [WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL,   WALL,  WALL,            WALL, WALL],
 ];
 
-const exchangeMap: GameMap = {
-  id: "exchange",
-  width: 14,
-  height: 10,
-  tiles: exchangeTiles,
-  spawn: { x: 1, y: 8 },
-};
+const exchangeMap = createMap(
+  SectorZoneId.Exchange,
+  { width: 14, height: 10 },
+  exchangeTiles,
+  { x: 1, y: 8 },
+);
 
-/* ------------------------------------------------------------------ */
-/*  ENEMIES + BOSSES -- battle stat blocks (GDD §7.1, §7.2)           */
-/* ------------------------------------------------------------------ */
 
 const enemies: Record<string, EnemyDef> = {
   "script-kiddie": {
@@ -519,36 +535,60 @@ const bosses: Record<string, EnemyDef> = {
   },
 };
 
-/* ------------------------------------------------------------------ */
-/*  ZONE CONFIGS                                                      */
-/* ------------------------------------------------------------------ */
 
-const zones: Record<string, ZoneConfig> = {
-  // GDD §4.2: Digital Sea tiles trigger encounters at 25-35% per step. The
-  // reducer's MOVE-handler kind guard (kind: "sea" on overworld, kind:
-  // "ground" in buildings, or the explicit `encounter` tile flag) gates
-  // which tiles actually roll; this rate applies inside that gate.
-  "sector-01": {
-    encounterRate: 0.3,
-    enemies: ["script-kiddie", "ransomware-bot", "cryptominer"],
+type ZoneDefinition = Readonly<{
+  config: ZoneConfig;
+  name: string;
+  label: string;
+}>;
+
+const zoneDefinitions: Record<SectorZoneId, ZoneDefinition> = {
+  [SectorZoneId.Sector01]: {
+    config: {
+      encounterRate: 0.3,
+      enemies: ["script-kiddie", "ransomware-bot", "cryptominer"],
+    },
+    name: "THE GRID",
+    label: "THE GRID",
   },
-  arcade: {
-    encounterRate: 0.3,
-    enemies: ["script-kiddie"],
+  [SectorZoneId.Arcade]: {
+    config: { encounterRate: 0.3, enemies: ["script-kiddie"] },
+    name: "ARCADE",
+    label: "ARCADE",
   },
-  bank: {
-    encounterRate: 0.3,
-    enemies: ["script-kiddie", "hacktivist", "ransomware-bot"],
+  [SectorZoneId.Bank]: {
+    config: {
+      encounterRate: 0.3,
+      enemies: ["script-kiddie", "hacktivist", "ransomware-bot"],
+    },
+    name: "BANK: FINANCIAL SECTOR",
+    label: "BANK",
   },
-  exchange: {
-    encounterRate: 0.3,
-    enemies: ["cryptominer", "mixer-bot", "rug-puller", "wallet-drainer"],
+  [SectorZoneId.Exchange]: {
+    config: {
+      encounterRate: 0.3,
+      enemies: ["cryptominer", "mixer-bot", "rug-puller", "wallet-drainer"],
+    },
+    name: "CRYPTO EXCHANGE",
+    label: "EXCHANGE",
   },
 };
 
-/* ------------------------------------------------------------------ */
-/*  INTEL DOSSIERS -- post-battle overlay content                     */
-/* ------------------------------------------------------------------ */
+function selectZoneData<T>(
+  select: (definition: ZoneDefinition) => T,
+): Record<string, T> {
+  return Object.fromEntries(
+    Object.entries(zoneDefinitions).map(([id, definition]) => [
+      id,
+      select(definition),
+    ]),
+  );
+}
+
+const zones = selectZoneData((definition) => definition.config);
+const zoneNames = selectZoneData((definition) => definition.name);
+const zoneLabels = selectZoneData((definition) => definition.label);
+
 
 const intel: Record<string, BossEntry> = {
   lazarus: {
@@ -572,14 +612,11 @@ const intel: Record<string, BossEntry> = {
     background:
       "TraderTraitor is a North Korean campaign identified by CISA, the FBI, and the U.S. Treasury. It uses social engineering and malicious applications to target cryptocurrency companies.",
     operations:
-      "The campaign has been linked to the 2022 Ronin Bridge and Harmony Horizon thefts. In this game, Recon tools are most effective because the fight centers on tracing transactions.",
+      "The campaign has been linked to the 2022 Ronin Bridge and Harmony Horizon thefts. The Lazarus Group used Tornado Cash to launder stolen cryptocurrency. In this game, Recon tools are most effective because the fight centers on tracing transactions.",
     badgeId: "exchange-raider",
   },
 };
 
-/* ------------------------------------------------------------------ */
-/*  BADGES                                                            */
-/* ------------------------------------------------------------------ */
 
 const badges: BadgeDef[] = [
   {
@@ -614,37 +651,14 @@ const badges: BadgeDef[] = [
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  ZONE DISPLAY NAMES                                                */
-/* ------------------------------------------------------------------ */
-
-// Long form: the HUD zone label above the canvas.
-const zoneNames: Record<string, string> = {
-  "sector-01": "THE GRID",
-  arcade: "ARCADE",
-  bank: "BANK: FINANCIAL SECTOR",
-  exchange: "CRYPTO EXCHANGE",
-};
-
-// Short form: the boot-screen save-slot summary.
-const zoneLabels: Record<string, string> = {
-  "sector-01": "THE GRID",
-  arcade: "ARCADE",
-  bank: "BANK",
-  exchange: "EXCHANGE",
-};
-
-/* ------------------------------------------------------------------ */
-/*  MODULE EXPORT                                                     */
-/* ------------------------------------------------------------------ */
 
 export const sector01: SectorModule = {
-  id: "sector-01",
+  id: SectorZoneId.Sector01,
   maps: {
-    "sector-01": outdoorMap,
-    arcade: arcadeMap,
-    bank: bankMap,
-    exchange: exchangeMap,
+    [SectorZoneId.Sector01]: outdoorMap,
+    [SectorZoneId.Arcade]: arcadeMap,
+    [SectorZoneId.Bank]: bankMap,
+    [SectorZoneId.Exchange]: exchangeMap,
   },
   enemies,
   bosses,

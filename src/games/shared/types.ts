@@ -1,20 +1,18 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
+export enum DifficultyValue {
+  Easy = "easy",
+  Medium = "medium",
+  Hard = "hard",
+}
 
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
+export type Difficulty = `${DifficultyValue}`;
 
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
+export enum BadgeTierValue {
+  Bronze = "bronze",
+  Silver = "silver",
+  Gold = "gold",
+}
 
-export type Difficulty = "easy" | "medium" | "hard";
-
-export type BadgeTier = "bronze" | "silver" | "gold";
+export type BadgeTier = `${BadgeTierValue}`;
 
 export type Badge = {
   id: string;
@@ -41,7 +39,7 @@ export type EarnedBadge = {
   id: string;
   gameId: string;
   tier: BadgeTier;
-  earnedAt: string; // ISO 8601 timestamp
+  earnedAt: string;
 };
 
 export type GamesState = {

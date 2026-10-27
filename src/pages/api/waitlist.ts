@@ -1,32 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { isValidContactEmail } from "../../../lib/contact-topics";
+import { ProtectedFormStatusValue, verifyRecaptcha } from "../../../lib/recaptcha";
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY ?? "";
-const RECAPTCHA_SECRET = process.env.GOOGLE_CAPTCHA_SECRET ?? "";
 
-const LIST_IDS: Record<string, number> = {
-  individual: 4,
-  team: 5,
-  enterprise: 8,
+enum WaitlistTierValue { Individual = "individual", Team = "team", Enterprise = "enterprise" }
+type WaitlistTier = `${WaitlistTierValue}`;
+enum BrevoResultValue { Ok = "ok", RateLimited = "rate_limited", Failed = "failed" }
+enum WaitlistRequestMethodValue { Post = "POST" }
+
+const LIST_IDS: Record<WaitlistTier, number> = {
+  [WaitlistTierValue.Individual]: 4,
+  [WaitlistTierValue.Team]: 5,
+  [WaitlistTierValue.Enterprise]: 8,
 };
+const BREVO_STATUS = { contactExists: 400, rateLimited: 429 };
+enum WaitlistErrorValue { UnsupportedMethod = "Method not allowed", InvalidEmail = "Enter a valid email address.", CaptchaRequired = "Complete the CAPTCHA.", CaptchaRejected = "We could not verify the CAPTCHA. Please try again.", TooManyRequests = "Too many requests. Please try again in a minute.", DeliveryFailed = "We could not add you to the list. Please try again." }
 
 type Body = {
   email?: string;
-  tier?: "individual" | "team" | "enterprise";
+  tier?: WaitlistTier;
   captchaToken?: string;
 };
 
-type BrevoResult = "ok" | "rate_limited" | "failed";
-
-async function verifyCaptcha(token: string): Promise<boolean> {
-  const res = await fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${token}`,
-    { method: "POST" },
-  );
-  const data = await res.json();
-  return data.success === true && (data.score ?? 1) >= 0.5;
-}
-
-async function addToBrevo(email: string, listId: number): Promise<BrevoResult> {
+async function addToBrevo(email: string, listId: number): Promise<BrevoResultValue> {
   const createRes = await fetch("https://api.brevo.com/v3/contacts", {
     method: "POST",
     headers: {
@@ -40,10 +37,10 @@ async function addToBrevo(email: string, listId: number): Promise<BrevoResult> {
     }),
   });
 
-  if (createRes.ok) return "ok";
-  if (createRes.status === 429) return "rate_limited";
+  if (createRes.ok) return BrevoResultValue.Ok;
+  if (createRes.status === BREVO_STATUS.rateLimited) return BrevoResultValue.RateLimited;
 
-  if (createRes.status === 400) {
+  if (createRes.status === BREVO_STATUS.contactExists) {
     const updateRes = await fetch(
       `https://api.brevo.com/v3/contacts/${encodeURIComponent(email)}`,
       {
@@ -58,50 +55,48 @@ async function addToBrevo(email: string, listId: number): Promise<BrevoResult> {
       },
     );
 
-    if (updateRes.ok) return "ok";
-    if (updateRes.status === 429) return "rate_limited";
-    return "failed";
+    if (updateRes.ok) return BrevoResultValue.Ok;
+    if (updateRes.status === BREVO_STATUS.rateLimited) return BrevoResultValue.RateLimited;
+    return BrevoResultValue.Failed;
   }
 
-  return "failed";
+  return BrevoResultValue.Failed;
 }
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== WaitlistRequestMethodValue.Post) {
+    return res.status(ProtectedFormStatusValue.MethodNotAllowed).json({ error: WaitlistErrorValue.UnsupportedMethod });
   }
 
-  const { email, tier = "individual", captchaToken } = req.body as Body;
+  const { email, tier = WaitlistTierValue.Individual, captchaToken } = req.body as Body;
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: "Enter a valid email address." });
+  if (!email || !isValidContactEmail(email)) {
+    return res.status(ProtectedFormStatusValue.BadRequest).json({ error: WaitlistErrorValue.InvalidEmail });
   }
 
   if (!captchaToken) {
-    return res.status(400).json({ error: "Complete the CAPTCHA." });
+    return res.status(ProtectedFormStatusValue.BadRequest).json({ error: WaitlistErrorValue.CaptchaRequired });
   }
 
   const listId = LIST_IDS[tier] ?? LIST_IDS.individual;
 
-  const captchaValid = await verifyCaptcha(captchaToken);
+  const captchaValid = await verifyRecaptcha(captchaToken);
   if (!captchaValid) {
-    return res.status(403).json({ error: "We could not verify the CAPTCHA. Please try again." });
+    return res.status(ProtectedFormStatusValue.Forbidden).json({ error: WaitlistErrorValue.CaptchaRejected });
   }
 
   const result = await addToBrevo(email, listId);
 
-  if (result === "rate_limited") {
-    return res
-      .status(429)
-      .json({ error: "Too many requests. Please try again in a minute." });
+  if (result === BrevoResultValue.RateLimited) {
+    return res.status(ProtectedFormStatusValue.RateLimited).json({ error: WaitlistErrorValue.TooManyRequests });
   }
 
-  if (result === "failed") {
-    return res.status(500).json({ error: "We could not add you to the list. Please try again." });
+  if (result === BrevoResultValue.Failed) {
+    return res.status(ProtectedFormStatusValue.ServerError).json({ error: WaitlistErrorValue.DeliveryFailed });
   }
 
-  return res.status(200).json({ ok: true });
+  return res.status(ProtectedFormStatusValue.Ok).json({ ok: true });
 }

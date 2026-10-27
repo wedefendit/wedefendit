@@ -1,27 +1,25 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
+import {
+  DifficultyValue,
+  type Difficulty,
+} from "../../shared/types";
 
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
+export enum ZoneIdValue {
+  Main = "main",
+  Guest = "guest",
+  IoT = "iot",
+}
 
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
+export type ZoneId = `${ZoneIdValue}`;
 
-import type { Difficulty } from "../../shared/types";
+export enum RoomIdValue {
+  Office = "office",
+  LivingRoom = "living-room",
+  Kitchen = "kitchen",
+  Bedroom = "bedroom",
+  EntryExterior = "entry-exterior",
+}
 
-export type ZoneId = "main" | "guest" | "iot";
-
-export type RoomId =
-  | "office"
-  | "living-room"
-  | "kitchen"
-  | "bedroom"
-  | "entry-exterior";
+export type RoomId = `${RoomIdValue}`;
 
 export type Zone = {
   id: ZoneId;
@@ -38,21 +36,21 @@ export type Room = {
 
 export const ZONES: Zone[] = [
   {
-    id: "main",
+    id: ZoneIdValue.Main,
     name: "Main Network",
     shortName: "Main",
     description:
       "For personal and work devices you trust and use every day.",
   },
   {
-    id: "guest",
+    id: ZoneIdValue.Guest,
     name: "Guest Network",
     shortName: "Guest",
     description:
       "For visitors and devices that only need temporary internet access.",
   },
   {
-    id: "iot",
+    id: ZoneIdValue.IoT,
     name: "Smart Devices / IoT",
     shortName: "IoT",
     description:
@@ -62,67 +60,57 @@ export const ZONES: Zone[] = [
 
 export const ROOMS: Room[] = [
   {
-    id: "office",
+    id: RoomIdValue.Office,
     name: "Office",
     description:
       "A workspace for computers, printers, and other office devices.",
   },
   {
-    id: "living-room",
+    id: RoomIdValue.LivingRoom,
     name: "Living Room",
     description: "A shared space for TVs, consoles, speakers, and personal devices.",
   },
   {
-    id: "kitchen",
+    id: RoomIdValue.Kitchen,
     name: "Kitchen",
     description: "A utility space for appliances and smart devices.",
   },
   {
-    id: "bedroom",
+    id: RoomIdValue.Bedroom,
     name: "Bedroom",
     description: "A personal space where phones and tablets are often used.",
   },
   {
-    id: "entry-exterior",
+    id: RoomIdValue.EntryExterior,
     name: "Entry / Exterior",
     description: "An outdoor area for doorbells, cameras, and other entry devices.",
   },
 ];
 
-/**
- * Room → zone pre-assignments per difficulty tier.
- *
- * - Easy: every room is pre-tagged with a zone so the player only places
- *   devices. Guest separation is introduced in Medium and Hard.
- * - Medium: the most intuitive rooms are pre-tagged, rest are blank (null).
- * - Hard: nothing is pre-tagged. the player assigns every zone and every device.
- *
- * A `null` value means the player must assign the zone for that room.
- */
 export const ROOM_ZONE_ASSIGNMENTS: Record<
   Difficulty,
   Record<RoomId, ZoneId | null>
 > = {
-  easy: {
-    office: "main",
-    bedroom: "main",
-    "living-room": "iot",
-    kitchen: "iot",
-    "entry-exterior": "iot",
+  [DifficultyValue.Easy]: {
+    [RoomIdValue.Office]: ZoneIdValue.Main,
+    [RoomIdValue.Bedroom]: ZoneIdValue.Main,
+    [RoomIdValue.LivingRoom]: ZoneIdValue.IoT,
+    [RoomIdValue.Kitchen]: ZoneIdValue.IoT,
+    [RoomIdValue.EntryExterior]: ZoneIdValue.IoT,
   },
-  medium: {
-    office: "main",
-    "living-room": "iot",
-    bedroom: null,
-    kitchen: null,
-    "entry-exterior": null,
+  [DifficultyValue.Medium]: {
+    [RoomIdValue.Office]: ZoneIdValue.Main,
+    [RoomIdValue.LivingRoom]: ZoneIdValue.IoT,
+    [RoomIdValue.Bedroom]: null,
+    [RoomIdValue.Kitchen]: null,
+    [RoomIdValue.EntryExterior]: null,
   },
-  hard: {
-    office: null,
-    "living-room": null,
-    bedroom: null,
-    kitchen: null,
-    "entry-exterior": null,
+  [DifficultyValue.Hard]: {
+    [RoomIdValue.Office]: null,
+    [RoomIdValue.LivingRoom]: null,
+    [RoomIdValue.Bedroom]: null,
+    [RoomIdValue.Kitchen]: null,
+    [RoomIdValue.EntryExterior]: null,
   },
 };
 

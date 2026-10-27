@@ -1,27 +1,50 @@
-/*
-Copyright \u00A9 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-import type { Difficulty } from "../shared/types";
+import { DifficultyValue, type Difficulty } from "../shared/types";
 import { COMBO_TIPS } from "./content/deviceTips";
-import type {
-  AppliedCombo,
-  DeviceId,
-  PlacementFinding,
-  ScoreResult,
-  ZoneId,
+import {
+  AppliedComboIdValue,
+  DeviceCategoryValue,
+  DeviceIdValue,
+  PlacementFindingSeverityValue,
+  ZoneIdValue,
+  getDevice,
+  isCamera,
+  isTrusted,
+  type AppliedCombo,
+  type DeviceId,
+  type PlacementFinding,
+  type ScoreResult,
+  type ZoneId,
 } from "./engine";
-import type { PlacementMap } from "./model";
+import {
+  BadgeJustEarnedValue,
+  DIGITAL_HOUSE_BADGES,
+  type PlacementMap,
+} from "./model";
+
+enum RiskGroupValue { Trusted = "trusted", Entertainment = "entertainment" }
+type RiskCopy = Readonly<{ id: string; singular: string; plural: string }>;
+const GROUP_RISK_COPY: Record<RiskGroupValue, Readonly<{ critical: RiskCopy; wrong: RiskCopy }>> = {
+  [RiskGroupValue.Trusted]: {
+    critical: {
+      id: "trusted-critical",
+      singular: "A personal device is on the IoT network.", plural: "Personal devices are on the IoT network.",
+    },
+    wrong: {
+      id: "trusted-wrong",
+      singular: "A personal device is not on the Main network.", plural: "Some personal devices are not on the Main network.",
+    },
+  },
+  [RiskGroupValue.Entertainment]: {
+    critical: {
+      id: "entertainment-main",
+      singular: "An entertainment device is still on your personal network.", plural: "Entertainment devices are still on your personal network.",
+    },
+    wrong: {
+      id: "entertainment-off-iot",
+      singular: "An entertainment device still has more access than it needs.", plural: "Entertainment devices still have more access than they need.",
+    },
+  },
+};
 
 export type OpenRiskItem = {
   id: string;
@@ -35,7 +58,7 @@ function zoneOf(placements: PlacementMap, deviceId: DeviceId): ZoneId | null {
 
 function comboById(
   result: ScoreResult,
-  comboId: AppliedCombo["id"],
+  comboId: `${AppliedComboIdValue}`,
 ): AppliedCombo | undefined {
   return result.appliedCombos.find((combo) => combo.id === comboId);
 }
@@ -55,48 +78,41 @@ function firstFinding(
 }
 
 function isTrustedFinding(finding: PlacementFinding): boolean {
-  return (
-    finding.deviceId === "work-laptop" ||
-    finding.deviceId === "personal-phone" ||
-    finding.deviceId === "tablet"
-  );
+  return isTrusted(finding.deviceId);
 }
 
 function isEntertainmentFinding(finding: PlacementFinding): boolean {
   return (
-    finding.deviceId === "smart-tv" ||
-    finding.deviceId === "smart-speaker" ||
-    finding.deviceId === "game-console"
+    getDevice(finding.deviceId).category ===
+    DeviceCategoryValue.Entertainment
   );
 }
 
 function isCameraFinding(finding: PlacementFinding): boolean {
-  return (
-    finding.deviceId === "doorbell-camera" || finding.deviceId === "camera-hub"
-  );
+  return isCamera(finding.deviceId);
 }
 
 function guestRiskItem(
   finding: PlacementFinding,
   difficulty: Difficulty,
 ): OpenRiskItem {
-  if (difficulty === "easy") {
+  if (difficulty === DifficultyValue.Easy) {
     return {
-      id: "guest-phone",
+      id: DeviceIdValue.GuestPhone,
       label: "Easy mode does not include a separate Guest network.",
     };
   }
 
-  if (finding.actualZone === "main") {
+  if (finding.actualZone === ZoneIdValue.Main) {
     return {
-      id: "guest-phone",
+      id: DeviceIdValue.GuestPhone,
       label:
         "The guest phone shares the Main network with personal devices.",
     };
   }
 
   return {
-    id: "guest-phone",
+    id: DeviceIdValue.GuestPhone,
     label: "The guest phone is not on the Guest network.",
   };
 }
@@ -112,34 +128,27 @@ function cameraRiskItem(findings: PlacementFinding[]): OpenRiskItem {
   };
 }
 
-function trustedRiskItem(findings: PlacementFinding[]): OpenRiskItem {
+function groupRiskItem(
+  findings: PlacementFinding[],
+  group: RiskGroupValue,
+): OpenRiskItem {
   const criticalCount = findings.filter(
-    (finding) => finding.severity === "critical",
+    (finding) =>
+      finding.severity === PlacementFindingSeverityValue.Critical,
   ).length;
-
-  if (criticalCount > 0) {
-    return {
-      id: "trusted-critical",
-      label:
-        criticalCount === 1
-          ? "A personal device is on the IoT network."
-          : "Personal devices are on the IoT network.",
-      count: criticalCount > 1 ? criticalCount : undefined,
-    };
-  }
-
+  const count = criticalCount > 0 ? criticalCount : findings.length;
+  const copy = GROUP_RISK_COPY[group][
+    criticalCount > 0 ? "critical" : "wrong"
+  ];
   return {
-    id: "trusted-wrong",
-    label:
-      findings.length === 1
-        ? "A personal device is not on the Main network."
-        : "Some personal devices are not on the Main network.",
-    count: findings.length > 1 ? findings.length : undefined,
+    id: copy.id,
+    label: count === 1 ? copy.singular : copy.plural,
+    count: count > 1 ? count : undefined,
   };
 }
 
 function printerRiskItem(finding: PlacementFinding): OpenRiskItem {
-  if (finding.actualZone === "main") {
+  if (finding.actualZone === ZoneIdValue.Main) {
     return {
       id: "printer-main",
       label: "The printer shares the Main network with personal devices.",
@@ -152,58 +161,34 @@ function printerRiskItem(finding: PlacementFinding): OpenRiskItem {
   };
 }
 
-function entertainmentRiskItem(findings: PlacementFinding[]): OpenRiskItem {
-  const criticalCount = findings.filter(
-    (finding) => finding.severity === "critical",
-  ).length;
-
-  if (criticalCount > 0) {
-    return {
-      id: "entertainment-main",
-      label:
-        criticalCount === 1
-          ? "An entertainment device is still on your personal network."
-          : "Entertainment devices are still on your personal network.",
-      count: criticalCount > 1 ? criticalCount : undefined,
-    };
-  }
-
-  return {
-    id: "entertainment-off-iot",
-    label:
-      findings.length === 1
-        ? "An entertainment device still has more access than it needs."
-        : "Entertainment devices still have more access than they need.",
-    count: findings.length > 1 ? findings.length : undefined,
-  };
-}
-
 export function scanWins(placements: PlacementMap): string[] {
   const wins: string[] = [];
 
-  if (zoneOf(placements, "guest-phone") === "guest") {
+  if (
+    zoneOf(placements, DeviceIdValue.GuestPhone) === ZoneIdValue.Guest
+  ) {
     wins.push("Guest access is separated from personal devices.");
   }
   if (
-    zoneOf(placements, "doorbell-camera") === "iot" &&
-    zoneOf(placements, "camera-hub") === "iot"
+    zoneOf(placements, DeviceIdValue.DoorbellCamera) === ZoneIdValue.IoT &&
+    zoneOf(placements, DeviceIdValue.CameraHub) === ZoneIdValue.IoT
   ) {
     wins.push("Both cameras are separated from your personal devices.");
   }
   if (
-    zoneOf(placements, "work-laptop") === "main" &&
-    zoneOf(placements, "personal-phone") === "main"
+    zoneOf(placements, DeviceIdValue.WorkLaptop) === ZoneIdValue.Main &&
+    zoneOf(placements, DeviceIdValue.PersonalPhone) === ZoneIdValue.Main
   ) {
     wins.push("Work and personal devices share the Main network.");
   }
   if (
-    zoneOf(placements, "smart-tv") === "iot" &&
-    zoneOf(placements, "smart-speaker") === "iot" &&
-    zoneOf(placements, "game-console") === "iot"
+    zoneOf(placements, DeviceIdValue.SmartTv) === ZoneIdValue.IoT &&
+    zoneOf(placements, DeviceIdValue.SmartSpeaker) === ZoneIdValue.IoT &&
+    zoneOf(placements, DeviceIdValue.GameConsole) === ZoneIdValue.IoT
   ) {
     wins.push("Entertainment devices are separated from personal devices.");
   }
-  if (zoneOf(placements, "printer") === "iot") {
+  if (zoneOf(placements, DeviceIdValue.Printer) === ZoneIdValue.IoT) {
     wins.push(
       "The printer is separated from personal devices.",
     );
@@ -223,13 +208,13 @@ export function buildOpenRiskItems(
 
   const guestFinding = firstFinding(
     result,
-    (finding) => finding.deviceId === "guest-phone",
+    (finding) => finding.deviceId === DeviceIdValue.GuestPhone,
   );
   if (guestFinding) {
     items.push(guestRiskItem(guestFinding, difficulty));
   }
 
-  const cameraOnMain = comboById(result, "camera-on-main");
+  const cameraOnMain = comboById(result, AppliedComboIdValue.CameraOnMain);
   const cameraFindings = findingsFor(result, isCameraFinding);
   if (cameraOnMain) {
     items.push({
@@ -243,18 +228,21 @@ export function buildOpenRiskItems(
 
   const trustedFindings = findingsFor(result, isTrustedFinding);
   if (trustedFindings.length > 0) {
-    items.push(trustedRiskItem(trustedFindings));
+    items.push(groupRiskItem(trustedFindings, RiskGroupValue.Trusted));
   }
 
   const printerFinding = firstFinding(
     result,
-    (finding) => finding.deviceId === "printer",
+    (finding) => finding.deviceId === DeviceIdValue.Printer,
   );
   if (printerFinding) {
     items.push(printerRiskItem(printerFinding));
   }
 
-  const entertainmentClutter = comboById(result, "entertainment-clutter");
+  const entertainmentClutter = comboById(
+    result,
+    AppliedComboIdValue.EntertainmentClutter,
+  );
   const entertainmentFindings = findingsFor(result, isEntertainmentFinding);
   if (entertainmentClutter) {
     items.push({
@@ -263,10 +251,12 @@ export function buildOpenRiskItems(
       count: entertainmentClutter.count,
     });
   } else if (entertainmentFindings.length > 0) {
-    items.push(entertainmentRiskItem(entertainmentFindings));
+    items.push(
+      groupRiskItem(entertainmentFindings, RiskGroupValue.Entertainment),
+    );
   }
 
-  const singleZoneDump = comboById(result, "single-zone-dump");
+  const singleZoneDump = comboById(result, AppliedComboIdValue.SingleZoneDump);
   if (singleZoneDump) {
     items.push({
       id: singleZoneDump.id,
@@ -281,7 +271,7 @@ export function buildOpenRiskItems(
 export function scanRisks(
   _placements: PlacementMap,
   result: ScoreResult,
-  difficulty: Difficulty = "medium",
+  difficulty: Difficulty = DifficultyValue.Medium,
 ): string[] {
   return buildOpenRiskItems(result, difficulty).map((item) => item.label);
 }
@@ -289,13 +279,18 @@ export function scanRisks(
 export function scanImprovements(
   _placements: PlacementMap,
   result: ScoreResult,
-  difficulty: Difficulty = "medium",
+  difficulty: Difficulty = DifficultyValue.Medium,
 ): string[] {
   const improvements = new Set<string>();
 
-  if (firstFinding(result, (finding) => finding.deviceId === "guest-phone")) {
+  if (
+    firstFinding(
+      result,
+      (finding) => finding.deviceId === DeviceIdValue.GuestPhone,
+    )
+  ) {
     improvements.add(
-      difficulty === "easy"
+      difficulty === DifficultyValue.Easy
         ? "Easy mode does not include a Guest network. Try Medium or Hard to separate visitor devices."
         : "Move the guest phone to the Guest network.",
     );
@@ -315,11 +310,16 @@ export function scanImprovements(
     );
   }
 
-  if (firstFinding(result, (finding) => finding.deviceId === "printer")) {
+  if (
+    firstFinding(
+      result,
+      (finding) => finding.deviceId === DeviceIdValue.Printer,
+    )
+  ) {
     improvements.add("Move the printer to the IoT network.");
   }
 
-  if (comboById(result, "single-zone-dump")) {
+  if (comboById(result, AppliedComboIdValue.SingleZoneDump)) {
     improvements.add("Split devices across at least two zones.");
   }
 
@@ -333,7 +333,14 @@ export function scanImprovements(
 }
 
 export function getBadgeLabel(total: number, difficulty: Difficulty): string {
-  if (difficulty === "hard" && total >= 70) return "Network Architect tier";
-  if (total >= 40) return "Home Network Rookie tier";
+  if (
+    difficulty === DifficultyValue.Hard &&
+    total >= DIGITAL_HOUSE_BADGES[BadgeJustEarnedValue.Architect].minScore
+  ) {
+    return "Network Architect tier";
+  }
+  if (total >= DIGITAL_HOUSE_BADGES[BadgeJustEarnedValue.Rookie].minScore) {
+    return "Home Network Rookie tier";
+  }
   return "Getting started";
 }

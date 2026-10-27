@@ -1,6 +1,4 @@
-// next.config.ts
-
-/** @type {import('next').NextConfig} */
+import type { NextConfig } from "next";
 
 const tileOrigins =
   "https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org";
@@ -62,23 +60,24 @@ const securityHeaders = [
     value: "max-age=31536000; includeSubDomains; preload",
   },
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // Matches the CSP frame-ancestors 'self' above.
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
-  // allow-popups keeps reCAPTCHA's popup/opener relationship intact.
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   { key: "Permissions-Policy", value: permissionsPolicy },
 ];
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   devIndicators: false,
-  async headers() {
-    return [
+  experimental: {
+    useTypeScriptCli: false,
+  },
+  headers() {
+    return Promise.resolve([
       {
         source: "/:path*",
         headers: securityHeaders,
       },
-    ];
+    ]);
   },
 };
 

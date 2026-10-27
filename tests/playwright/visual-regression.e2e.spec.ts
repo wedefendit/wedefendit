@@ -49,9 +49,7 @@ async function applyTheme(page: Page, theme: Theme) {
   await page.addInitScript((t) => {
     try {
       localStorage.setItem("theme", t);
-    } catch {
-      // private-mode / quota — best effort; the default (dark) still renders
-    }
+    } catch {}
   }, theme);
   await page.emulateMedia({ colorScheme: theme });
 }
@@ -151,7 +149,6 @@ test.describe("Visual: site pages", () => {
           await page.setViewportSize({ width: vp.width, height: vp.height });
           await page.goto(pg.path, { waitUntil: "networkidle" });
           await stabilize(page);
-          await page.waitForTimeout(300);
           await settle(page);
           await expect(page).toHaveScreenshot(
             `${pg.name}-${theme}-${vp.name}.png`,
@@ -175,7 +172,6 @@ test.describe("Visual: Digital House", () => {
       await page.goto(ROUTE, { waitUntil: "networkidle" });
       await stabilize(page);
       await dismissOnboarding(page);
-      await page.waitForTimeout(200);
       await expect(page).toHaveScreenshot(`dh-empty-${vp.name}.png`, {
         animations: "disabled",
       });
@@ -185,8 +181,9 @@ test.describe("Visual: Digital House", () => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto(ROUTE, { waitUntil: "networkidle" });
       await stabilize(page);
-      // CoachMark onboarding auto-opens after 400ms
-      await page.waitForTimeout(600);
+      await expect(
+        page.getByRole("dialog", { name: "Build a safer home network" }),
+      ).toBeVisible();
       await expect(page).toHaveScreenshot(`dh-onboarding-${vp.name}.png`, {
         animations: "disabled",
       });
@@ -200,7 +197,6 @@ test.describe("Visual: Digital House", () => {
       // Open help modal via button
       await page.getByRole("button", { name: /how to play/i }).click();
       await expect(page.getByTestId("dh-help-modal")).toBeVisible();
-      await page.waitForTimeout(200);
       await expect(page).toHaveScreenshot(`dh-help-modal-${vp.name}.png`, {
         animations: "disabled",
       });
@@ -218,13 +214,17 @@ test.describe("Visual: Digital House", () => {
         ["personal-phone", "bedroom"],
         ["smart-tv", "living-room"],
       ];
-      for (const [dev, room] of placements) {
-        await page.getByTestId("dh-device-" + dev).click();
-        await page.getByTestId("dh-room-" + room).click();
-        await page.waitForTimeout(100);
+      for (const [index, [dev, room]] of placements.entries()) {
+        await page.getByTestId("dh-device-" + dev).press("Enter");
+        await page.getByTestId("dh-room-" + room).press("Enter");
+        await expect(page.getByTestId("dh-score-hud")).toContainText(
+          `${index + 1}/10`,
+        );
       }
 
-      await page.waitForTimeout(200);
+      await expect(page.getByTestId("dh-analysis-card")).not.toContainText(
+        "Drag a device to a room to begin",
+      );
       await expect(page).toHaveScreenshot(`dh-mid-game-${vp.name}.png`, {
         animations: "disabled",
       });
@@ -249,17 +249,18 @@ test.describe("Visual: Digital House", () => {
         ["doorbell-camera", "entry-exterior"],
         ["camera-hub", "kitchen"],
       ];
-      for (const [dev, room] of all) {
-        await page.getByTestId("dh-device-" + dev).click();
-        await page.getByTestId("dh-room-" + room).click();
-        await page.waitForTimeout(80);
+      for (const [index, [dev, room]] of all.entries()) {
+        await page.getByTestId("dh-device-" + dev).press("Enter");
+        await page.getByTestId("dh-room-" + room).press("Enter");
+        await expect(page.getByTestId("dh-score-hud")).toContainText(
+          `${index + 1}/10`,
+        );
       }
 
-      const aarBtn = page.getByRole("button", { name: /after-action/i });
+      const aarBtn = page.getByRole("button", { name: /results/i });
       await aarBtn.scrollIntoViewIfNeeded();
       await aarBtn.click();
       await expect(page.getByLabel(/after-action report/i)).toBeVisible();
-      await page.waitForTimeout(300);
 
       await expect(page).toHaveScreenshot(`dh-after-action-${vp.name}.png`, {
         animations: "disabled",

@@ -1,23 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-// Renderer for a single service-area landing page (/service-areas/<city>).
-// Content is data-driven from data/locations/<city>.json. The page links out to
-// the canonical /services/<slug> pages rather than restating service copy, and
-// emits a LocalBusiness + Service + FAQPage structured-data graph scoped to the
-// city. Testimonials render only when the owner has supplied verified reviews.
-
 import Link from "next/link";
 import { ThemedImage } from "@/components/ThemedImage";
 import { ArrowRight } from "lucide-react";
@@ -32,52 +12,53 @@ import {
   generateServiceLd,
 } from "@/lib/json-ld";
 import type { LocationContent } from "@/lib/location-page";
-import { ogImageUrl, DEFAULT_OG_IMAGE } from "@/lib/og";
+import { ogImageUrl, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/og";
 
-// Service-area cities that have a hand-made /img/og/og-<slug>.jpg share card.
-// Add a slug here when its card is added; others fall back to the brand card.
 const OG_CARD_SLUGS: ReadonlySet<string> = new Set([
   "ocala",
   "belleview",
   "the-villages",
 ]);
 
-const BASE_URL = "https://www.wedefendit.com";
 const FIGURE = "fade-image relative w-full overflow-hidden";
 const IMG_SIZES = "(min-width: 1024px) 960px, 100vw";
-const PROVIDER = { "@type": "Organization", name: "Defend I.T. Solutions" } as const;
+const PROVIDER: Readonly<{ "@type": "Organization"; name: string }> = { "@type": "Organization", name: "Defend I.T. Solutions" };
 const SECTION = "pt-6 sm:pt-8 border-t border-hairline";
-const TOUCH = { touchAction: "manipulation" } as const;
+const TOUCH: Readonly<{ touchAction: "manipulation" }> = { touchAction: "manipulation" };
 const PRIMARY_BTN =
   "inline-flex items-center justify-center gap-2 rounded-lg bg-accent-fill px-6 py-3 font-semibold text-accent-contrast shadow-card transition hover:bg-accent-fill-hover hover:shadow-card-hover touch-manipulation";
 const SECONDARY_BTN =
   "inline-flex items-center justify-center gap-2 rounded-lg border border-hairline px-6 py-3 font-semibold text-ink transition hover:border-border-accent hover:text-accent touch-manipulation";
 const SERVICE_LINK =
   "flex h-full flex-col gap-1 rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-4 transition hover:border-border-accent touch-manipulation";
+const BODY_TEXT = "text-ink-muted text-sm sm:text-base leading-relaxed";
+const SECTION_TITLE = "text-h2 tracking-h2 font-semibold text-ink";
+const ITEM_GRID = "mt-5 grid list-none gap-3 p-0 sm:grid-cols-2";
+const ITEM_SUMMARY = "text-sm leading-relaxed text-ink-muted";
+const WIDE_FIGURE = `${FIGURE} mt-4 aspect-[16/9]`;
+const LOCATION_SECTION_ID = { services: "local-services", reviews: "local-reviews" };
 
 type LocationPageProps = Readonly<{ location: LocationContent }>;
 
 export function LocationPage({ location }: LocationPageProps) {
-  const canonical = `${BASE_URL}/service-areas/${location.slug}`;
+  const canonical = `${SITE_URL}/service-areas/${location.slug}`;
   const crumbs = [
     { name: "Home", href: "/" },
     { name: "Service Areas", href: "/service-areas" },
     { name: location.city },
   ];
 
-  // Social card and structured-data image are both generated dynamically from
-  // the page title (no per-city static raster).
   const ogImage = OG_CARD_SLUGS.has(location.slug)
     ? ogImageUrl(`og-${location.slug}`)
     : DEFAULT_OG_IMAGE;
   const hasBanner = Boolean(location.banner);
-  const breadcrumbLd = generateBreadCrumbJsonLd({ items: crumbs, baseUrl: BASE_URL });
+  const breadcrumbLd = generateBreadCrumbJsonLd({ items: crumbs, baseUrl: SITE_URL });
   const businessLd = generateLocalBusinessLd(location.areaServed, ogImage);
   const serviceLds = location.services.map((svc) =>
     generateServiceLd({
       name: `${svc.label} in ${location.city}, ${location.state}`,
       description: svc.summary,
-      url: `${BASE_URL}/services/${svc.slug}`,
+      url: `${SITE_URL}/services/${svc.slug}`,
       image: ogImage,
       areaServed: location.areaServed,
       provider: PROVIDER,
@@ -102,12 +83,10 @@ export function LocationPage({ location }: LocationPageProps) {
       />
 
       <PageContainer>
-        {/* Breadcrumbs: contained, above the full-bleed hero */}
         <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
-          <BreadCrumbs items={crumbs} baseUrl={BASE_URL} />
+          <BreadCrumbs items={crumbs} baseUrl={SITE_URL} />
         </div>
 
-        {/* Hero: full-bleed, like home / about / services */}
         {location.heroImage ? (
           <HeroBanner
             dark={location.heroImage.src}
@@ -147,7 +126,7 @@ export function LocationPage({ location }: LocationPageProps) {
 
           <section className="space-y-3">
             {location.intro.map((paragraph) => (
-              <p key={paragraph} className="text-ink-muted text-sm sm:text-base leading-relaxed">
+              <p key={paragraph} className={BODY_TEXT}>
                 {paragraph}
               </p>
             ))}
@@ -167,14 +146,14 @@ export function LocationPage({ location }: LocationPageProps) {
 
             return (
             <section key={section.heading} className={SECTION}>
-              <h2 className="text-h2 tracking-h2 font-semibold text-ink">{section.heading}</h2>
+              <h2 className={SECTION_TITLE}>{section.heading}</h2>
 
               {section.paragraph && (
                 <div className="mt-3 space-y-2">
                   {section.paragraph.map((paragraph) => (
                     <p
                       key={paragraph}
-                      className="text-ink-muted text-sm sm:text-base leading-relaxed"
+                      className={BODY_TEXT}
                     >
                       {paragraph}
                     </p>
@@ -191,7 +170,7 @@ export function LocationPage({ location }: LocationPageProps) {
               )}
 
               {section.image && (
-                <figure className={`${FIGURE} mt-4 aspect-[16/9]`}>
+                <figure className={WIDE_FIGURE}>
                   <ThemedImage
                     dark={section.image.src}
                     alt={section.image.alt}
@@ -204,16 +183,16 @@ export function LocationPage({ location }: LocationPageProps) {
             );
           })}
 
-          <section className={SECTION} aria-labelledby="local-services">
-            <h2 id="local-services" className="text-h2 tracking-h2 font-semibold text-ink">
+          <section className={SECTION} aria-labelledby={LOCATION_SECTION_ID.services}>
+            <h2 id={LOCATION_SECTION_ID.services} className={SECTION_TITLE}>
               Services Available in {location.city}
             </h2>
-            <ul className="mt-5 grid list-none gap-3 p-0 sm:grid-cols-2">
+            <ul className={ITEM_GRID}>
               {location.services.map((svc) => (
                 <li key={svc.slug}>
                   <Link href={`/services/${svc.slug}`} className={SERVICE_LINK} style={TOUCH}>
                     <span className="font-semibold text-ink">{svc.label}</span>
-                    <span className="text-sm leading-relaxed text-ink-muted">{svc.summary}</span>
+                    <span className={ITEM_SUMMARY}>{svc.summary}</span>
                   </Link>
                 </li>
               ))}
@@ -221,15 +200,15 @@ export function LocationPage({ location }: LocationPageProps) {
           </section>
 
           {location.testimonials.length > 0 && (
-            <section className={SECTION} aria-labelledby="local-reviews">
-              <h2 id="local-reviews" className="text-h2 tracking-h2 font-semibold text-ink">
+            <section className={SECTION} aria-labelledby={LOCATION_SECTION_ID.reviews}>
+              <h2 id={LOCATION_SECTION_ID.reviews} className={SECTION_TITLE}>
                 What neighbors say
               </h2>
-              <ul className="mt-5 grid list-none gap-3 p-0 sm:grid-cols-2">
+              <ul className={ITEM_GRID}>
                 {location.testimonials.map((testimonial) => (
                   <li key={testimonial.quote}>
                     <Card wash className="h-full p-4">
-                      <blockquote className="text-sm leading-relaxed text-ink-muted">
+                      <blockquote className={ITEM_SUMMARY}>
                         {testimonial.quote}
                       </blockquote>
                       <p className="mt-2 text-sm font-semibold text-ink">
@@ -268,7 +247,7 @@ export function LocationPage({ location }: LocationPageProps) {
               </>
             )}
             <div className={hasBanner ? "relative max-w-md text-left" : "relative"}>
-              <h2 className="text-h2 tracking-h2 font-semibold text-ink text-balance">
+              <h2 className={`${SECTION_TITLE} text-balance`}>
                 Get Local Tech Help in {location.city}
               </h2>
               <p

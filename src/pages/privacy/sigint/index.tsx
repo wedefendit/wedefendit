@@ -1,5 +1,13 @@
-import { LegalPage } from "@/components";
-import { Meta } from "@/components";
+import { LegalPage, Meta } from "@/components";
+import { SITE_URL } from "@/lib/og";
+
+const CANONICAL = `${SITE_URL}/privacy/sigint`;
+const SIGINT_LEGAL_VALUE = { effectiveDate: "26th day of March, 2026" };
+const PRIVACY_EMAIL = "privacy@wedefendit.com";
+const PRIVACY_MAILTO = `mailto:${PRIVACY_EMAIL}`;
+const MAILING_ADDRESS = "3035 SE MARICAMP RD UNIT 104-205, Ocala, FL 34471";
+const CHILDREN_POLICY = "The minimum age to use our website is 13 years of age. We do not knowingly collect or use personal data from children under 16 years of age. If we learn that we have collected personal data from a child under 16 years of age, the personal data will be deleted as soon as possible. If a child under 16 years of age has provided us with personal data their parent or guardian may contact our privacy officer.";
+const SIGINT_LEGAL_CLASS = { heading: "text-h3 font-semibold uppercase border-b border-hairline my-4", orderedList: "list-decimal ml-6 my-2", unorderedList: "list-disc ml-6 my-2", subheading: "font-semibold mt-4 mb-1 underline", link: "text-accent underline", blockSpacing: "my-2", topSpacing: "mt-2" };
 
 export default function SigintPrivacy() {
   return (
@@ -7,8 +15,8 @@ export default function SigintPrivacy() {
       <Meta
         title="SIGINT Dashboard™ Privacy Policy | Defend I.T. Solutions"
         description="Privacy policy for the SIGINT Dashboard waiting list and product communications."
-        url="https://www.wedefendit.com/privacy/sigint"
-        canonical="https://www.wedefendit.com/privacy/sigint"
+        url={CANONICAL}
+        canonical={CANONICAL}
       />
 
       <LegalPage>
@@ -21,7 +29,7 @@ export default function SigintPrivacy() {
           collects email addresses for pre-launch early access notification.
           <br />
           <br />
-          <strong>Effective date:</strong> 26th day of March, 2026
+          <strong>Effective date:</strong> {SIGINT_LEGAL_VALUE.effectiveDate}
         </p>
 
         <p className="mb-6">
@@ -31,23 +39,23 @@ export default function SigintPrivacy() {
           <br />
           Contact:{" "}
           <a
-            href="mailto:privacy@wedefendit.com"
-            className="text-accent underline"
+            href={PRIVACY_MAILTO}
+            className={SIGINT_LEGAL_CLASS.link}
           >
-            privacy@wedefendit.com
+            {PRIVACY_EMAIL}
           </a>
           <br />
-          3035 SE MARICAMP RD UNIT 104-205, Ocala, FL 34471
+          {MAILING_ADDRESS}
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Purpose
         </h2>
         <p>
           The purpose of this privacy policy (&quot;Privacy Policy&quot;) is to
           inform users of our Site of the following:
         </p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>The personal data we will collect</li>
           <li>Use of collected data</li>
           <li>Who has access to the data collected</li>
@@ -59,11 +67,11 @@ export default function SigintPrivacy() {
           our Site.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Consent
         </h2>
         <p>By using our Site users agree that they consent to:</p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>The conditions set out in this Privacy Policy</li>
           <li>
             The collection, use, and retention of the data listed in this
@@ -71,7 +79,7 @@ export default function SigintPrivacy() {
           </li>
         </ol>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Lawful Basis for Data Processing
         </h2>
         <p>
@@ -80,15 +88,15 @@ export default function SigintPrivacy() {
           use and how you use them. We process your personal data on the
           following bases:
         </p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>
             <strong>Consent:</strong> You have given consent for processing for
             one or more specific purposes. You can withdraw consent by emailing{" "}
             <a
-              href="mailto:privacy@wedefendit.com"
-              className="text-accent underline"
+              href={PRIVACY_MAILTO}
+              className={SIGINT_LEGAL_CLASS.link}
             >
-              privacy@wedefendit.com
+            {PRIVACY_EMAIL}
             </a>{" "}
             or by clicking the unsubscribe link in any email.
           </li>
@@ -101,7 +109,7 @@ export default function SigintPrivacy() {
           </li>
         </ol>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Personal Data We Collect
         </h2>
         <p>
@@ -110,40 +118,40 @@ export default function SigintPrivacy() {
           data listed below without notifying you first.
         </p>
 
-        <h3 className="font-semibold mt-4 mb-1 underline">
+        <h3 className={SIGINT_LEGAL_CLASS.subheading}>
           Data Collected Automatically
         </h3>
         <p>
           When you visit and use our Site, we may automatically collect the
           following data:
         </p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={SIGINT_LEGAL_CLASS.unorderedList}>
           <li>IP address</li>
           <li>Hardware and software details</li>
           <li>Clicked links</li>
         </ul>
         <p>This data is used for the following purposes:</p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={SIGINT_LEGAL_CLASS.unorderedList}>
           <li>Spam prevention and bot detection (Google reCAPTCHA)</li>
           <li>Email delivery confirmation tracking (Brevo)</li>
         </ul>
 
-        <h3 className="font-semibold mt-4 mb-1 underline">
+        <h3 className={SIGINT_LEGAL_CLASS.subheading}>
           Data Collected in a Non-Automatic Way
         </h3>
         <p>
           We may also collect the following data when you perform certain
           functions on our Site:
         </p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={SIGINT_LEGAL_CLASS.unorderedList}>
           <li>Email address</li>
         </ul>
         <p>This data may be collected using the following methods:</p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={SIGINT_LEGAL_CLASS.unorderedList}>
           <li>Waiting list sign-up form submissions</li>
         </ul>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           How We Use Personal Data
         </h2>
         <p>
@@ -153,20 +161,20 @@ export default function SigintPrivacy() {
           Privacy Policy. The data we collect is used for the following
           purposes:
         </p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={SIGINT_LEGAL_CLASS.unorderedList}>
           <li>
             To notify waiting list subscribers about SIGINT Dashboard product
             availability and early access
           </li>
         </ul>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Who We Share Personal Data With
         </h2>
 
-        <h3 className="font-semibold mt-4 mb-1 underline">Third Parties</h3>
+        <h3 className={SIGINT_LEGAL_CLASS.subheading}>Third Parties</h3>
         <p>We may share user data with the following third parties:</p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>
             <strong>Google LLC (reCAPTCHA)</strong> &mdash; IP address, browser
             and device fingerprint data &mdash; for spam prevention and bot
@@ -183,12 +191,12 @@ export default function SigintPrivacy() {
           reasonably necessary to achieve the given purpose.
         </p>
 
-        <h3 className="font-semibold mt-4 mb-1 underline">Other Disclosures</h3>
+        <h3 className={SIGINT_LEGAL_CLASS.subheading}>Other Disclosures</h3>
         <p>
           We will not sell or share your data with other third parties, except
           in the following cases:
         </p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>If the law requires it;</li>
           <li>If it is required for any legal proceeding;</li>
           <li>To prove or protect our legal rights; and</li>
@@ -203,7 +211,7 @@ export default function SigintPrivacy() {
           policies and practices.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           How Long We Store Personal Data
         </h2>
         <p>
@@ -214,7 +222,7 @@ export default function SigintPrivacy() {
           You will be notified if your data is kept for longer than this period.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           How We Protect Your Personal Data
         </h2>
         <p>
@@ -232,11 +240,11 @@ export default function SigintPrivacy() {
           reasonably practical.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           International Data Transfers
         </h2>
         <p>We transfer user personal data to the following countries:</p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>United States; and</li>
           <li>France.</li>
         </ol>
@@ -249,7 +257,7 @@ export default function SigintPrivacy() {
           If you are located in the United Kingdom or the European Union, we
           will only transfer your personal data if:
         </p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>
             The country your personal data is being transferred to has been
             deemed to have adequate data protection by the European Commission
@@ -264,11 +272,11 @@ export default function SigintPrivacy() {
           </li>
         </ol>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Your Rights as a User
         </h2>
         <p>Under the GDPR, you have the following rights:</p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>Right to be informed;</li>
           <li>Right of access;</li>
           <li>Right to rectification;</li>
@@ -278,20 +286,14 @@ export default function SigintPrivacy() {
           <li>Right to object.</li>
         </ol>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Children
         </h2>
         <p>
-          The minimum age to use our website is 13 years of age. We do not
-          knowingly collect or use personal data from children under 16 years of
-          age. If we learn that we have collected personal data from a child
-          under 16 years of age, the personal data will be deleted as soon as
-          possible. If a child under 16 years of age has provided us with
-          personal data their parent or guardian may contact our privacy
-          officer.
+          {CHILDREN_POLICY}
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           How to Access, Modify, Delete, or Challenge the Data Collected
         </h2>
         <p>
@@ -302,20 +304,20 @@ export default function SigintPrivacy() {
           to exercise any of your other rights under the GDPR, please contact
           our privacy officer here:
         </p>
-        <p className="my-2">
+        <p className={SIGINT_LEGAL_CLASS.blockSpacing}>
           Anthony Tropeano
           <br />
           <a
-            href="mailto:privacy@wedefendit.com"
-            className="text-accent underline"
+            href={PRIVACY_MAILTO}
+            className={SIGINT_LEGAL_CLASS.link}
           >
-            privacy@wedefendit.com
+            {PRIVACY_EMAIL}
           </a>
           <br />
-          3035 SE MARICAMP RD UNIT 104-205, Ocala, FL 34471
+          {MAILING_ADDRESS}
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Do Not Track Notice
         </h2>
         <p>
@@ -327,7 +329,7 @@ export default function SigintPrivacy() {
           your data will respond to DNT signals.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           How to Opt-Out of Data Collection, Use or Disclosure
         </h2>
         <p>
@@ -335,22 +337,22 @@ export default function SigintPrivacy() {
           Modify, Delete, or Challenge the Data Collected&quot; section, we
           provide the following specific opt-out methods:
         </p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>
             Receiving waiting list and product launch notification emails. You
             can opt-out by clicking the unsubscribe link at the bottom of any
             email or by emailing{" "}
             <a
-              href="mailto:privacy@wedefendit.com"
-              className="text-accent underline"
+              href={PRIVACY_MAILTO}
+              className={SIGINT_LEGAL_CLASS.link}
             >
-              privacy@wedefendit.com
+            {PRIVACY_EMAIL}
             </a>
             .
           </li>
         </ol>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Cookie Policy
         </h2>
         <p>
@@ -361,18 +363,18 @@ export default function SigintPrivacy() {
           Internet browser, but this may decrease the quality of your user
           experience.
         </p>
-        <p className="mt-2">
+        <p className={SIGINT_LEGAL_CLASS.topSpacing}>
           We do not use first-party cookies. We use the following types of
           third-party cookies on our Site:
         </p>
-        <ol className="list-decimal ml-6 my-2">
+        <ol className={SIGINT_LEGAL_CLASS.orderedList}>
           <li>
             <strong>Third-Party Cookies (Google reCAPTCHA)</strong> &mdash; Used
             for spam prevention and bot detection.
           </li>
         </ol>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Additional Clauses
         </h2>
         <p>
@@ -382,14 +384,14 @@ export default function SigintPrivacy() {
           and will not be used for any other marketing communications without
           your explicit consent.
         </p>
-        <p className="mt-2">
+        <p className={SIGINT_LEGAL_CLASS.topSpacing}>
           This website and waiting list are provided &quot;as is&quot; without
           warranties of any kind. Defend I.T. Solutions, LLC shall not be liable
           for any damages arising from the use of this website or the waiting
           list sign-up process.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Modifications
         </h2>
         <p>
@@ -402,7 +404,7 @@ export default function SigintPrivacy() {
           we may notify users by email of changes to this Privacy Policy.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Complaints
         </h2>
         <p>
@@ -417,21 +419,21 @@ export default function SigintPrivacy() {
           (CNIL), France.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={SIGINT_LEGAL_CLASS.heading}>
           Contact
         </h2>
         <p>For questions or concerns about this Privacy Policy, contact:</p>
-        <p className="my-2">
+        <p className={SIGINT_LEGAL_CLASS.blockSpacing}>
           Anthony Tropeano
           <br />
           <a
-            href="mailto:privacy@wedefendit.com"
-            className="text-accent underline"
+            href={PRIVACY_MAILTO}
+            className={SIGINT_LEGAL_CLASS.link}
           >
-            privacy@wedefendit.com
+            {PRIVACY_EMAIL}
           </a>
           <br />
-          3035 SE MARICAMP RD UNIT 104-205, Ocala, FL 34471
+          {MAILING_ADDRESS}
         </p>
       </LegalPage>
     </>

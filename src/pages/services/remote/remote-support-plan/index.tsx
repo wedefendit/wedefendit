@@ -1,17 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import {
   PageContainer,
   Meta,
@@ -22,6 +8,32 @@ import {
 import { generateFAQPageLd, localBusinessLd } from "@/lib/json-ld";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/og";
+
+const CANONICAL = `${SITE_URL}/services/remote/remote-support-plan`;
+const SUPPORT_PATH = { remote: "/services/remote", contact: "/contact" };
+const SUPPORT_SECTION_ID = { why: "why-plan", approach: "tech-approach", included: "included", eligibility: "eligibility", tiers: "tiered-support", services: "view-remote-services", enroll: "enroll", devices: "more-devices" };
+const SVG_VALUE: Readonly<{ fill: "none"; stroke: "currentColor"; viewBox: "0 0 24 24"; round: "round" }> = { fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", round: "round" };
+const TOUCH: Readonly<{ touchAction: "manipulation" }> = { touchAction: "manipulation" };
+const SUPPORT_CLASS = {
+  icon: "w-5 h-5 text-accent",
+  featureLabel: "text-sm font-medium text-ink",
+  sectionTitle: "text-h2 tracking-h2 font-semibold text-ink",
+  sectionTitleSpaced: "text-h2 tracking-h2 font-semibold text-ink mb-4",
+  sectionText: "mt-2 text-ink-muted",
+  section: "pt-6 sm:pt-8 border-t border-hairline",
+  protectedItem: "flex items-start gap-3",
+  protectedTitle: "font-semibold text-ink mb-1",
+  protectedText: "text-sm text-ink-muted",
+  tierHeader: "flex items-center gap-3 mb-4",
+  tierTitle: "text-h3 tracking-h3 font-semibold text-ink",
+  tierLead: "text-ink-muted mb-4",
+  tierBody: "text-sm text-ink-muted leading-relaxed",
+  tierFooter: "mt-6 pt-4 border-t border-hairline",
+  relative: "relative",
+  actionIcon: "w-5 h-5",
+};
+const DEVICE_LIMIT_COPY = "The standard Remote Support Plan covers up to 14 enrolled devices. If you need more, we can define custom device limits and access options.";
 
 export default function RemoteSupportPlanPage() {
   const faq = [
@@ -59,14 +71,13 @@ export default function RemoteSupportPlanPage() {
       <Meta
         title="Remote Support Plan for Central Florida | Defend I.T. Solutions"
         description="Secure remote tech support for verified local clients in Ocala, Belleview, and The Villages. Compare access options, enrollment requirements, and included services."
-        url="https://www.wedefendit.com/services/remote/remote-support-plan"
+        url={CANONICAL}
         keywords="Remote Support Plan, secure remote tech support, remote computer help, Ocala, Belleview, The Villages, DISecureLink"
       />
 
       <JsonLdScript jsonLd={localBusinessLd} />
       <JsonLdScript jsonLd={faqLd} />
       <PageContainer>
-        {/* Left by default on mobile; larger screens inherit existing look */}
         <main className="max-w-5xl mx-auto py-8 sm:py-10 space-y-6 sm:space-y-7 px-4 sm:px-6 text-left">
           <BreadCrumbs
             items={[
@@ -81,20 +92,19 @@ export default function RemoteSupportPlanPage() {
             includeJsonLd={true}
           />
 
-          {/* Hero Section */}
           <div className="relative overflow-hidden rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] px-6 py-8 shadow-card space-y-4">
             <div className="relative inline-flex items-center gap-2 rounded-full border border-border-accent bg-surface px-4 py-2 text-eyebrow font-semibold uppercase tracking-eyebrow text-accent">
               <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.25}
-                viewBox="0 0 24 24"
                 aria-hidden
+                className="w-4 h-4"
+                fill={SVG_VALUE.fill}
+                stroke={SVG_VALUE.stroke}
+                strokeWidth={1.25}
+                viewBox={SVG_VALUE.viewBox}
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  strokeLinecap={SVG_VALUE.round}
+                  strokeLinejoin={SVG_VALUE.round}
                   strokeWidth={2}
                   d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                 />
@@ -112,25 +122,25 @@ export default function RemoteSupportPlanPage() {
               access.
             </p>
 
-            {/* Feature Highlights - Now Visual Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
               <div className="relative flex items-center gap-3 overflow-hidden rounded-card border border-hairline bg-surface p-3 shadow-card">
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-border-accent bg-surface">
                   <svg
-                    className="w-5 h-5 text-accent"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    aria-hidden
+                    className={SUPPORT_CLASS.icon}
+                    fill={SVG_VALUE.fill}
+                    stroke={SVG_VALUE.stroke}
+                    viewBox={SVG_VALUE.viewBox}
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap={SVG_VALUE.round}
+                      strokeLinejoin={SVG_VALUE.round}
                       strokeWidth={2}
                       d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                     />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-ink">
+                <span className={SUPPORT_CLASS.featureLabel}>
                   Encrypted Remote Sessions
                 </span>
               </div>
@@ -138,20 +148,21 @@ export default function RemoteSupportPlanPage() {
               <div className="relative flex items-center gap-3 overflow-hidden rounded-card border border-hairline bg-surface p-3 shadow-card">
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-border-accent bg-surface">
                   <svg
-                    className="w-5 h-5 text-accent"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    aria-hidden
+                    className={SUPPORT_CLASS.icon}
+                    fill={SVG_VALUE.fill}
+                    stroke={SVG_VALUE.stroke}
+                    viewBox={SVG_VALUE.viewBox}
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap={SVG_VALUE.round}
+                      strokeLinejoin={SVG_VALUE.round}
                       strokeWidth={2}
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-ink">
+                <span className={SUPPORT_CLASS.featureLabel}>
                   Access You Control
                 </span>
               </div>
@@ -159,88 +170,88 @@ export default function RemoteSupportPlanPage() {
               <div className="relative flex items-center gap-3 overflow-hidden rounded-card border border-hairline bg-surface p-3 shadow-card">
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-border-accent bg-surface">
                   <svg
-                    className="w-5 h-5 text-accent"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    aria-hidden
+                    className={SUPPORT_CLASS.icon}
+                    fill={SVG_VALUE.fill}
+                    stroke={SVG_VALUE.stroke}
+                    viewBox={SVG_VALUE.viewBox}
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap={SVG_VALUE.round}
+                      strokeLinejoin={SVG_VALUE.round}
                       strokeWidth={2}
                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                     />
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap={SVG_VALUE.round}
+                      strokeLinejoin={SVG_VALUE.round}
                       strokeWidth={2}
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-ink">
+                <span className={SUPPORT_CLASS.featureLabel}>
                   In-Person Enrollment
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Why a plan */}
           <section
             className="pt-6 sm:pt-8 first:pt-0 border-t border-hairline first:border-t-0"
-            aria-labelledby="why-plan"
+            aria-labelledby={SUPPORT_SECTION_ID.why}
           >
             <h2
-              id="why-plan"
-              className="text-h2 tracking-h2 font-semibold text-ink"
+              id={SUPPORT_SECTION_ID.why}
+              className={SUPPORT_CLASS.sectionTitle}
             >
               Why Use a Support Plan
             </h2>
-            <p className="mt-2 text-ink-muted">
+            <p className={SUPPORT_CLASS.sectionText}>
               Remote access needs a secure connection, an enrolled device, and clear
               permissions. The plan provides that foundation so approved
               follow-up work can happen without another on-site visit.
             </p>
-            <p className="mt-2 text-ink-muted">
+            <p className={SUPPORT_CLASS.sectionText}>
               Plan fees cover device enrollment, secure access infrastructure,
               maintenance, and support capacity reserved for plan clients.
             </p>
           </section>
 
-          {/* How Remote Access Is Protected */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="tech-approach"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.approach}
           >
             <h2
-              id="tech-approach"
-              className="text-h2 tracking-h2 font-semibold text-ink"
+              id={SUPPORT_SECTION_ID.approach}
+              className={SUPPORT_CLASS.sectionTitle}
             >
               How Remote Access Is Protected
             </h2>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-start gap-3">
+                <div className={SUPPORT_CLASS.protectedItem}>
                   <div className="w-10 h-10 rounded-full bg-surface border border-border-accent flex items-center justify-center flex-shrink-0">
                     <svg
-                      className="w-5 h-5 text-accent"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className={SUPPORT_CLASS.icon}
+                      fill={SVG_VALUE.fill}
+                      stroke={SVG_VALUE.stroke}
+                      viewBox={SVG_VALUE.viewBox}
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
                       />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink mb-1">
+                    <h3 className={SUPPORT_CLASS.protectedTitle}>
                       Private Infrastructure
                     </h3>
-                    <p className="text-sm text-ink-muted">
+                    <p className={SUPPORT_CLASS.protectedText}>
                       Remote support services run on private company infrastructure and are
                       not open directly to the public internet.
                     </p>
@@ -249,27 +260,28 @@ export default function RemoteSupportPlanPage() {
               </div>
 
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-start gap-3">
+                <div className={SUPPORT_CLASS.protectedItem}>
                   <div className="w-10 h-10 rounded-full bg-surface border border-border-accent flex items-center justify-center flex-shrink-0">
                     <svg
-                      className="w-5 h-5 text-accent"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className={SUPPORT_CLASS.icon}
+                      fill={SVG_VALUE.fill}
+                      stroke={SVG_VALUE.stroke}
+                      viewBox={SVG_VALUE.viewBox}
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                       />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink mb-1">
+                    <h3 className={SUPPORT_CLASS.protectedTitle}>
                       Scoped Access
                     </h3>
-                    <p className="text-sm text-ink-muted">
+                    <p className={SUPPORT_CLASS.protectedText}>
                       DISecureLink routes only approved support traffic. Normal browsing
                       stays on your regular connection.
                     </p>
@@ -278,27 +290,28 @@ export default function RemoteSupportPlanPage() {
               </div>
 
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-start gap-3">
+                <div className={SUPPORT_CLASS.protectedItem}>
                   <div className="w-10 h-10 rounded-full bg-surface border border-border-accent flex items-center justify-center flex-shrink-0">
                     <svg
-                      className="w-5 h-5 text-accent"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className={SUPPORT_CLASS.icon}
+                      fill={SVG_VALUE.fill}
+                      stroke={SVG_VALUE.stroke}
+                      viewBox={SVG_VALUE.viewBox}
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
                       />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink mb-1">
+                    <h3 className={SUPPORT_CLASS.protectedTitle}>
                       Layered Protection
                     </h3>
-                    <p className="text-sm text-ink-muted">
+                    <p className={SUPPORT_CLASS.protectedText}>
                       Remote sessions are encrypted inside the private support
                       connection.
                     </p>
@@ -307,27 +320,28 @@ export default function RemoteSupportPlanPage() {
               </div>
 
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-start gap-3">
+                <div className={SUPPORT_CLASS.protectedItem}>
                   <div className="w-10 h-10 rounded-full bg-surface border border-border-accent flex items-center justify-center flex-shrink-0">
                     <svg
-                      className="w-5 h-5 text-accent"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className={SUPPORT_CLASS.icon}
+                      fill={SVG_VALUE.fill}
+                      stroke={SVG_VALUE.stroke}
+                      viewBox={SVG_VALUE.viewBox}
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                       />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink mb-1">
+                    <h3 className={SUPPORT_CLASS.protectedTitle}>
                       Device-Level Access Control
                     </h3>
-                    <p className="text-sm text-ink-muted">
+                    <p className={SUPPORT_CLASS.protectedText}>
                       Access is limited to enrolled devices and the permissions selected for
                       each device. Authorization can be revoked.
                     </p>
@@ -336,27 +350,28 @@ export default function RemoteSupportPlanPage() {
               </div>
 
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-start gap-3">
+                <div className={SUPPORT_CLASS.protectedItem}>
                   <div className="w-10 h-10 rounded-full bg-surface border border-border-accent flex items-center justify-center flex-shrink-0">
                     <svg
-                      className="w-5 h-5 text-accent"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className={SUPPORT_CLASS.icon}
+                      fill={SVG_VALUE.fill}
+                      stroke={SVG_VALUE.stroke}
+                      viewBox={SVG_VALUE.viewBox}
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                       />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink mb-1">
+                    <h3 className={SUPPORT_CLASS.protectedTitle}>
                       Restricted Network Paths
                     </h3>
-                    <p className="text-sm text-ink-muted">
+                    <p className={SUPPORT_CLASS.protectedText}>
                       Default-deny network rules block traffic except for approved support
                       services.
                     </p>
@@ -365,33 +380,34 @@ export default function RemoteSupportPlanPage() {
               </div>
 
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-start gap-3">
+                <div className={SUPPORT_CLASS.protectedItem}>
                   <div className="w-10 h-10 rounded-full bg-surface border border-border-accent flex items-center justify-center flex-shrink-0">
                     <svg
-                      className="w-5 h-5 text-accent"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      aria-hidden
+                      className={SUPPORT_CLASS.icon}
+                      fill={SVG_VALUE.fill}
+                      stroke={SVG_VALUE.stroke}
+                      viewBox={SVG_VALUE.viewBox}
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
                       />
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap={SVG_VALUE.round}
+                        strokeLinejoin={SVG_VALUE.round}
                         strokeWidth={2}
                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-ink mb-1">
+                    <h3 className={SUPPORT_CLASS.protectedTitle}>
                       Maintained Systems
                     </h3>
-                    <p className="text-sm text-ink-muted">
+                    <p className={SUPPORT_CLASS.protectedText}>
                       We monitor, patch, and maintain the systems used to provide remote
                       support.
                     </p>
@@ -401,14 +417,13 @@ export default function RemoteSupportPlanPage() {
             </div>
           </section>
 
-          {/* Included */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="included"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.included}
           >
             <h2
-              id="included"
-              className="text-h2 tracking-h2 font-semibold text-ink"
+              id={SUPPORT_SECTION_ID.included}
+              className={SUPPORT_CLASS.sectionTitle}
             >
               What Is Included
             </h2>
@@ -424,32 +439,30 @@ export default function RemoteSupportPlanPage() {
             </ul>
           </section>
 
-          {/* Eligibility */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="eligibility"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.eligibility}
           >
             <h2
-              id="eligibility"
-              className="text-h2 tracking-h2 font-semibold text-ink"
+              id={SUPPORT_SECTION_ID.eligibility}
+              className={SUPPORT_CLASS.sectionTitle}
             >
               Who Is Eligible
             </h2>
-            <p className="mt-2 text-ink-muted">
+            <p className={SUPPORT_CLASS.sectionText}>
               This plan is available to clients in Ocala, Belleview, The Villages,
               and nearby communities. Enrollment includes in-person client and
               device verification before remote support is available.
             </p>
           </section>
 
-          {/* Tiered Support */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="tiered-support"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.tiers}
           >
             <h2
-              id="tiered-support"
-              className="text-h2 tracking-h2 font-semibold text-ink mb-4"
+              id={SUPPORT_SECTION_ID.tiers}
+              className={SUPPORT_CLASS.sectionTitleSpaced}
             >
               Remote Access Options
             </h2>
@@ -458,26 +471,25 @@ export default function RemoteSupportPlanPage() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Tier 1 */}
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-6 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-center gap-3 mb-4">
+                <div className={SUPPORT_CLASS.tierHeader}>
                   <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border-accent bg-surface text-xl font-bold text-accent">
                     1
                   </div>
-                  <h3 className="text-h3 tracking-h3 font-semibold text-ink">
+                  <h3 className={SUPPORT_CLASS.tierTitle}>
                     Tier 1
                   </h3>
                 </div>
-                <p className="text-ink-muted mb-4">
+                <p className={SUPPORT_CLASS.tierLead}>
                   <strong>Authorized Unattended Access</strong>
                 </p>
-                <p className="text-sm text-ink-muted leading-relaxed">
+                <p className={SUPPORT_CLASS.tierBody}>
                   After enrollment and authorization, we can connect without you
                   starting each session. This option fits scheduled
                   maintenance, updates, and approved non-urgent work.
                 </p>
-                <div className="mt-6 pt-4 border-t border-hairline">
-                  <p className="text-sm text-ink-muted">
+                <div className={SUPPORT_CLASS.tierFooter}>
+                  <p className={SUPPORT_CLASS.protectedText}>
                     ✓ Authorized unattended access
                     <br />
                     ✓ Scheduled or after-hours work when available
@@ -486,26 +498,25 @@ export default function RemoteSupportPlanPage() {
                 </div>
               </div>
 
-              {/* Tier 2 */}
               <div className="relative overflow-hidden rounded-card border border-hairline bg-surface bg-[image:var(--wash)] p-6 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-card-hover">
-                <div className="flex items-center gap-3 mb-4">
+                <div className={SUPPORT_CLASS.tierHeader}>
                   <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border-accent bg-surface text-xl font-bold text-accent">
                     2
                   </div>
-                  <h3 className="text-h3 tracking-h3 font-semibold text-ink">
+                  <h3 className={SUPPORT_CLASS.tierTitle}>
                     Tier 2
                   </h3>
                 </div>
-                <p className="text-ink-muted mb-4">
+                <p className={SUPPORT_CLASS.tierLead}>
                   <strong>Client-Initiated Access</strong>
                 </p>
-                <p className="text-sm text-ink-muted leading-relaxed">
+                <p className={SUPPORT_CLASS.tierBody}>
                   You start each session and remain available to enter credentials or
                   answer questions. This option fits live troubleshooting and
                   guided support.
                 </p>
-                <div className="mt-6 pt-4 border-t border-hairline">
-                  <p className="text-sm text-ink-muted">
+                <div className={SUPPORT_CLASS.tierFooter}>
+                  <p className={SUPPORT_CLASS.protectedText}>
                     ✓ You start each session
                     <br />
                     ✓ Credentials stay with you
@@ -525,19 +536,18 @@ export default function RemoteSupportPlanPage() {
             </div>
           </section>
 
-          {/* View Remote Services */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="view-remote-services"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.services}
           >
             <h2
-              id="view-remote-services"
-              className="text-h2 tracking-h2 font-semibold text-ink mb-4"
+              id={SUPPORT_SECTION_ID.services}
+              className={SUPPORT_CLASS.sectionTitleSpaced}
             >
               View Remote Services
             </h2>
             <div className="relative mt-3 overflow-hidden rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-6 text-center shadow-card">
-              <div className="relative">
+              <div className={SUPPORT_CLASS.relative}>
                 <p className="text-ink mb-4">
                   Enrolled clients can use remote sessions for software
                   troubleshooting, malware cleanup, security assessments, and
@@ -545,30 +555,29 @@ export default function RemoteSupportPlanPage() {
                   and do not require the plan.
                 </p>
                 <Link
-                  href="/services/remote"
-                  style={{ touchAction: "manipulation" }}
+                  href={SUPPORT_PATH.remote}
+                  style={TOUCH}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent-fill text-accent-contrast font-semibold transition-all shadow-md hover:bg-accent-fill-hover hover:shadow-lg touch-manipulation"
                 >
                   View Remote Services
-                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                  <ArrowRight className={SUPPORT_CLASS.actionIcon} aria-hidden="true" />
                 </Link>
               </div>
             </div>
           </section>
 
-          {/* CTA */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="enroll"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.enroll}
           >
             <h2
-              id="enroll"
-              className="text-h2 tracking-h2 font-semibold text-ink mb-4"
+              id={SUPPORT_SECTION_ID.enroll}
+              className={SUPPORT_CLASS.sectionTitleSpaced}
             >
               Enroll in the Remote Support Plan
             </h2>
             <div className="relative mt-3 overflow-hidden rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-8 text-center shadow-card">
-              <div className="relative">
+              <div className={SUPPORT_CLASS.relative}>
                 <p className="text-lg mb-2 font-semibold text-ink">
                   Start with an In-Person Setup
                 </p>
@@ -577,20 +586,21 @@ export default function RemoteSupportPlanPage() {
                   selected access option during a local setup visit.
                 </p>
                 <Link
-                  href="/contact"
-                  style={{ touchAction: "manipulation" }}
+                  href={SUPPORT_PATH.contact}
+                  style={TOUCH}
                   className="inline-flex items-center gap-2 rounded-lg border border-hairline bg-surface px-6 py-3 text-accent font-semibold shadow-card transition hover:-translate-y-0.5 hover:border-accent touch-manipulation"
                 >
                   Request Plan Enrollment
                   <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    aria-hidden
+                    className={SUPPORT_CLASS.actionIcon}
+                    fill={SVG_VALUE.fill}
+                    stroke={SVG_VALUE.stroke}
+                    viewBox={SVG_VALUE.viewBox}
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap={SVG_VALUE.round}
+                      strokeLinejoin={SVG_VALUE.round}
                       strokeWidth={2}
                       d="M17 8l4 4m0 0l-4 4m4-4H3"
                     />
@@ -604,32 +614,26 @@ export default function RemoteSupportPlanPage() {
             </div>
           </section>
 
-          {/* More devices */}
           <section
-            className="pt-6 sm:pt-8 border-t border-hairline"
-            aria-labelledby="more-devices"
-            id="more-devices"
+            className={SUPPORT_CLASS.section}
+            aria-labelledby={SUPPORT_SECTION_ID.devices}
+            id={SUPPORT_SECTION_ID.devices}
           >
-            <h2 className="text-h2 tracking-h2 font-semibold text-ink">
+            <h2 className={SUPPORT_CLASS.sectionTitle}>
               Need Coverage for More Devices?
             </h2>
-            <p className="mt-2 text-ink-muted">
-              The standard Remote Support Plan covers up to 14 enrolled devices. If
-              you need more, we can define custom device limits and access
-              options.
-            </p>
-            <p className="mt-2 text-ink-muted">
+            <p className={SUPPORT_CLASS.sectionText}>{DEVICE_LIMIT_COPY}</p>
+            <p className={SUPPORT_CLASS.sectionText}>
               We explain any additional setup, plan, or service costs before
               enrollment.
             </p>
-            <p className="mt-2 text-ink-muted">
-              <Link href="/contact" className="text-accent hover:underline">
+            <p className={SUPPORT_CLASS.sectionText}>
+              <Link href={SUPPORT_PATH.contact} className="text-accent hover:underline">
                 Contact us about additional devices
               </Link>.
             </p>
           </section>
 
-          {/* FAQ */}
           <FaqSection items={faq} />
         </main>
       </PageContainer>

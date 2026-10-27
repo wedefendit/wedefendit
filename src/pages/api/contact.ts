@@ -1,39 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import {
+  CONTACT_LIMITS,
+  ContactTopicValue,
+  contactTopicMessageLabel,
+  contactTopicRecipient,
+  isValidContactEmail,
+} from "../../../lib/contact-topics";
+import { ProtectedFormStatusValue, verifyRecaptcha } from "../../../lib/recaptcha";
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY ?? "";
-const RECAPTCHA_SECRET = process.env.GOOGLE_CAPTCHA_SECRET ?? "";
 
-const TOPIC_EMAILS: Record<string, string> = {
-  general: "contact@wedefendit.com",
-  computer_repair: "service@wedefendit.com",
-  virus_removal: "service@wedefendit.com",
-  network_security: "service@wedefendit.com",
-  scam_protection: "service@wedefendit.com",
-  data_recovery: "service@wedefendit.com",
-  onsite_support: "service@wedefendit.com",
-  remote_support: "service@wedefendit.com",
-  smart_home: "service@wedefendit.com",
-  sigint_pro: "sigint-pro@wedefendit.com",
-  sigint_enterprise: "sigint-enterprise@wedefendit.com",
-  sigint_community: "sigint-community@wedefendit.com",
-  other: "contact@wedefendit.com",
-};
-
-const TOPIC_LABELS: Record<string, string> = {
-  general: "General Question",
-  computer_repair: "Computer Repair",
-  virus_removal: "Virus and Malware Removal",
-  network_security: "Home Network and Wi-Fi Security",
-  scam_protection: "Scam and Fraud Protection",
-  data_recovery: "Data Recovery and Backup Help",
-  onsite_support: "On-Site Tech Support",
-  remote_support: "Remote Support",
-  smart_home: "Smart Home Setup and Security",
-  sigint_pro: "SIGINT Pro Inquiry",
-  sigint_enterprise: "SIGINT Enterprise Inquiry",
-  sigint_community: "SIGINT Community Question",
-  other: "Other",
-};
+enum ContactRequestMethodValue { Post = "POST" }
+enum ContactErrorValue { UnsupportedMethod = "Method not allowed", InvalidEmail = "Enter a valid email address.", ShortMessage = "Enter at least 10 characters in your message.", LongMessage = "Keep your message under 5,000 characters.", CaptchaRequired = "Complete the CAPTCHA.", CaptchaRejected = "We could not verify the CAPTCHA. Please try again.", TooManyRequests = "Too many requests. Please try again in a minute.", DeliveryFailed = "We could not send your message. Please try again." }
 
 type Body = {
   email?: string;
@@ -42,15 +20,6 @@ type Body = {
   message?: string;
   captchaToken?: string;
 };
-
-async function verifyCaptcha(token: string): Promise<boolean> {
-  const res = await fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${token}`,
-    { method: "POST" },
-  );
-  const data = await res.json();
-  return data.success === true && (data.score ?? 1) >= 0.5;
-}
 
 function escapeHtml(str: string): string {
   return str
@@ -65,43 +34,41 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== ContactRequestMethodValue.Post) {
+    return res.status(ProtectedFormStatusValue.MethodNotAllowed).json({ error: ContactErrorValue.UnsupportedMethod });
   }
 
   const {
     email,
     name,
-    topic = "general",
+    topic = ContactTopicValue.General,
     message,
     captchaToken,
   } = req.body as Body;
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: "Enter a valid email address." });
+  if (!email || !isValidContactEmail(email)) {
+    return res.status(ProtectedFormStatusValue.BadRequest).json({ error: ContactErrorValue.InvalidEmail });
   }
 
-  if (!message || message.trim().length < 10) {
-    return res
-      .status(400)
-      .json({ error: "Enter at least 10 characters in your message." });
+  if (!message || message.trim().length < CONTACT_LIMITS.messageMin) {
+    return res.status(ProtectedFormStatusValue.BadRequest).json({ error: ContactErrorValue.ShortMessage });
   }
 
-  if (message.length > 5000) {
-    return res.status(400).json({ error: "Keep your message under 5,000 characters." });
+  if (message.length > CONTACT_LIMITS.messageMax) {
+    return res.status(ProtectedFormStatusValue.BadRequest).json({ error: ContactErrorValue.LongMessage });
   }
 
   if (!captchaToken) {
-    return res.status(400).json({ error: "Complete the CAPTCHA." });
+    return res.status(ProtectedFormStatusValue.BadRequest).json({ error: ContactErrorValue.CaptchaRequired });
   }
 
-  const captchaValid = await verifyCaptcha(captchaToken);
+  const captchaValid = await verifyRecaptcha(captchaToken);
   if (!captchaValid) {
-    return res.status(403).json({ error: "We could not verify the CAPTCHA. Please try again." });
+    return res.status(ProtectedFormStatusValue.Forbidden).json({ error: ContactErrorValue.CaptchaRejected });
   }
 
-  const toEmail = TOPIC_EMAILS[topic] ?? TOPIC_EMAILS.general;
-  const topicLabel = TOPIC_LABELS[topic] ?? topic;
+  const toEmail = contactTopicRecipient(topic);
+  const topicLabel = contactTopicMessageLabel(topic);
   const senderName = name?.trim() || "Website Visitor";
 
   try {
@@ -123,21 +90,19 @@ export default async function handler(
       }),
     });
 
-    if (brevoRes.status === 429) {
-      return res
-        .status(429)
-        .json({ error: "Too many requests. Please try again in a minute." });
+    if (brevoRes.status === ProtectedFormStatusValue.RateLimited) {
+      return res.status(ProtectedFormStatusValue.RateLimited).json({ error: ContactErrorValue.TooManyRequests });
     }
 
     if (!brevoRes.ok) {
       const err = await brevoRes.text();
       console.error("Brevo SMTP error:", err);
-      return res.status(500).json({ error: "We could not send your message. Please try again." });
+      return res.status(ProtectedFormStatusValue.ServerError).json({ error: ContactErrorValue.DeliveryFailed });
     }
 
-    return res.status(200).json({ ok: true });
+    return res.status(ProtectedFormStatusValue.Ok).json({ ok: true });
   } catch (err) {
     console.error("Contact form error:", err);
-    return res.status(500).json({ error: "We could not send your message. Please try again." });
+    return res.status(ProtectedFormStatusValue.ServerError).json({ error: ContactErrorValue.DeliveryFailed });
   }
 }

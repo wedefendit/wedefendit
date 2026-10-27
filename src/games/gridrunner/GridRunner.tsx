@@ -1,7 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 "use client";
 
 import { GridRunnerShell } from "./GridRunnerShell";
@@ -9,7 +5,16 @@ import { useCallback, useEffect, useRef } from "react";
 import { useForceDarkMode } from "./hooks/useForceDarkMode";
 import { useGridRunner } from "./hooks/useGridRunner";
 import { useAudio } from "./hooks/useAudio";
-import type { ToolInstance, ToolType } from "./engine/types";
+import { GAME_LIMITS, OverlayValue } from "./engine/game-state";
+import {
+  GameScreenValue,
+  OnboardingKeyValue,
+  ToolTypeValue,
+  type OnboardingKey,
+  type ToolInstance,
+  type ToolType,
+} from "./engine/types";
+import { SfxIdValue, type SfxId } from "./engine/audio";
 import { BootScreen } from "./ui/screens/BootScreen";
 import { TitleScreen } from "./ui/screens/TitleScreen";
 import { OverworldScreen } from "./ui/screens/OverworldScreen";
@@ -28,50 +33,52 @@ import { SectorUnlockOverlay } from "./ui/screens/SectorUnlockOverlay";
 import { TutorialPrompt } from "./ui/screens/TutorialPrompt";
 import { BattleTransition } from "./ui/shared/BattleTransition";
 
-const ONBOARDING_COPY: Record<string, string> = {
-  loot: "You found a tool. Open Inventory or press I to equip it. Its stats determine damage, accuracy, and energy use.",
-  shop: "Spend Bits to buy tools. More tools become available as you level up.",
-  disc: "Identity Disc updated. Open it from the menu or press Shift+D to review tools and intel.",
-  boss: "Boss ahead. Equip your tools and restore your HP before moving forward.",
+enum ActionButtonValue {
+  Primary = "a",
+  Secondary = "b",
+}
+
+const ONBOARDING_COPY: Record<OnboardingKey, string> = {
+  [OnboardingKeyValue.Loot]:
+    "You found a tool. Open Inventory or press I to equip it. Its stats determine damage, accuracy, and energy use.",
+  [OnboardingKeyValue.Shop]:
+    "Use the shop to spend Bits on tools. More tools unlock as you level up.",
+  [OnboardingKeyValue.Disc]:
+    "Identity Disc updated. Open it from the menu or press Shift+D to review tools and intel.",
+  [OnboardingKeyValue.Boss]:
+    "Boss ahead. Equip your tools and restore your HP before moving forward.",
 };
 import { zoneNames } from "./data/sectors";
 
-const TOOL_SFX: Record<
-  ToolType,
-  "tool-recon" | "tool-exploit" | "tool-defense" | "tool-persistence"
-> = {
-  recon: "tool-recon",
-  exploit: "tool-exploit",
-  defense: "tool-defense",
-  persistence: "tool-persistence",
+const TOOL_SFX: Record<ToolType, SfxId> = {
+  [ToolTypeValue.Recon]: SfxIdValue.ToolRecon,
+  [ToolTypeValue.Exploit]: SfxIdValue.ToolExploit,
+  [ToolTypeValue.Defense]: SfxIdValue.ToolDefense,
+  [ToolTypeValue.Persistence]: SfxIdValue.ToolPersistence,
 };
 
-/**
- * Top-level GRIDRUNNER component. Manages the screen state machine:
- *   boot -> title -> overworld -> building -> battle
- * Overlays (menu, disc, inventory, operator, save, settings) render on top.
- */
 export function GridRunner() {
   useForceDarkMode();
   const game = useGridRunner();
 
-  const isBootScreen = game.screen === "boot";
-  const isTitleScreen = game.screen === "title";
-  const isBattle = game.screen === "battle";
-  const isMapScreen = game.screen === "overworld" || game.screen === "building";
+  const isBootScreen = game.screen === GameScreenValue.Boot;
+  const isTitleScreen = game.screen === GameScreenValue.Title;
+  const isBattle = game.screen === GameScreenValue.Battle;
+  const isMapScreen =
+    game.screen === GameScreenValue.Overworld ||
+    game.screen === GameScreenValue.Building;
   const zoneName =
     zoneNames[game.currentZone] ?? game.currentZone.toUpperCase();
 
   const isBoss = game.battle?.isBoss ?? false;
-  const isPaused = game.overlay !== "none";
+  const isPaused = game.overlay !== OverlayValue.None;
   const audio = useAudio(
-    isBootScreen ? "title" : game.screen,
+    isBootScreen ? GameScreenValue.Title : game.screen,
     game.currentZone,
     isBoss,
     isPaused,
   );
 
-  /* ---- SFX: step on move ---- */
   const prevPosRef = useRef(game.playerPos);
   useEffect(() => {
     const prev = prevPosRef.current;
@@ -79,33 +86,36 @@ export function GridRunner() {
       isMapScreen &&
       (prev.x !== game.playerPos.x || prev.y !== game.playerPos.y)
     ) {
-      audio.sfx("step");
+      audio.sfx(SfxIdValue.Step);
     }
     prevPosRef.current = game.playerPos;
   }, [game.playerPos, isMapScreen, audio]);
 
-  /* ---- SFX: encounter trigger ---- */
   const prevScreenRef = useRef(game.screen);
   useEffect(() => {
-    if (prevScreenRef.current !== "battle" && game.screen === "battle") {
-      audio.sfx("encounter");
+    if (
+      prevScreenRef.current !== GameScreenValue.Battle &&
+      game.screen === GameScreenValue.Battle
+    ) {
+      audio.sfx(SfxIdValue.Encounter);
     }
     prevScreenRef.current = game.screen;
   }, [game.screen, audio]);
 
-  /* ---- SFX: menu open/close ---- */
   const prevOverlayRef = useRef(game.overlay);
   useEffect(() => {
     const prev = prevOverlayRef.current;
-    if (prev === "none" && game.overlay !== "none") {
-      audio.sfx("menu-open");
-    } else if (prev !== "none" && game.overlay === "none") {
-      audio.sfx("menu-close");
+    if (prev === OverlayValue.None && game.overlay !== OverlayValue.None) {
+      audio.sfx(SfxIdValue.MenuOpen);
+    } else if (
+      prev !== OverlayValue.None &&
+      game.overlay === OverlayValue.None
+    ) {
+      audio.sfx(SfxIdValue.MenuClose);
     }
     prevOverlayRef.current = game.overlay;
   }, [game.overlay, audio]);
 
-  /* ---- SFX: battle log (hit/miss/critical) ---- */
   const prevLogLenRef = useRef(0);
   useEffect(() => {
     if (!game.battle) {
@@ -118,17 +128,16 @@ export function GridRunner() {
     for (let i = prevLogLenRef.current; i < log.length; i++) {
       const entry = log[i];
       if (entry.includes("[CRIT]")) {
-        audio.sfx("critical");
+        audio.sfx(SfxIdValue.Critical);
       } else if (entry.includes("[HIT]")) {
-        audio.sfx("hit");
+        audio.sfx(SfxIdValue.Hit);
       } else if (entry.includes("[MISS]")) {
-        audio.sfx("miss");
+        audio.sfx(SfxIdValue.Miss);
       }
     }
     prevLogLenRef.current = log.length;
   }, [game.battle?.log.length, game.battle, audio]);
 
-  /* ---- SFX: tool use wrapper ---- */
   const handleUseTool = useCallback(
     (tool: ToolInstance) => {
       audio.sfx(TOOL_SFX[tool.type]);
@@ -137,14 +146,12 @@ export function GridRunner() {
     [audio, game],
   );
 
-  /* ---- Title screen: mute toggle ---- */
   const handleMuteToggle = useCallback(() => {
     audio.onSettingsChange({ ...audio.settings, muted: !audio.settings.muted });
   }, [audio]);
 
-  /* ---- Boot screen: chime ---- */
   const handlePlayChime = useCallback(() => {
-    audio.sfx("level-up");
+    audio.sfx(SfxIdValue.LevelUp);
   }, [audio]);
 
   return (
@@ -153,8 +160,8 @@ export function GridRunner() {
       onDPadPress={game.handleDPadPress}
       onDPadRelease={game.handleDPadRelease}
       onActionPress={(btn) => {
-        if (btn === "a") game.handleInteract();
-        if (btn === "b") game.handleCloseOverlay();
+        if (btn === ActionButtonValue.Primary) game.handleInteract();
+        if (btn === ActionButtonValue.Secondary) game.handleCloseOverlay();
       }}
       onSelect={game.handleOpenDisc}
       onStart={game.handleOpenMenu}
@@ -209,22 +216,21 @@ export function GridRunner() {
         />
       )}
 
-      {/* Overlays */}
-      {game.overlay === "menu" && (
+      {game.overlay === OverlayValue.Menu && (
         <MenuOverlay
           onClose={game.handleCloseOverlay}
           onOpenOverlay={game.handleOpenOverlay}
           inBattle={isBattle}
         />
       )}
-      {game.overlay === "disc" && game.save && (
+      {game.overlay === OverlayValue.Disc && game.save && (
         <DiscScreen
           onClose={game.handleCloseOverlay}
           equippedTools={game.save.equippedTools}
           inventory={game.save.inventory}
         />
       )}
-      {game.overlay === "inventory" && game.save && (
+      {game.overlay === OverlayValue.Inventory && game.save && (
         <InventoryScreen
           onClose={game.handleCloseOverlay}
           equippedTools={game.save.equippedTools}
@@ -233,7 +239,7 @@ export function GridRunner() {
           onScrap={game.handleScrapTool}
         />
       )}
-      {game.overlay === "operator" && game.save && (
+      {game.overlay === OverlayValue.Operator && game.save && (
         <OperatorScreen
           onClose={game.handleCloseOverlay}
           player={game.save.player}
@@ -243,29 +249,29 @@ export function GridRunner() {
           playTime={game.save.playTime}
         />
       )}
-      {game.overlay === "save" && (
+      {game.overlay === OverlayValue.Save && (
         <SaveScreen
           onClose={game.handleCloseOverlay}
           onSave={game.handleManualSave}
         />
       )}
-      {game.overlay === "settings" && (
+      {game.overlay === OverlayValue.Settings && (
         <SettingsScreen
           onClose={game.handleCloseOverlay}
           audioSettings={audio.settings}
           onAudioChange={audio.onSettingsChange}
         />
       )}
-      {game.overlay === "shop" && game.save && (
+      {game.overlay === OverlayValue.Shop && game.save && (
         <ShopScreen
           onClose={game.handleCloseOverlay}
           player={game.save.player}
           bits={game.save.bits}
-          inventoryFull={game.save.inventory.length >= 12}
+          inventoryFull={game.save.inventory.length >= GAME_LIMITS.inventoryItems}
           onBuy={game.handleBuyTool}
         />
       )}
-      {game.overlay === "level-up" && game.levelUpSummary && (
+      {game.overlay === OverlayValue.LevelUp && game.levelUpSummary && (
         <LevelUpOverlay
           oldLevel={game.levelUpSummary.oldLevel}
           newLevel={game.levelUpSummary.newLevel}
@@ -273,13 +279,13 @@ export function GridRunner() {
           onContinue={game.handleDismissLevelUp}
         />
       )}
-      {game.overlay === "intel" && game.pendingIntelBossId && (
+      {game.overlay === OverlayValue.Intel && game.pendingIntelBossId && (
         <IntelReportScreen
           bossId={game.pendingIntelBossId}
           onClose={game.handleDismissIntel}
         />
       )}
-      {game.overlay === "sector-unlock" && (
+      {game.overlay === OverlayValue.SectorUnlock && (
         <SectorUnlockOverlay onClose={game.handleDismissSectorUnlock} />
       )}
       {game.battleTransition && (
@@ -289,15 +295,13 @@ export function GridRunner() {
         />
       )}
       {game.activeOnboarding &&
-        game.overlay !== "level-up" &&
-        game.overlay !== "intel" && (
+        game.overlay !== OverlayValue.LevelUp &&
+        game.overlay !== OverlayValue.Intel && (
           <div className="absolute inset-x-0 bottom-0 z-50 p-2">
             <TutorialPrompt
               message={ONBOARDING_COPY[game.activeOnboarding]}
               onDismiss={() =>
-                game.handleDismissOnboarding(
-                  game.activeOnboarding as "loot" | "shop" | "disc" | "boss",
-                )
+                game.handleDismissOnboarding(game.activeOnboarding)
               }
             />
           </div>

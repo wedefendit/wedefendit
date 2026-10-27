@@ -2,14 +2,25 @@ import { defineConfig } from "@playwright/test";
 
 const port = 3005;
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:" + port;
+const RETAIN_ON_FAILURE = "retain-on-failure";
+const NEVER_OPEN_REPORT = "never";
+
+enum BrowserName {
+  Chromium = "chromium",
+  Firefox = "firefox",
+  WebKit = "webkit",
+}
+
+enum ReporterName {
+  List = "list",
+  Html = "html",
+}
 
 export default defineConfig({
   testDir: "./tests/playwright",
   testMatch: "*.e2e.spec.ts",
   fullyParallel: true,
   workers: "100%",
-  // One retry absorbs rare, irreducible sub-frame settling noise in full-page
-  // visual snapshots; a genuine failure still fails on the retry.
   retries: 1,
   timeout: 45_000,
   expect: {
@@ -19,36 +30,36 @@ export default defineConfig({
       threshold: 0.25,
     },
   },
-  reporter: [["list"], ["html", { open: "never" }]],
+  reporter: [[ReporterName.List], [ReporterName.Html, { open: NEVER_OPEN_REPORT }]],
   outputDir: "test-results/playwright",
   use: {
     baseURL,
     headless: true,
     colorScheme: "dark",
-    trace: "retain-on-failure",
+    trace: RETAIN_ON_FAILURE,
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    video: RETAIN_ON_FAILURE,
   },
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: "npm run dev -- --hostname 127.0.0.1",
+        command: "npm run build && npm run start -- --hostname 127.0.0.1",
         url: baseURL + "/awareness/digital-house",
         reuseExistingServer: true,
         timeout: 180_000,
       },
   projects: [
     {
-      name: "chromium",
-      use: { browserName: "chromium" },
+      name: BrowserName.Chromium,
+      use: { browserName: BrowserName.Chromium },
     },
     {
-      name: "firefox",
-      use: { browserName: "firefox" },
+      name: BrowserName.Firefox,
+      use: { browserName: BrowserName.Firefox },
     },
     {
-      name: "webkit",
-      use: { browserName: "webkit" },
+      name: BrowserName.WebKit,
+      use: { browserName: BrowserName.WebKit },
     },
   ],
 });

@@ -1,18 +1,92 @@
 import type { DragEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DEVICES, type Device, type DeviceId, type ZoneId } from "../engine";
-import { CARD, TOOLBAR_LABEL, TRAY_NAME } from "../model";
-import { DeviceIcon, type DeviceIconTone } from "./DeviceIcon";
+import {
+  DEVICES,
+  DeviceCategoryValue,
+  type DeviceCategory,
+  type DeviceId,
+  type ZoneId,
+} from "../engine";
+import { CARD } from "../model";
+import {
+  DeviceIcon,
+  type DeviceIconSize,
+  type DeviceIconTone,
+} from "./DeviceIcon";
 
-const CAT_EDGE: Record<Device["category"], string> = {
-  trusted: "#38bdf8",
-  guest: "#fbbf24",
-  "gray-area": "#94a3b8",
-  entertainment: "#a78bfa",
-  camera: "#f87171",
+enum ScrollFadeValue { Start = "start", Middle = "mid", End = "end" }
+enum BrowserEventValue { Scroll = "scroll", Wheel = "wheel", TouchMove = "touchmove", TouchEnd = "touchend", TouchCancel = "touchcancel" }
+enum ActivationKeyValue { Enter = "Enter", Space = " " }
+
+const BUTTON_ROLE = "button";
+const DEVICE_TEST_ID_PREFIX = "dh-device-";
+const HINT_ANIMATION = "dh-hintPulse 1.5s ease-in-out infinite";
+const HINT_CLASS = "text-[18px] font-black text-sky-400";
+const INVENTORY_PANEL_ID = "dh-inventory-panel";
+const PLACED_ICON_CLASS = "opacity-75";
+const TILE_ICON_SIZE: DeviceIconSize = "tile";
+
+const CAT_EDGE: Record<DeviceCategory, string> = {
+  [DeviceCategoryValue.Trusted]: "#38bdf8",
+  [DeviceCategoryValue.Guest]: "#fbbf24",
+  [DeviceCategoryValue.GrayArea]: "#94a3b8",
+  [DeviceCategoryValue.Entertainment]: "#a78bfa",
+  [DeviceCategoryValue.Camera]: "#f87171",
 };
 
-// ======== MOBILE: Horizontal scroll strip ========
+function resolveDeviceTone(
+  id: DeviceId, placed: boolean,
+  placedZones: Record<DeviceId, ZoneId | null> | undefined,
+  defaultTone: DeviceIconTone,
+): DeviceIconTone {
+  const zone = placed ? placedZones?.[id] : null;
+  return zone ? (`zone-${zone}` as DeviceIconTone) : defaultTone;
+}
+
+function scrollFade(
+  scrollLeft: number, scrollWidth: number, clientWidth: number,
+): ScrollFadeValue {
+  if (scrollLeft <= 4) return ScrollFadeValue.Start;
+  if (scrollLeft + clientWidth >= scrollWidth - 4) {
+    return ScrollFadeValue.End;
+  }
+  return ScrollFadeValue.Middle;
+}
+
+function deviceBorderColor(
+  guided: boolean, selected: boolean, category: DeviceCategory, fallback: string,
+): string {
+  if (guided) return CAT_EDGE[category];
+  if (selected) return CAT_EDGE[DeviceCategoryValue.Trusted];
+  return fallback;
+}
+
+function mobileDeviceStateClass(selected: boolean, placed: boolean): string {
+  if (selected) {
+    return "scale-[1.06] shadow-[0_0_14px_rgba(56,189,248,0.35)] ring-1 ring-sky-300/80 dark:shadow-[0_0_14px_rgba(56,189,248,0.45)] dark:ring-sky-300/70";
+  }
+  if (placed) return "cursor-pointer opacity-40";
+  return "cursor-pointer hover:bg-slate-100/90 dark:hover:bg-slate-800/90";
+}
+
+function desktopDeviceStateClass(selected: boolean, placed: boolean, allowDrag: boolean): string {
+  if (selected) {
+    return "border-sky-400 bg-sky-50/90 ring-1 ring-sky-300/60 dark:border-sky-400 dark:bg-sky-950/60 dark:ring-sky-500/40";
+  }
+  if (placed) {
+    return "cursor-pointer border-slate-200/70 bg-slate-100/55 opacity-60 dark:border-slate-700/60 dark:bg-slate-800/40";
+  }
+  if (allowDrag) {
+    return "cursor-grab border-slate-200/80 bg-white/84 hover:border-sky-300/80 active:cursor-grabbing dark:border-slate-700/70 dark:bg-slate-900/60 dark:hover:border-sky-400/40";
+  }
+  return "cursor-pointer border-slate-200/80 bg-white/84 hover:border-sky-300/80 dark:border-slate-700/70 dark:bg-slate-900/60 dark:hover:border-sky-400/40";
+}
+
+function openRiskLabel(riskCount: number): string {
+  if (riskCount === 0) return "No open risks";
+  const suffix = riskCount === 1 ? "" : "s";
+  return `${riskCount} open risk${suffix}`;
+}
 
 export type DeviceStripProps = Readonly<{
   selectedId: DeviceId | null;
@@ -38,41 +112,33 @@ export function DeviceStrip({
   onTouchDragStart,
 }: DeviceStripProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [fade, setFade] = useState<"start" | "mid" | "end">("start");
-  const toneFor = (id: DeviceId, placed: boolean): DeviceIconTone => {
-    if (placed && placedZones) {
-      const z = placedZones[id];
-      if (z) return `zone-${z}` as DeviceIconTone;
-    }
-    return deviceTone;
-  };
+  const [fade, setFade] = useState<ScrollFadeValue>(ScrollFadeValue.Start);
   const updateFade = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     const { scrollLeft: sl, scrollWidth: sw, clientWidth: cw } = el;
-    setFade(sl <= 4 ? "start" : sl + cw >= sw - 4 ? "end" : "mid");
+    setFade(scrollFade(sl, sw, cw));
   }, []);
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     updateFade();
-    el.addEventListener("scroll", updateFade, { passive: true });
+    el.addEventListener(BrowserEventValue.Scroll, updateFade, { passive: true });
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY === 0) return;
       e.preventDefault();
       el.scrollLeft += e.deltaY;
     };
-    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener(BrowserEventValue.Wheel, onWheel, { passive: false });
     const ro = new globalThis.ResizeObserver(updateFade);
     ro.observe(el);
     return () => {
-      el.removeEventListener("scroll", updateFade);
-      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener(BrowserEventValue.Scroll, updateFade);
+      el.removeEventListener(BrowserEventValue.Wheel, onWheel);
       ro.disconnect();
     };
   }, [updateFade]);
 
-  // Long-press gate: quick horizontal swipe = scroll, deliberate hold = drag
   const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dragOriginRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -95,13 +161,21 @@ export function DeviceStrip({
       }
       e.preventDefault();
     };
-    globalThis.addEventListener("touchmove", onMove, { passive: false });
-    globalThis.addEventListener("touchend", cancelPendingDrag);
-    globalThis.addEventListener("touchcancel", cancelPendingDrag);
+    globalThis.addEventListener(BrowserEventValue.TouchMove, onMove, {
+      passive: false,
+    });
+    globalThis.addEventListener(BrowserEventValue.TouchEnd, cancelPendingDrag);
+    globalThis.addEventListener(
+      BrowserEventValue.TouchCancel,
+      cancelPendingDrag,
+    );
     return () => {
-      globalThis.removeEventListener("touchmove", onMove);
-      globalThis.removeEventListener("touchend", cancelPendingDrag);
-      globalThis.removeEventListener("touchcancel", cancelPendingDrag);
+      globalThis.removeEventListener(BrowserEventValue.TouchMove, onMove);
+      globalThis.removeEventListener(BrowserEventValue.TouchEnd, cancelPendingDrag);
+      globalThis.removeEventListener(
+        BrowserEventValue.TouchCancel,
+        cancelPendingDrag,
+      );
       cancelPendingDrag();
     };
   }, [cancelPendingDrag]);
@@ -124,27 +198,27 @@ export function DeviceStrip({
 
   return (
     <div data-testid="dh-device-strip" className="relative w-full">
-      {fade !== "start" && (
+      {fade !== ScrollFadeValue.Start && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-10 items-center justify-start bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent pl-1.5"
         >
           <span
-            className="text-[18px] font-black text-sky-400"
-            style={{ animation: "dh-hintPulse 1.5s ease-in-out infinite" }}
+            className={HINT_CLASS}
+            style={{ animation: HINT_ANIMATION }}
           >
             ‹
           </span>
         </div>
       )}
-      {fade !== "end" && (
+      {fade !== ScrollFadeValue.End && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-10 items-center justify-end bg-gradient-to-l from-slate-900 via-slate-900/80 to-transparent pr-1.5"
         >
           <span
-            className="text-[18px] font-black text-sky-400"
-            style={{ animation: "dh-hintPulse 1.5s ease-in-out infinite" }}
+            className={HINT_CLASS}
+            style={{ animation: HINT_ANIMATION }}
           >
             ›
           </span>
@@ -159,17 +233,18 @@ export function DeviceStrip({
           {DEVICES.map((dev) => {
             const placed = placedIds.has(dev.id);
             const sel = selectedId === dev.id;
-            const bc = guided
-              ? CAT_EDGE[dev.category]
-              : sel
-                ? "#38bdf8"
-                : "rgba(148,163,184,0.42)";
+            const bc = deviceBorderColor(
+              guided,
+              sel,
+              dev.category,
+              "rgba(148,163,184,0.42)",
+            );
             return (
               <div
                 key={dev.id}
-                role="button"
+                role={BUTTON_ROLE}
                 tabIndex={0}
-                data-testid={"dh-device-" + dev.id}
+                data-testid={DEVICE_TEST_ID_PREFIX + dev.id}
                 draggable={allowDrag && !placed}
                 onDragStart={(e) => {
                   if (!allowDrag) return;
@@ -186,7 +261,10 @@ export function DeviceStrip({
                   else onSelect(dev.id);
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (
+                    e.key === ActivationKeyValue.Enter ||
+                    e.key === ActivationKeyValue.Space
+                  ) {
                     e.preventDefault();
                     if (placed) onReturn(dev.id);
                     else onSelect(dev.id);
@@ -202,20 +280,21 @@ export function DeviceStrip({
                 title={dev.name}
                 className={[
                   "touch-manipulation flex w-14 min-w-14 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-lg border p-1.5 bg-white/90 shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all dark:bg-slate-900/80",
-                  sel
-                    ? "scale-[1.06] shadow-[0_0_14px_rgba(56,189,248,0.35)] ring-1 ring-sky-300/80 dark:shadow-[0_0_14px_rgba(56,189,248,0.45)] dark:ring-sky-300/70"
-                    : placed
-                      ? "cursor-pointer opacity-40"
-                      : "cursor-pointer hover:bg-slate-100/90 dark:hover:bg-slate-800/90",
+                  mobileDeviceStateClass(sel, placed),
                 ].join(" ")}
                 style={{ borderColor: bc }}
               >
                 <DeviceIcon
                   deviceId={dev.id}
                   category={dev.category}
-                  size="tile"
-                  tone={toneFor(dev.id, placed)}
-                  className={placed ? "opacity-75" : "" + " mt-0.5"}
+                  size={TILE_ICON_SIZE}
+                  tone={resolveDeviceTone(
+                    dev.id,
+                    placed,
+                    placedZones,
+                    deviceTone,
+                  )}
+                  className={placed ? PLACED_ICON_CLASS : "" + " mt-0.5"}
                 />
                 <span
                   className={[
@@ -225,7 +304,7 @@ export function DeviceStrip({
                       : "text-slate-700 dark:text-slate-100",
                   ].join(" ")}
                 >
-                  {TOOLBAR_LABEL[dev.id]}
+                  {dev.toolbarLabel}
                 </span>
               </div>
             );
@@ -236,21 +315,16 @@ export function DeviceStrip({
   );
 }
 
-// ======== DESKTOP: Sidebar card grid (unchanged logic, kept compact) ========
-
 export type DeviceTrayGridProps = Readonly<{
   selectedId: DeviceId | null;
   placedIds: ReadonlySet<DeviceId>;
   placedZones?: Record<DeviceId, ZoneId | null>;
   onSelect: (id: DeviceId) => void;
   onReturn: (id: DeviceId) => void;
-  layout: "toolbar" | "compact";
   allowDrag: boolean;
   guided: boolean;
   deviceTone: DeviceIconTone;
-  columns?: 1 | 2 | 3 | 4;
-  framed?: boolean;
-  showHeading?: boolean;
+  columns: 1 | 2 | 3 | 4;
   onTouchDragStart?: (id: DeviceId, e: React.TouchEvent) => void;
 }>;
 
@@ -260,56 +334,40 @@ export function DeviceTrayGrid({
   placedZones,
   onSelect,
   onReturn,
-  layout,
   allowDrag,
   guided,
   deviceTone,
-  columns = 2,
-  framed = true,
-  showHeading = true,
+  columns,
   onTouchDragStart,
 }: DeviceTrayGridProps) {
-  const toneFor = (id: DeviceId, placed: boolean): DeviceIconTone => {
-    if (placed && placedZones) {
-      const z = placedZones[id];
-      if (z) return `zone-${z}` as DeviceIconTone;
-    }
-    return deviceTone;
-  };
   const hdrag = (e: DragEvent<HTMLElement>, d: DeviceId) => {
     if (!allowDrag) return;
     e.dataTransfer.setData("text/plain", d);
     e.dataTransfer.effectAllowed = "move";
   };
   const hkey = (e: React.KeyboardEvent, d: DeviceId, pl: boolean) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (
+      e.key === ActivationKeyValue.Enter ||
+      e.key === ActivationKeyValue.Space
+    ) {
       e.preventDefault();
       if (pl) onReturn(d);
       else onSelect(d);
     }
   };
 
-  // "toolbar" layout preserved for backward compat but unused in the new layout
-  if (layout === "toolbar") return null;
-
   return (
-    <div
-      className={
-        framed ? CARD + " dh-inventory-panel p-2.5" : "dh-inventory-panel"
-      }
-    >
-      {showHeading && (
-        <div className="dh-inventory-heading mb-1.5 flex items-center gap-2">
-          <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-700 xl:text-[11px] dark:text-slate-300">
-            Inventory
+    <div className="dh-inventory-panel">
+      <div className="dh-inventory-heading mb-1.5 flex items-center gap-2">
+        <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-700 xl:text-[11px] dark:text-slate-300">
+          Inventory
+        </span>
+        {placedIds.size > 0 ? (
+          <span className="text-[12px] font-semibold text-sky-700 xl:text-[11px] dark:text-sky-300">
+            {DEVICES.length - placedIds.size} left
           </span>
-          {placedIds.size > 0 && (
-            <span className="text-[12px] font-semibold text-sky-700 xl:text-[11px] dark:text-sky-300">
-              {10 - placedIds.size} left
-            </span>
-          )}
-        </div>
-      )}
+        ) : null}
+      </div>
       <div
         data-testid="dh-inventory-grid"
         className="dh-inventory-grid grid gap-1.5"
@@ -318,16 +376,17 @@ export function DeviceTrayGrid({
         {DEVICES.map((dev) => {
           const pl = placedIds.has(dev.id);
           const sel = selectedId === dev.id;
-          const bc = guided
-            ? CAT_EDGE[dev.category]
-            : sel
-              ? "#38bdf8"
-              : "rgba(148,163,184,0.3)";
+          const bc = deviceBorderColor(
+            guided,
+            sel,
+            dev.category,
+            "rgba(148,163,184,0.3)",
+          );
           return (
             <button
               key={dev.id}
-              type="button"
-              data-testid={"dh-device-" + dev.id}
+              type={BUTTON_ROLE}
+              data-testid={DEVICE_TEST_ID_PREFIX + dev.id}
               draggable={allowDrag && !pl}
               onDragStart={(e) => hdrag(e, dev.id)}
               onClick={() => {
@@ -341,7 +400,7 @@ export function DeviceTrayGrid({
                   : undefined
               }
               aria-pressed={sel}
-              aria-label={TRAY_NAME[dev.id]}
+              aria-label={dev.trayName}
               title={dev.description}
               style={{
                 borderLeftColor: bc,
@@ -352,21 +411,20 @@ export function DeviceTrayGrid({
               }}
               className={[
                 "dh-inventory-card touch-manipulation grid items-center gap-2 overflow-hidden rounded-lg border pl-1.5 pr-2 transition-all",
-                sel
-                  ? "border-sky-400 bg-sky-50/90 ring-1 ring-sky-300/60 dark:border-sky-400 dark:bg-sky-950/60 dark:ring-sky-500/40"
-                  : pl
-                    ? "cursor-pointer border-slate-200/70 bg-slate-100/55 opacity-60 dark:border-slate-700/60 dark:bg-slate-800/40"
-                    : allowDrag
-                      ? "cursor-grab border-slate-200/80 bg-white/84 hover:border-sky-300/80 active:cursor-grabbing dark:border-slate-700/70 dark:bg-slate-900/60 dark:hover:border-sky-400/40"
-                      : "cursor-pointer border-slate-200/80 bg-white/84 hover:border-sky-300/80 dark:border-slate-700/70 dark:bg-slate-900/60 dark:hover:border-sky-400/40",
+                desktopDeviceStateClass(sel, pl, allowDrag),
               ].join(" ")}
             >
               <DeviceIcon
                 deviceId={dev.id}
                 category={dev.category}
-                size="tile"
-                tone={toneFor(dev.id, pl)}
-                className={pl ? "opacity-75" : ""}
+                size={TILE_ICON_SIZE}
+                tone={resolveDeviceTone(
+                  dev.id,
+                  pl,
+                  placedZones,
+                  deviceTone,
+                )}
+                className={pl ? PLACED_ICON_CLASS : ""}
               />
               <span
                 className={[
@@ -376,7 +434,7 @@ export function DeviceTrayGrid({
                     : "text-slate-900 dark:text-slate-50",
                 ].join(" ")}
               >
-                {TRAY_NAME[dev.id]}
+                {dev.trayName}
               </span>
             </button>
           );
@@ -385,8 +443,6 @@ export function DeviceTrayGrid({
     </div>
   );
 }
-
-// ======== After-action button ========
 
 export type AfterActionReportButtonProps = Readonly<{
   score: number;
@@ -399,13 +455,10 @@ export function AfterActionReportButton({
   riskCount,
   onOpen,
 }: AfterActionReportButtonProps) {
-  const wl =
-    riskCount === 0
-      ? "No open risks"
-      : `${riskCount} open risk${riskCount === 1 ? "" : "s"}`;
+  const wl = openRiskLabel(riskCount);
   return (
     <button
-      type="button"
+      type={BUTTON_ROLE}
       onClick={onOpen}
       style={{ animation: "dh-dangerPulse 2s ease-in-out infinite" }}
       className={
@@ -432,8 +485,6 @@ export function AfterActionReportButton({
     </button>
   );
 }
-
-// ======== Desktop sidebar panel ========
 
 export type DigitalHouseInventoryPanelProps = Readonly<{
   selectedId: DeviceId | null;
@@ -470,7 +521,7 @@ export function DigitalHouseInventoryPanel({
 }: DigitalHouseInventoryPanelProps) {
   return (
     <div
-      data-testid="dh-inventory-panel"
+      data-testid={INVENTORY_PANEL_ID}
       className={CARD + " flex flex-col p-3 xl:p-4"}
     >
       <DeviceTrayGrid
@@ -479,13 +530,10 @@ export function DigitalHouseInventoryPanel({
         placedZones={placedZones}
         onSelect={onSelect}
         onReturn={onReturn}
-        layout="compact"
         allowDrag={allowDrag}
         guided={guided}
         deviceTone={deviceTone}
         columns={columns}
-        framed={false}
-        showHeading
         onTouchDragStart={onTouchDragStart}
       />
       {showAfterAction && onOpenAfterAction ? (

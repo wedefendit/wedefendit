@@ -1,17 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import { useRouter } from "next/router";
 import { Navbar } from "./Nav";
 import { Footer } from "./Footer";
@@ -22,11 +8,6 @@ type LayoutProps = Readonly<{
   children?: ReactNode;
 }>;
 
-/**
- * Routes that render as full-viewport games. On these pages the floating
- * ThemeToggle and footer are skipped so the game owns the full viewport below
- * the sticky nav. The circuit background stays visible.
- */
 const GAME_ROUTES: ReadonlySet<string> = new Set([
   "/awareness/digital-house",
   "/awareness/gridrunner",
@@ -47,7 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     >
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-accent-fill focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-contrast focus:shadow-lg"
+        className="sr-only size-11 focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:size-auto focus:rounded-lg focus:bg-accent-fill focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-contrast focus:shadow-lg"
       >
         Skip to main content
       </a>

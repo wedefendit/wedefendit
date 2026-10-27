@@ -1,19 +1,6 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { localBusinessLd } from "@/lib/json-ld";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import companyInfo from "../../../data/company-info.json";
 import {
   Meta,
@@ -38,6 +25,30 @@ const { contact, name, service_areas } = companyInfo;
 const { phone, email, address, gpg, service_email } = contact;
 const { street, city, state, zip } = address;
 const { fingerprint, key_id, key_url, secure_email } = gpg;
+const CONTACT_CLASS = {
+  infoRow: "flex items-start gap-3",
+  infoIcon: "w-5 h-5 text-accent mt-1 flex-shrink-0",
+  infoHeading: "font-semibold text-ink",
+  emailLink: "text-accent hover:underline text-sm break-all",
+  smallIcon: "w-4 h-4",
+  detailHeading: "font-semibold mb-1",
+  detailSection: "pt-2 border-t border-hairline",
+};
+const CONTACT_VALUE = { touch: { touchAction: "manipulation" }, pgp: "pgp", panel: "pgp-panel", secureQuery: "secure", enabled: "1", hashPrefix: "#" };
+
+function subscribeToLocation(): () => void {
+  return () => {};
+}
+
+function secureContactRequested(): boolean {
+  const url = new URL(globalThis.location.href);
+  return url.searchParams.get(CONTACT_VALUE.secureQuery) === CONTACT_VALUE.enabled ||
+    url.hash.replace(CONTACT_VALUE.hashPrefix, "") === CONTACT_VALUE.pgp;
+}
+
+function serverSecureContactRequested(): boolean {
+  return false;
+}
 
 function HeadingSection() {
   return (
@@ -62,7 +73,7 @@ function PrimaryContact() {
           Call or Text
         </h2>
         <a
-          href={`tel:${phone.replace(/[^0-9]/g, "")}`}
+          href={`tel:${phone.replace(/\D/g, "")}`}
           className="block text-3xl font-bold text-accent hover:underline"
         >
           {phone.replace("+1", "")}
@@ -83,41 +94,38 @@ function ContactInfoCard() {
       </h3>
 
       <div className="space-y-4">
-        {/* Standard Email */}
-        <div className="flex items-start gap-3">
-          <Mail className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
+        <div className={CONTACT_CLASS.infoRow}>
+          <Mail className={CONTACT_CLASS.infoIcon} />
           <div>
-            <h4 className="font-semibold text-ink">
+            <h4 className={CONTACT_CLASS.infoHeading}>
               General Questions
             </h4>
             <a
               href={`mailto:${email}`}
-              className="text-accent hover:underline text-sm break-all"
+              className={CONTACT_CLASS.emailLink}
             >
               {email}
             </a>
           </div>
         </div>
 
-        {/* Service Email */}
-        <div className="flex items-start gap-3">
-          <Mail className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
+        <div className={CONTACT_CLASS.infoRow}>
+          <Mail className={CONTACT_CLASS.infoIcon} />
           <div>
-            <h4 className="font-semibold text-ink">
+            <h4 className={CONTACT_CLASS.infoHeading}>
               Service Requests
             </h4>
             <a
               href={`mailto:${service_email}`}
-              className="text-accent hover:underline text-sm break-all"
+              className={CONTACT_CLASS.emailLink}
             >
               {service_email}
             </a>
           </div>
         </div>
 
-        {/* Address */}
         <div className="flex items-start gap-3 pt-2 border-t border-hairline">
-          <MapPin className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
+          <MapPin className={CONTACT_CLASS.infoIcon} />
           <div>
             <h4 className="font-semibold text-ink mb-1">
               Mailing Address
@@ -142,13 +150,13 @@ function ContactInfoCard() {
 function SecureContactCard({
   showPGP,
   setShowPGP,
-}: {
+}: Readonly<{
   showPGP: boolean;
   setShowPGP: (v: boolean) => void;
-}) {
+}>) {
   return (
     <section
-      id="pgp"
+      id={CONTACT_VALUE.pgp}
       className="relative overflow-hidden rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-6 shadow-card"
     >
       <div className="flex items-start gap-4">
@@ -165,26 +173,26 @@ function SecureContactCard({
           <button
             type="button"
             onClick={() => setShowPGP(!showPGP)}
-            style={{ touchAction: "manipulation" }}
+            style={CONTACT_VALUE.touch}
             className="inline-flex items-center gap-2 px-4 py-2 rounded bg-accent-fill text-accent-contrast text-sm font-medium shadow transition-all hover:bg-accent-fill-hover touch-manipulation"
-            aria-controls="pgp-panel"
+            aria-controls={CONTACT_VALUE.panel}
             aria-expanded={showPGP}
           >
             {showPGP ? "Hide" : "Show"} PGP Details
             {showPGP ? (
-              <ChevronUp className="w-4 h-4" />
+              <ChevronUp className={CONTACT_CLASS.smallIcon} />
             ) : (
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDown className={CONTACT_CLASS.smallIcon} />
             )}
           </button>
 
           {showPGP && (
             <div
-              id="pgp-panel"
+              id={CONTACT_VALUE.panel}
               className="mt-6 space-y-4 rounded-card border border-hairline bg-surface p-4 text-sm text-ink-muted shadow-card"
             >
               <div>
-                <p className="font-semibold mb-1">Secure Email Address:</p>
+                <p className={CONTACT_CLASS.detailHeading}>Secure Email Address:</p>
                 <a
                   href={`mailto:${secure_email}`}
                   className="text-accent hover:underline break-all"
@@ -199,21 +207,21 @@ function SecureContactCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   download
-                  style={{ touchAction: "manipulation" }}
+                  style={CONTACT_VALUE.touch}
                   className="inline-block rounded bg-accent-fill px-4 py-2 text-accent-contrast font-medium text-sm shadow transition-all hover:bg-accent-fill-hover touch-manipulation"
                 >
                   Download Public PGP Key
                 </a>
               </div>
 
-              <div className="pt-2 border-t border-hairline">
-                <p className="font-semibold mb-1">Key ID:</p>
+              <div className={CONTACT_CLASS.detailSection}>
+                <p className={CONTACT_CLASS.detailHeading}>Key ID:</p>
                 <CopyableCode text={key_id} />
               </div>
 
-              <div className="pt-2 border-t border-hairline">
+              <div className={CONTACT_CLASS.detailSection}>
                 <div className="flex items-center gap-2 mb-2">
-                  <Fingerprint className="w-4 h-4" />
+                  <Fingerprint className={CONTACT_CLASS.smallIcon} />
                   <p className="font-semibold">Fingerprint:</p>
                 </div>
                 <CopyableCode text={fingerprint.replace(/\s+/g, "")} />
@@ -226,7 +234,7 @@ function SecureContactCard({
   );
 }
 
-const canonical = "https://www.wedefendit.com/contact";
+const canonical = `${SITE_URL}/contact`;
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
@@ -236,7 +244,7 @@ const breadcrumbLd = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://www.wedefendit.com/",
+      item: `${SITE_URL}/`,
     },
     { "@type": "ListItem", position: 2, name: "Contact", item: canonical },
   ],
@@ -260,7 +268,7 @@ const contactPageLd = {
       contactType: "Customer Service",
       availableLanguage: "English",
       email: contact.email,
-      serviceUrl: "https://www.wedefendit.com/services",
+      serviceUrl: `${SITE_URL}/services`,
       url: canonical,
       areaServed: service_areas,
     },
@@ -268,20 +276,20 @@ const contactPageLd = {
 };
 
 export default function ContactPage() {
-  const [showPGP, setShowPGP] = useState(false);
+  const requestedSecureContact = useSyncExternalStore(
+    subscribeToLocation,
+    secureContactRequested,
+    serverSecureContactRequested,
+  );
+  const [showPgpOverride, setShowPgpOverride] = useState<boolean | null>(null);
+  const showPGP = showPgpOverride ?? requestedSecureContact;
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const url = new URL(window.location.href);
-    if (
-      url.searchParams.get("secure") === "1" ||
-      url.hash.replace("#", "") === "pgp"
-    ) {
-      setShowPGP(true);
-      const el = document.getElementById("pgp");
+    if (requestedSecureContact) {
+      const el = document.getElementById(CONTACT_VALUE.pgp);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, []);
+  }, [requestedSecureContact]);
 
   return (
     <>
@@ -306,16 +314,13 @@ export default function ContactPage() {
 
           <HeadingSection />
 
-          {/* Main Contact Section - Two Column Layout */}
           <div className="grid gap-6 md:grid-cols-2 md:gap-8">
             <PrimaryContact />
             <ContactInfoCard />
           </div>
 
-          {/* Secure Contact Section */}
-          <SecureContactCard showPGP={showPGP} setShowPGP={setShowPGP} />
+          <SecureContactCard showPGP={showPGP} setShowPGP={setShowPgpOverride} />
 
-          {/* Contact Form */}
           <section className="relative overflow-hidden rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-4 shadow-card sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <MessageSquare className="w-7 h-7 sm:w-8 sm:h-8 text-accent flex-shrink-0" />
@@ -332,7 +337,6 @@ export default function ContactPage() {
             <ContactForm className="max-w-xl mx-auto" />
           </section>
 
-          {/* Service Area */}
           <ServiceAreaAndBooking />
         </div>
       </PageContainer>

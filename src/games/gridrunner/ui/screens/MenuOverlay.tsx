@@ -1,58 +1,66 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
+import { OverlayValue } from "../../engine/game-state";
+
+type MenuTarget =
+  | OverlayValue.Disc
+  | OverlayValue.Inventory
+  | OverlayValue.Operator
+  | OverlayValue.Save
+  | OverlayValue.Settings;
 
 type MenuOverlayProps = Readonly<{
   onClose: () => void;
-  onOpenOverlay: (
-    target: "disc" | "inventory" | "operator" | "save" | "settings",
-  ) => void;
+  onOpenOverlay: (target: MenuTarget) => void;
   inBattle: boolean;
 }>;
 
-const MENU_ITEMS = [
+type MenuItem = Readonly<{
+  id: MenuTarget;
+  label: string;
+  desc: string;
+  battleOk: boolean;
+}>;
+
+const MENU_ITEMS: readonly MenuItem[] = [
   {
-    id: "disc",
+    id: OverlayValue.Disc,
     label: "DISC",
     desc: "Review tools and types",
     battleOk: true,
   },
   {
-    id: "inventory",
+    id: OverlayValue.Inventory,
     label: "INVENTORY",
     desc: "Equip and manage tools",
     battleOk: true,
   },
   {
-    id: "operator",
+    id: OverlayValue.Operator,
     label: "OPERATOR",
     desc: "View stats, badges, and level",
     battleOk: true,
   },
-  { id: "save", label: "SAVE", desc: "Save your progress", battleOk: false },
   {
-    id: "settings",
+    id: OverlayValue.Save,
+    label: "SAVE",
+    desc: "Save your progress",
+    battleOk: false,
+  },
+  {
+    id: OverlayValue.Settings,
     label: "SETTINGS",
     desc: "Change audio settings",
     battleOk: true,
   },
-] as const;
+];
+const MENU_VALUES: Readonly<{ button: "button" }> = { button: "button" };
 
 export function MenuOverlay({
   onClose,
   onOpenOverlay,
   inBattle,
 }: MenuOverlayProps) {
-  function handleSelect(id: string) {
-    if (
-      id === "disc" ||
-      id === "inventory" ||
-      id === "operator" ||
-      id === "save" ||
-      id === "settings"
-    ) {
-      onOpenOverlay(id);
-    }
+  function handleSelect(id: MenuTarget) {
+    onOpenOverlay(id);
   }
 
   return (
@@ -73,7 +81,7 @@ export function MenuOverlay({
           return (
             <button
               key={item.id}
-              type="button"
+              type={MENU_VALUES.button}
               disabled={disabled}
               onClick={() => handleSelect(item.id)}
               className="gr-font-mono flex items-center justify-between rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-3 py-2.5 text-left text-sm text-[#00f0ff] transition-opacity disabled:opacity-30"
@@ -88,7 +96,7 @@ export function MenuOverlay({
           Press B to close
         </p>
         <button
-          type="button"
+          type={MENU_VALUES.button}
           onClick={onClose}
           className="gr-font-mono mt-1 min-h-[44px] rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-3 py-2.5 text-sm font-bold tracking-widest text-[#aabbcc] active:brightness-150"
         >

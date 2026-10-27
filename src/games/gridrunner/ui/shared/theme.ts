@@ -1,92 +1,22 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
+import { ToolTypeValue, type ToolType } from "../../engine/types";
 
-/* ------------------------------------------------------------------ */
-/*  Color tokens — single source of truth for all GRIDRUNNER UI       */
-/* ------------------------------------------------------------------ */
+export const GRIDRUNNER_DETAIL_TEXT_CLASS = "text-xs text-[#aabbcc]";
 
-export const GR = {
-  bgDeep: "#0a0e1a",
-  bgPanel: "#0f1b2d",
-  bgDarker: "#080c16",
-  bgInput: "#0a1220",
-  bgLog: "#060a12",
-  bgMeter: "#0d1520",
-  border: "#1a3a4a",
-  borderCyan: "#00f0ff",
-  cyan: "#00f0ff",
-  magenta: "#ff00de",
-  orange: "#ff6b00",
-  red: "#ff003c",
-  green: "#00ff41",
-  discRed: "#ff5c72",
-  text: "#e0e0e0",
-  textDim: "#aabbcc",
-  textMuted: "#8899aa",
-  textDisabled: "#4a5568",
-  textBright: "#d0d8e0",
-  lootOrange: "#ff9500",
-  lootPurple: "#a855f7",
-  lootBlue: "#4da6ff",
-} as const;
-
-/* ------------------------------------------------------------------ */
-/*  Rarity color maps                                                 */
-/* ------------------------------------------------------------------ */
-
-export const RARITY_TEXT: Record<string, string> = {
-  common: "text-[#e0e0e0]",
-  uncommon: "text-[#00ff41]",
-  rare: "text-[#4da6ff]",
-  epic: "text-[#a855f7]",
-  legendary: "text-[#ff9500]",
+export const TOOL_TYPE_PRESENTATION: Record<ToolType, Readonly<{
+  textClass: string;
+  badgeClass: string;
+  label: string;
+  title: string;
+  strong: string;
+  weak: string;
+  chartDescription: string;
+  toolDescription: string;
+}>> = {
+  [ToolTypeValue.Recon]: { textClass: "text-[#00f0ff]", badgeClass: "text-[#00f0ff] border-[#00f0ff]/40", label: "RECON", title: "Recon", strong: "Persistence (1.5x)", weak: "Defense (0.75x)", chartDescription: "Scanning and information gathering. Know your target before you strike.", toolDescription: "Security teams use reconnaissance to map systems and identify weaknesses. In battle, Recon is strong against Persistence but weak against Defense." },
+  [ToolTypeValue.Exploit]: { textClass: "text-[#ff5c72]", badgeClass: "text-[#ff5c72] border-[#ff5c72]/40", label: "EXPLOIT", title: "Exploit", strong: "Defense (1.5x)", weak: "Persistence (0.75x)", chartDescription: "Direct attacks that break through defenses. High risk, high reward.", toolDescription: "Penetration testers use controlled exploits to confirm that a vulnerability can be used. In battle, Exploit is strong against Defense but weak against Persistence." },
+  [ToolTypeValue.Defense]: { textClass: "text-[#00ff41]", badgeClass: "text-[#00ff41] border-[#00ff41]/40", label: "DEFENSE", title: "Defense", strong: "Exploit (1.5x)", weak: "Recon (0.75x)", chartDescription: "Shields and detection. Blocks incoming attacks and reveals threats.", toolDescription: "Defensive tools help block, detect, and investigate attacks. In battle, Defense is strong against Exploit but weak against Recon." },
+  [ToolTypeValue.Persistence]: { textClass: "text-[#ff00de]", badgeClass: "text-[#a855f7] border-[#a855f7]/40", label: "PERSIST", title: "Persistence", strong: "Recon (1.5x)", weak: "Exploit (0.75x)", chartDescription: "Maintaining access. Slow damage over time that is hard to remove.", toolDescription: "Threat actors use persistence techniques to maintain access after a compromise. In battle, Persistence is strong against Recon but weak against Exploit." },
 };
-
-export const RARITY_BORDER: Record<string, string> = {
-  common: "border-[#e0e0e0]/30",
-  uncommon: "border-[#00ff41]/30",
-  rare: "border-[#4da6ff]/30",
-  epic: "border-[#a855f7]/30",
-  legendary: "border-[#ff9500]/30",
-};
-
-export const SCRAP_VALUES: Record<string, number> = {
-  common: 3,
-  uncommon: 8,
-  rare: 20,
-  epic: 50,
-  legendary: 120,
-};
-
-/* ------------------------------------------------------------------ */
-/*  Tool type color maps                                              */
-/* ------------------------------------------------------------------ */
-
-export const TYPE_TEXT: Record<string, string> = {
-  recon: "text-[#00f0ff]",
-  exploit: "text-[#ff5c72]",
-  defense: "text-[#00ff41]",
-  persistence: "text-[#ff00de]",
-};
-
-export const TYPE_LABELS: Record<string, string> = {
-  recon: "RECON",
-  exploit: "EXPLOIT",
-  defense: "DEFENSE",
-  persistence: "PERSIST",
-};
-
-export const TYPE_BADGE: Record<string, string> = {
-  recon: "text-[#00f0ff] border-[#00f0ff]/40",
-  exploit: "text-[#ff5c72] border-[#ff5c72]/40",
-  defense: "text-[#00ff41] border-[#00ff41]/40",
-  persistence: "text-[#a855f7] border-[#a855f7]/40",
-};
-
-/* ------------------------------------------------------------------ */
-/*  Battle log tag colors                                             */
-/* ------------------------------------------------------------------ */
 
 export const TAG_COLORS: Record<string, string> = {
   SYS: "text-[#00f0ff]",

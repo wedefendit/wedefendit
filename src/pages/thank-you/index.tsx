@@ -1,25 +1,14 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import { CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PageContainer } from "@/components";
 import jsonData from "../../../data/company-info.json";
 const contact = jsonData.contact;
+const CANONICAL = `${SITE_URL}/thank-you`;
+const PAGE_TITLE = "Appointment Confirmed | Defend I.T. Solutions";
+const OG_IMAGE = ogImageUrl("Appointment Confirmed");
 
 export default function ThankYouPage() {
   const [secondsLeft, setSecondsLeft] = useState(15);
@@ -27,7 +16,7 @@ export default function ThankYouPage() {
 
   useEffect(() => {
     if (secondsLeft <= 0) {
-      router.push("/");
+      void router.push("/");
       return;
     }
 
@@ -41,14 +30,14 @@ export default function ThankYouPage() {
   return (
     <>
       <Head>
-        <title>Appointment Confirmed | Defend I.T. Solutions</title>
+        <title>{PAGE_TITLE}</title>
         <meta
           name="description"
           content="Your appointment with Defend I.T. Solutions is scheduled. Call us if you have questions or need to reschedule."
         />
         <meta
           property="og:title"
-          content="Appointment Confirmed | Defend I.T. Solutions"
+          content={PAGE_TITLE}
         />
         <meta
           property="og:description"
@@ -56,18 +45,18 @@ export default function ThankYouPage() {
         />
         <meta
           property="og:url"
-          content="https://www.wedefendit.com/thank-you"
+          content={CANONICAL}
         />
         <meta property="og:type" content="website" />
         <meta
           property="og:image"
-          content={ogImageUrl("Appointment Confirmed")}
+          content={OG_IMAGE}
         />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Appointment Confirmed | Defend I.T. Solutions"
+          content={PAGE_TITLE}
         />
         <meta
           name="twitter:description"
@@ -75,10 +64,10 @@ export default function ThankYouPage() {
         />
         <meta
           name="twitter:image"
-          content={ogImageUrl("Appointment Confirmed")}
+          content={OG_IMAGE}
         />
 
-        <link rel="canonical" href="https://www.wedefendit.com/thank-you" />
+        <link rel="canonical" href={CANONICAL} />
         <meta
           name="keywords"
           content="Thank You, Appointment Confirmed, Defend I.T. Solutions, Tech Support, The Villages, Ocala, Cybersecurity, Local IT Services"
@@ -101,7 +90,7 @@ export default function ThankYouPage() {
               Questions or changes? Call us at:
             </p>
             <a
-              href={`tel:+${contact.phone.replace(/[^0-9]/g, "")}`}
+              href={`tel:+${contact.phone.replace(/\D/g, "")}`}
               className="text-base sm:text-lg text-accent hover:underline break-words"
             >
               {contact.phone}
@@ -120,7 +109,7 @@ export default function ThankYouPage() {
           </div>
 
           <p className="text-sm text-ink-dim">
-            If you are not redirected automatically,&nbsp;
+            If you are not redirected automatically,{"\u00a0"}
             <button
               type="button"
               onClick={() => router.push("/")}

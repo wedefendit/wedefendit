@@ -1,120 +1,116 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
+import type { ZoneId } from "./zones";
 
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
+export enum DeviceIdValue {
+  WorkLaptop = "work-laptop",
+  PersonalPhone = "personal-phone",
+  Tablet = "tablet",
+  GuestPhone = "guest-phone",
+  Printer = "printer",
+  SmartTv = "smart-tv",
+  SmartSpeaker = "smart-speaker",
+  GameConsole = "game-console",
+  DoorbellCamera = "doorbell-camera",
+  CameraHub = "camera-hub",
+}
 
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
+export type DeviceId = `${DeviceIdValue}`;
 
-export type DeviceId =
-  | "work-laptop"
-  | "personal-phone"
-  | "tablet"
-  | "guest-phone"
-  | "printer"
-  | "smart-tv"
-  | "smart-speaker"
-  | "game-console"
-  | "doorbell-camera"
-  | "camera-hub";
+export enum DeviceCategoryValue {
+  Trusted = "trusted",
+  Guest = "guest",
+  GrayArea = "gray-area",
+  Entertainment = "entertainment",
+  Camera = "camera",
+}
 
-export type DeviceCategory =
-  | "trusted"
-  | "guest"
-  | "gray-area"
-  | "entertainment"
-  | "camera";
+export type DeviceCategory = `${DeviceCategoryValue}`;
 
 export type Device = {
   id: DeviceId;
   name: string;
-  shortName: string;
+  trayName: string;
+  toolbarLabel: string;
   category: DeviceCategory;
+  idealZone: ZoneId;
   description: string;
 };
 
 export const DEVICES: Device[] = [
   {
-    id: "work-laptop",
+    id: DeviceIdValue.WorkLaptop,
     name: "Work laptop",
-    shortName: "Laptop",
-    category: "trusted",
+    trayName: "Work Laptop", toolbarLabel: "Laptop",
+    category: DeviceCategoryValue.Trusted, idealZone: "main",
     description:
       "Your main work computer, which contains sensitive accounts and data.",
   },
   {
-    id: "personal-phone",
+    id: DeviceIdValue.PersonalPhone,
     name: "Personal phone",
-    shortName: "Phone",
-    category: "trusted",
+    trayName: "Phone", toolbarLabel: "Phone",
+    category: DeviceCategoryValue.Trusted, idealZone: "main",
     description:
       "Your phone, with banking, email, and authentication apps.",
   },
   {
-    id: "tablet",
+    id: DeviceIdValue.Tablet,
     name: "Tablet",
-    shortName: "Tablet",
-    category: "trusted",
+    trayName: "Tablet", toolbarLabel: "Tab",
+    category: DeviceCategoryValue.Trusted, idealZone: "main",
     description:
       "A personal device used for browsing, reading, and light work.",
   },
   {
-    id: "guest-phone",
+    id: DeviceIdValue.GuestPhone,
     name: "Guest phone",
-    shortName: "Guest",
-    category: "guest",
+    trayName: "Guest Phone", toolbarLabel: "Guest",
+    category: DeviceCategoryValue.Guest, idealZone: "guest",
     description:
       "A visitor's device that only needs temporary internet access.",
   },
   {
-    id: "printer",
+    id: DeviceIdValue.Printer,
     name: "Printer",
-    shortName: "Printer",
-    category: "gray-area",
+    trayName: "Printer", toolbarLabel: "Print",
+    category: DeviceCategoryValue.GrayArea, idealZone: "iot",
     description:
       "A printer that may receive security updates less often than your computer or phone.",
   },
   {
-    id: "smart-tv",
+    id: DeviceIdValue.SmartTv,
     name: "Smart TV",
-    shortName: "TV",
-    category: "entertainment",
+    trayName: "Smart TV", toolbarLabel: "TV",
+    category: DeviceCategoryValue.Entertainment, idealZone: "iot",
     description: "A connected TV that runs streaming apps and communicates with online services.",
   },
   {
-    id: "smart-speaker",
+    id: DeviceIdValue.SmartSpeaker,
     name: "Smart speaker",
-    shortName: "Speaker",
-    category: "entertainment",
+    trayName: "Speaker", toolbarLabel: "Spkr",
+    category: DeviceCategoryValue.Entertainment, idealZone: "iot",
     description:
       "A voice assistant connected to online services and other smart home devices.",
   },
   {
-    id: "game-console",
+    id: DeviceIdValue.GameConsole,
     name: "Game console",
-    shortName: "Console",
-    category: "entertainment",
+    trayName: "Console", toolbarLabel: "Game",
+    category: DeviceCategoryValue.Entertainment, idealZone: "iot",
     description: "A console used for gaming, streaming, and voice chat.",
   },
   {
-    id: "doorbell-camera",
+    id: DeviceIdValue.DoorbellCamera,
     name: "Doorbell camera",
-    shortName: "Doorbell",
-    category: "camera",
+    trayName: "Doorbell", toolbarLabel: "Bell",
+    category: DeviceCategoryValue.Camera, idealZone: "iot",
     description:
       "An internet-connected camera at your front door.",
   },
   {
-    id: "camera-hub",
+    id: DeviceIdValue.CameraHub,
     name: "Camera hub / indoor cameras",
-    shortName: "Cameras",
-    category: "camera",
+    trayName: "Cameras", toolbarLabel: "Cam",
+    category: DeviceCategoryValue.Camera, idealZone: "iot",
     description:
       "Indoor cameras and a hub that stores or manages private video.",
   },
@@ -132,30 +128,18 @@ export function getDevice(id: DeviceId): Device {
   return DEVICE_BY_ID[id];
 }
 
-export const TRUSTED_DEVICE_IDS: DeviceId[] = [
-  "work-laptop",
-  "personal-phone",
-  "tablet",
-];
-
-export const ENTERTAINMENT_AND_CAMERA_IDS: DeviceId[] = [
-  "smart-tv",
-  "smart-speaker",
-  "game-console",
-  "doorbell-camera",
-  "camera-hub",
-];
-
-export const CAMERA_IDS: DeviceId[] = ["doorbell-camera", "camera-hub"];
-
 export function isTrusted(id: DeviceId): boolean {
-  return TRUSTED_DEVICE_IDS.includes(id);
+  return getDevice(id).category === DeviceCategoryValue.Trusted;
 }
 
 export function isCamera(id: DeviceId): boolean {
-  return CAMERA_IDS.includes(id);
+  return getDevice(id).category === DeviceCategoryValue.Camera;
 }
 
 export function isEntertainmentOrCamera(id: DeviceId): boolean {
-  return ENTERTAINMENT_AND_CAMERA_IDS.includes(id);
+  const category = getDevice(id).category;
+  return (
+    category === DeviceCategoryValue.Entertainment ||
+    category === DeviceCategoryValue.Camera
+  );
 }

@@ -1,33 +1,16 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
 import Head from "next/head";
 import JsonLdScript from "./JsonLdScript";
-import { DEFAULT_OG_IMAGE } from "@/lib/og";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/og";
 
 interface MetaProps {
   title?: string;
   description?: string;
-  /** Explicit OG image URL. When omitted, falls back to the brand share card. */
   image?: string;
-  /** @deprecated OG cards are static now; ignored. Kept so existing callers compile. */
-  ogImageTitle?: string;
   imageAlt?: string;
   url?: string;
   keywords?: string;
   canonical?: string;
   siteName?: string;
-  twitterSite?: string; // e.g. @wedefendit
   noindex?: boolean;
   ogLocale?: string; // e.g. en_US
   themeColor?: string;
@@ -40,7 +23,7 @@ export const Meta = ({
   description = "Cybersecurity & I.T. Services in The Villages and Ocala",
   image,
   imageAlt = "Defend I.T. Solutions logo and tagline",
-  url = "https://www.wedefendit.com/",
+  url = `${SITE_URL}/`,
   keywords = "cybersecurity, IT support, Ocala, The Villages, Belleview, small business IT, home tech support, network security, computer repair, tech services, elderly scams, online safety",
   canonical,
   siteName = "Defend I.T. Solutions",
@@ -64,7 +47,6 @@ export const Meta = ({
 
     <link rel="canonical" href={canonical || url} />
 
-    {/* Open Graph */}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:locale" content={ogLocale} />
@@ -77,14 +59,12 @@ export const Meta = ({
     <meta property="og:image:height" content="630" />
     <meta property="og:image:secure_url" content={ogImage} />
 
-    {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={imageAlt} />
 
-    {/* JSON-LD */}
     {structuredData && <JsonLdScript jsonLd={structuredData} />}
   </Head>
   );

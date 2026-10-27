@@ -1,160 +1,135 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
-/**
- * The full reducer is not exported from useGridRunner.ts (it's closure
- * state for the hook). Rather than export internals, we validate the
- * DISMISS_ONBOARDING state transition by reproducing the two branches
- * the reducer exercises and asserting the resulting shape. The branches
- * under test are the ones most likely to drift when the reducer is
- * touched: (1) dismiss sets the flag and shifts the queue, (2) the shop
- * dismiss also opens the shop overlay.
- */
-
 import { describe, expect, it } from "vitest";
-import type {
-  GridRunnerSave,
-  OnboardingFlags,
-  OnboardingKey,
+import { createBattle } from "../engine/battle";
+import { gameReducer } from "../engine/game-reducer";
+import {
+  createInitialGameState,
+  GameActionValue,
+  OverlayValue,
+  type GridRunnerState,
+} from "../engine/game-state";
+import { BaseToolIdValue, createCommonTool } from "../engine/loot";
+import { createNewSave } from "../engine/save";
+import { spawnEnemy } from "../engine/enemies";
+import {
+  BattlePhaseValue,
+  GameScreenValue,
+  OnboardingKeyValue,
+  type GridRunnerSave,
+  type OnboardingFlags,
+  type OnboardingKey,
 } from "../engine/types";
 
-type MiniState = {
-  save: GridRunnerSave | null;
-  onboardingQueue: OnboardingKey[];
-  pendingShopOpen: boolean;
-  overlay: "none" | "shop";
-  overlayReturnTo: "none" | "menu";
-};
-
 const EMPTY_FLAGS: OnboardingFlags = {
-  loot: false,
-  shop: false,
-  disc: false,
-  boss: false,
+  [OnboardingKeyValue.Loot]: false,
+  [OnboardingKeyValue.Shop]: false,
+  [OnboardingKeyValue.Disc]: false,
+  [OnboardingKeyValue.Boss]: false,
 };
 
 function makeSave(flags: Partial<OnboardingFlags> = {}): GridRunnerSave {
   return {
-    version: 3,
-    playerName: "Op",
-    player: {
-      level: 1,
-      xp: 0,
-      xpToNext: 50,
-      integrity: 100,
-      maxIntegrity: 100,
-      compute: 60,
-      maxCompute: 60,
-      bandwidth: 10,
-      firewall: 5,
-    },
-    inventory: [],
-    equippedTools: [null, null, null, null],
+    ...createNewSave("Op"),
     currentZone: "arcade",
     currentPosition: { x: 0, y: 0 },
-    defeatedBosses: [],
     completedTutorial: true,
-    unlockedIntelEntries: [],
     onboarding: { ...EMPTY_FLAGS, ...flags },
-    bits: 0,
-    credits: 0,
-    playTime: 0,
-    savedAt: "2026-04-17T00:00:00.000Z",
   };
 }
 
-/** Mirrors the DISMISS_ONBOARDING case in useGridRunner.ts reducer. */
-function dismissOnboarding(state: MiniState, key: OnboardingKey): MiniState {
-  if (!state.save) return state;
-  if (state.onboardingQueue[0] !== key) return state;
-  const nextQueue = state.onboardingQueue.slice(1);
-  const nextSave = {
-    ...state.save,
-    onboarding: { ...state.save.onboarding, [key]: true },
-  };
-  const openShopNow = key === "shop" && state.pendingShopOpen;
+function onboardingState(
+  queue: OnboardingKey[],
+  flags: Partial<OnboardingFlags> = {},
+): GridRunnerState {
   return {
-    ...state,
-    save: nextSave,
-    onboardingQueue: nextQueue,
-    pendingShopOpen: openShopNow ? false : state.pendingShopOpen,
-    overlay: openShopNow ? "shop" : state.overlay,
-    overlayReturnTo: openShopNow ? "none" : state.overlayReturnTo,
+    ...createInitialGameState(),
+    screen: GameScreenValue.Building,
+    save: makeSave(flags),
+    currentZone: "arcade",
+    onboardingQueue: queue,
+  };
+}
+
+function dismiss(state: GridRunnerState, key: OnboardingKey): GridRunnerState {
+  return gameReducer(state, { type: GameActionValue.DismissOnboarding, key });
+}
+
+function finishBattle(state: GridRunnerState): GridRunnerState {
+  const exiting = gameReducer(state, { type: GameActionValue.BattleEnd });
+  return gameReducer(exiting, { type: GameActionValue.BattleTransitionEnd });
+}
+
+function winningBattleState(
+  flags: Partial<OnboardingFlags> = {},
+  queue: OnboardingKey[] = [],
+  includeLoot = true,
+): GridRunnerState {
+  const enemy = spawnEnemy("script-kiddie", 1);
+  const loot = includeLoot ? createCommonTool(BaseToolIdValue.Nmap) : null;
+  return {
+    ...onboardingState(queue, flags),
+    screen: GameScreenValue.Battle,
+    battle: {
+      ...createBattle(enemy, false),
+      phase: BattlePhaseValue.Won,
+      lootDrop: loot,
+    },
   };
 }
 
 describe("DISMISS_ONBOARDING transition", () => {
   it("sets the matching flag and shifts the queue", () => {
-    const initial: MiniState = {
-      save: makeSave(),
-      onboardingQueue: ["loot", "disc"],
-      pendingShopOpen: false,
-      overlay: "none",
-      overlayReturnTo: "none",
-    };
-    const next = dismissOnboarding(initial, "loot");
+    const initial = onboardingState([
+      OnboardingKeyValue.Loot,
+      OnboardingKeyValue.Disc,
+    ]);
+    const next = dismiss(initial, OnboardingKeyValue.Loot);
     expect(next.save?.onboarding.loot).toBe(true);
     expect(next.save?.onboarding.disc).toBe(false);
-    expect(next.onboardingQueue).toEqual(["disc"]);
-    expect(next.overlay).toBe("none");
+    expect(next.onboardingQueue).toEqual([OnboardingKeyValue.Disc]);
+    expect(next.overlay).toBe(OverlayValue.None);
   });
 
-  it("opens the shop overlay when dismissing the shop onboarding", () => {
-    const initial: MiniState = {
-      save: makeSave(),
-      onboardingQueue: ["shop"],
+  it("opens the shop overlay when dismissing shop onboarding", () => {
+    const initial = {
+      ...onboardingState([OnboardingKeyValue.Shop]),
       pendingShopOpen: true,
-      overlay: "none",
-      overlayReturnTo: "none",
     };
-    const next = dismissOnboarding(initial, "shop");
+    const next = dismiss(initial, OnboardingKeyValue.Shop);
     expect(next.save?.onboarding.shop).toBe(true);
     expect(next.pendingShopOpen).toBe(false);
-    expect(next.overlay).toBe("shop");
-    expect(next.overlayReturnTo).toBe("none");
+    expect(next.overlay).toBe(OverlayValue.Shop);
+    expect(next.overlayReturnTo).toBe(OverlayValue.None);
   });
 
-  it("is a no-op when the key does not match the front of the queue", () => {
-    const initial: MiniState = {
-      save: makeSave(),
-      onboardingQueue: ["loot"],
-      pendingShopOpen: false,
-      overlay: "none",
-      overlayReturnTo: "none",
-    };
-    const next = dismissOnboarding(initial, "shop");
+  it("is a no-op when the key does not match the queue front", () => {
+    const initial = onboardingState([OnboardingKeyValue.Loot]);
+    const next = dismiss(initial, OnboardingKeyValue.Shop);
     expect(next).toBe(initial);
   });
 });
 
-/**
- * Trigger-guard logic: loot is only queued when the flag is false AND
- * loot is not already pending. This mirrors the BATTLE_END check in
- * useGridRunner.ts so drift in that rule is caught.
- */
-function shouldQueueLoot(
-  save: GridRunnerSave,
-  lootDrop: boolean,
-  queue: OnboardingKey[],
-): boolean {
-  return lootDrop && !save.onboarding.loot && !queue.includes("loot");
-}
-
 describe("loot onboarding trigger guard", () => {
   it("queues when loot dropped and flag is false", () => {
-    expect(shouldQueueLoot(makeSave(), true, [])).toBe(true);
+    const next = finishBattle(winningBattleState());
+    expect(next.onboardingQueue).toContain(OnboardingKeyValue.Loot);
   });
 
   it("does not queue when flag is already true", () => {
-    expect(shouldQueueLoot(makeSave({ loot: true }), true, [])).toBe(false);
+    const next = finishBattle(
+      winningBattleState({ [OnboardingKeyValue.Loot]: true }),
+    );
+    expect(next.onboardingQueue).not.toContain(OnboardingKeyValue.Loot);
   });
 
   it("does not queue when no loot dropped", () => {
-    expect(shouldQueueLoot(makeSave(), false, [])).toBe(false);
+    const next = finishBattle(winningBattleState({}, [], false));
+    expect(next.onboardingQueue).not.toContain(OnboardingKeyValue.Loot);
   });
 
-  it("does not queue when already pending", () => {
-    expect(shouldQueueLoot(makeSave(), true, ["loot"])).toBe(false);
+  it("does not queue a duplicate pending prompt", () => {
+    const next = finishBattle(
+      winningBattleState({}, [OnboardingKeyValue.Loot]),
+    );
+    expect(next.onboardingQueue).toEqual([OnboardingKeyValue.Loot]);
   });
 });

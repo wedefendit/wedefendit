@@ -88,7 +88,6 @@ async function placeAllDevices(page: Page) {
   for (let i = 0; i < deviceIds.length; i++) {
     await page.getByTestId("dh-device-" + deviceIds[i]).click();
     await page.getByTestId("dh-room-" + roomIds[i]).click();
-    await page.waitForTimeout(80);
   }
 }
 
@@ -97,7 +96,7 @@ async function placeAllDevices(page: Page) {
 test.describe("Help Modal lifecycle", () => {
   test.use({ hasTouch: true, isMobile: true });
   test.beforeEach(({ browserName }) => {
-    test.skip(browserName === "firefox", "isMobile not supported in Firefox");
+    test.skip(browserName === "firefox", "isMobile not supported in Firefox"); // NOSONAR
   });
 
   for (const vp of PHONE_VIEWPORTS) {
@@ -116,7 +115,7 @@ test.describe("Help Modal lifecycle", () => {
 
       // X button must not be occluded -- use exact aria-label to avoid
       // matching the backdrop ("Close help") in strict mode
-      const closeBtn = page.getByRole("button", { name: "Close", exact: true });
+      const closeBtn = modal.getByLabel("Close", { exact: true });
       await assertNotOccluded(closeBtn);
 
       // Tap to close
@@ -158,7 +157,7 @@ test.describe("Help Modal lifecycle", () => {
 test.describe("After-Action Report lifecycle", () => {
   test.use({ hasTouch: true, isMobile: true });
   test.beforeEach(({ browserName }) => {
-    test.skip(browserName === "firefox", "isMobile not supported in Firefox");
+    test.skip(browserName === "firefox", "isMobile not supported in Firefox"); // NOSONAR
   });
 
   for (const vp of PHONE_VIEWPORTS) {
@@ -170,7 +169,7 @@ test.describe("After-Action Report lifecycle", () => {
       await placeAllDevices(page);
 
       // Open the after-action report
-      const aarBtn = page.getByRole("button", { name: /after-action/i });
+      const aarBtn = page.getByRole("button", { name: /results/i });
       await aarBtn.scrollIntoViewIfNeeded();
       await aarBtn.click();
       const modal = page.getByLabel(/after-action report/i);
@@ -195,7 +194,7 @@ test.describe("After-Action Report lifecycle", () => {
       await openGame(page);
       await placeAllDevices(page);
 
-      const aarBtn = page.getByRole("button", { name: /after-action/i });
+      const aarBtn = page.getByRole("button", { name: /results/i });
       await aarBtn.scrollIntoViewIfNeeded();
       await aarBtn.click();
       const modal = page.getByLabel(/after-action report/i);
@@ -213,7 +212,7 @@ test.describe("After-Action Report lifecycle", () => {
       await openGame(page);
       await placeAllDevices(page);
 
-      const aarBtn = page.getByRole("button", { name: /after-action/i });
+      const aarBtn = page.getByRole("button", { name: /results/i });
       await aarBtn.scrollIntoViewIfNeeded();
       await aarBtn.click();
       await expect(page.getByLabel(/after-action report/i)).toBeVisible();
@@ -227,7 +226,7 @@ test.describe("After-Action Report lifecycle", () => {
 test.describe("Analysis card feedback", () => {
   test.use({ hasTouch: true, isMobile: true });
   test.beforeEach(({ browserName }) => {
-    test.skip(browserName === "firefox", "isMobile not supported in Firefox");
+    test.skip(browserName === "firefox", "isMobile not supported in Firefox"); // NOSONAR
   });
 
   for (const vp of PHONE_VIEWPORTS) {
@@ -240,10 +239,10 @@ test.describe("Analysis card feedback", () => {
       // Place a device to trigger feedback
       await page.getByTestId("dh-device-camera-hub").click();
       await page.getByTestId("dh-room-kitchen").click();
-      await page.waitForTimeout(200);
 
       const card = page.getByTestId("dh-analysis-card");
       await expect(card).toBeVisible();
+      await expect(card).not.toContainText("Drag a device to a room to begin");
 
       // No overflow:hidden clipping
       const overflow = await card.evaluate(
@@ -266,9 +265,9 @@ test.describe("Analysis card feedback", () => {
 
       await page.getByTestId("dh-device-camera-hub").click();
       await page.getByTestId("dh-room-kitchen").click();
-      await page.waitForTimeout(200);
 
       const card = page.getByTestId("dh-analysis-card");
+      await expect(card).not.toContainText("Drag a device to a room to begin");
       const ratio = await card.evaluate((el) => {
         const spans = el.querySelectorAll("span");
         const tip = spans[spans.length - 1] as HTMLElement | undefined;
@@ -289,7 +288,7 @@ test.describe("Analysis card feedback", () => {
 test.describe("Touch targets", () => {
   test.use({ hasTouch: true, isMobile: true });
   test.beforeEach(({ browserName }) => {
-    test.skip(browserName === "firefox", "isMobile not supported in Firefox");
+    test.skip(browserName === "firefox", "isMobile not supported in Firefox"); // NOSONAR
   });
 
   test("all game buttons >= 44px on iPhone SE", async ({ page }) => {
@@ -306,6 +305,7 @@ test.describe("Touch targets", () => {
         '[aria-label^="Switch to"]',
       ].join(", "),
     });
+    await expect(page.getByTestId("dh-root")).toBeVisible();
   });
 
   test("modal close buttons >= 38px on iPhone SE", async ({ page }) => {
@@ -316,15 +316,13 @@ test.describe("Touch targets", () => {
 
     // Open help modal
     await page.getByRole("button", { name: /how to play/i }).click();
-    await expect(page.getByTestId("dh-help-modal")).toBeVisible();
+    const modal = page.getByTestId("dh-help-modal");
+    await expect(modal).toBeVisible();
 
     // Help modal X -- exact match to avoid strict mode on backdrop
-    const helpClose = page.getByRole("button", { name: "Close", exact: true });
+    const helpClose = modal.getByLabel("Close", { exact: true });
     const helpBox = await helpClose.boundingBox();
-    expect(helpBox).toBeTruthy();
-    if (helpBox) {
-      expect(helpBox.width, "Help X width").toBeGreaterThanOrEqual(34);
-      expect(helpBox.height, "Help X height").toBeGreaterThanOrEqual(34);
-    }
+    expect(helpBox?.width ?? 0, "Help X width").toBeGreaterThanOrEqual(34);
+    expect(helpBox?.height ?? 0, "Help X height").toBeGreaterThanOrEqual(34);
   });
 });

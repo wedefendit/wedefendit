@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Flame, Sparkles } from "lucide-react";
+import { DifficultyValue } from "../shared/types";
 import { useDigitalHouseController } from "./DigitalHouse.controller";
+import { ToastTypeValue } from "./model";
 import {
   MobileScaledHouseFrame,
   ScaledHouseFrame,
@@ -21,63 +23,87 @@ import {
   DigitalHouseScoreHud,
 } from "./ui/DigitalHouseStatusStrip";
 
+const DIGITAL_HOUSE_TEST_ID = {
+  main: "dh-main",
+  housePanel: "dh-house-panel",
+};
+const FULL_WIDTH_ROW_CLASS = "w-full shrink-0";
+const MOBILE_HOUSE_PANEL_CLASS =
+  "relative min-h-0 w-full flex-1 overflow-visible";
+const TOAST_ICON_SIZE = 14;
+const MOBILE_TOAST_BOTTOM_OFFSET = 60;
+const DESKTOP_TOAST_BOTTOM_OFFSET = 12;
+
 export function DigitalHouse() {
-  const c = useDigitalHouseController();
+  const {
+    activeToast, allowDrag, badgeJustEarned, closeSummary, coachStepsConfig,
+    deviceTone, difficulty, dismissHelp, dismissIdleHint, dismissOnboarding,
+    guidedDeviceCards, handleSelect, handleTryAgain, helpOpen, houseProps,
+    idleHint, inventoryColumns, isComplete, lastPlacement, mobile, onTryHarder,
+    openHelp, openSummary, placedIds, placedZones, placements, railRef, result,
+    returnDevice, riskCount, scoreDelta, selectedDevice, selectedId, showEnd,
+    showOnboarding, tablet, totalDevices, zoneBlockedFeedback,
+  } = useDigitalHouseController();
   const inventoryScrollRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (c.isComplete && inventoryScrollRef.current) {
+    if (isComplete && inventoryScrollRef.current) {
       inventoryScrollRef.current.scrollTo({
         top: inventoryScrollRef.current.scrollHeight,
         behavior: "smooth",
       });
     }
-  }, [c.isComplete]);
+  }, [isComplete]);
 
   const scoreHud = (
     <DigitalHouseScoreHud
-      result={c.result}
-      placedCount={c.placedIds.size}
-      totalDevices={c.totalDevices}
-      mobile={c.mobile}
-      difficulty={c.difficulty}
-      scoreDelta={c.scoreDelta}
+      result={result}
+      placedCount={placedIds.size}
+      totalDevices={totalDevices}
+      mobile={mobile}
+      difficulty={difficulty}
+      scoreDelta={scoreDelta}
     />
   );
 
   const analysisCard = (
     <DigitalHouseAnalysisCard
-      lastPlacement={c.lastPlacement}
-      selectedDevice={c.selectedDevice}
-      result={c.result}
-      desktop={!c.mobile}
+      lastPlacement={lastPlacement}
+      selectedDevice={selectedDevice}
+      result={result}
+      desktop={!mobile}
     />
   );
 
   const inventoryCard = (
     <DigitalHouseInventoryPanel
-      selectedId={c.selectedId}
-      placedIds={c.placedIds}
-      placedZones={c.placedZones}
-      onSelect={c.handleSelect}
-      onReturn={c.returnDevice}
-      allowDrag={c.allowDrag}
-      guided={c.guidedDeviceCards}
-      deviceTone={c.deviceTone}
-      columns={c.inventoryColumns}
-      onTouchDragStart={c.houseProps.onTouchDragStart}
-      showAfterAction={c.isComplete}
-      score={c.result.total}
-      riskCount={c.riskCount}
-      onOpenAfterAction={c.openSummary}
+      selectedId={selectedId}
+      placedIds={placedIds}
+      placedZones={placedZones}
+      onSelect={handleSelect}
+      onReturn={returnDevice}
+      allowDrag={allowDrag}
+      guided={guidedDeviceCards}
+      deviceTone={deviceTone}
+      columns={inventoryColumns}
+      onTouchDragStart={houseProps.onTouchDragStart}
+      showAfterAction={isComplete}
+      score={result.total}
+      riskCount={riskCount}
+      onOpenAfterAction={openSummary}
     />
   );
+  const idleHintOverlay = idleHint && !showOnboarding && (
+    <div className="pointer-events-none absolute inset-x-2 bottom-2 z-20 flex justify-center">
+      <IdleHintBanner hint={idleHint} onDismiss={dismissIdleHint} />
+    </div>
+  );
+  const halfwayToast = activeToast?.type === ToastTypeValue.Halfway;
 
   return (
     <div
       data-testid="dh-root"
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden text-slate-950 dark:text-slate-50"
     >
-      {/* Keyframes */}
       <style>
         {[
           "@keyframes dh-popIn { 0% { transform: scale(0); opacity: 0 } 60% { transform: scale(1.2) } 100% { transform: scale(1); opacity: 1 } }",
@@ -94,41 +120,28 @@ export function DigitalHouse() {
         ].join(" ")}
       </style>
 
-      <DigitalHouseHeader onOpenHelp={c.openHelp} />
+      <DigitalHouseHeader onOpenHelp={openHelp} />
 
-      {/* ======== MOBILE LAYOUT (base) ======== */}
-      {c.mobile ? (
+      {mobile && (
         <main
-          data-testid="dh-main"
+          data-testid={DIGITAL_HOUSE_TEST_ID.main}
           className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden px-2 py-1"
         >
-          {/* Score strip */}
-          <div className="w-full shrink-0">{scoreHud}</div>
+          <div className={FULL_WIDTH_ROW_CLASS}>{scoreHud}</div>
 
-          {/* Analysis strip above the house */}
-          <div className="w-full shrink-0">{analysisCard}</div>
+          <div className={FULL_WIDTH_ROW_CLASS}>{analysisCard}</div>
 
-          {/* House fills remaining vertical space */}
           <section
-            data-testid="dh-house-panel"
-            className="relative min-h-0 w-full flex-1 overflow-visible"
+            data-testid={DIGITAL_HOUSE_TEST_ID.housePanel}
+            className={MOBILE_HOUSE_PANEL_CLASS}
           >
-            <MobileScaledHouseFrame {...c.houseProps} />
+            <MobileScaledHouseFrame {...houseProps} />
 
-            {/* Idle hint floats over the house bottom */}
-            {c.idleHint && !c.showOnboarding && (
-              <div className="pointer-events-none absolute inset-x-2 bottom-2 z-20 flex justify-center">
-                <IdleHintBanner
-                  hint={c.idleHint}
-                  onDismiss={c.dismissIdleHint}
-                />
-              </div>
-            )}
+            {idleHintOverlay}
 
-            {/* Zone-blocked feedback */}
-            {c.zoneBlockedFeedback && (
+            {zoneBlockedFeedback && (
               <div
-                key={c.zoneBlockedFeedback.key}
+                key={zoneBlockedFeedback.key}
                 style={{ animation: "dh-slideIn 0.3s ease" }}
                 className="absolute inset-x-2 bottom-2 z-20 flex justify-center"
               >
@@ -139,94 +152,73 @@ export function DigitalHouse() {
             )}
           </section>
 
-          {/* Device strip centered */}
           <div className="w-full shrink-0 pt-1">
             <DeviceStrip
-              selectedId={c.selectedId}
-              placedIds={c.placedIds}
-              placedZones={c.placedZones}
-              onSelect={c.handleSelect}
-              onReturn={c.returnDevice}
-              allowDrag={c.allowDrag}
-              guided={c.guidedDeviceCards}
-              deviceTone={c.deviceTone}
-              onTouchDragStart={c.houseProps.onTouchDragStart}
+              selectedId={selectedId}
+              placedIds={placedIds}
+              placedZones={placedZones}
+              onSelect={handleSelect}
+              onReturn={returnDevice}
+              allowDrag={allowDrag}
+              guided={guidedDeviceCards}
+              deviceTone={deviceTone}
+              onTouchDragStart={houseProps.onTouchDragStart}
             />
           </div>
-          {c.isComplete && (
+          {isComplete && (
             <div className="w-full shrink-0 px-1 pt-1">
               <AfterActionReportButton
-                score={c.result.total}
-                riskCount={c.riskCount}
-                onOpen={c.openSummary}
+                score={result.total}
+                riskCount={riskCount}
+                onOpen={openSummary}
               />
             </div>
           )}
         </main>
-      ) : c.tablet ? (
-        /* ======== TABLET LAYOUT (820-1099px) — stacked, viewport-locked ======== */
+      )}
+      {!mobile && tablet && (
         <main
-          data-testid="dh-main"
+          data-testid={DIGITAL_HOUSE_TEST_ID.main}
           className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden px-4 py-2"
         >
           <div className="mx-auto flex min-h-0 w-full max-w-[860px] flex-1 flex-col gap-1 overflow-hidden">
-            {/* Score HUD with rings */}
-            <div className="w-full shrink-0">{scoreHud}</div>
+            <div className={FULL_WIDTH_ROW_CLASS}>{scoreHud}</div>
 
-            {/* Analysis above house */}
-            <div className="w-full shrink-0">{analysisCard}</div>
+            <div className={FULL_WIDTH_ROW_CLASS}>{analysisCard}</div>
 
-            {/* House — fills remaining space */}
             <section
-              data-testid="dh-house-panel"
-              className="relative min-h-0 w-full flex-1 overflow-visible"
+              data-testid={DIGITAL_HOUSE_TEST_ID.housePanel}
+              className={MOBILE_HOUSE_PANEL_CLASS}
             >
-              <MobileScaledHouseFrame {...c.houseProps} />
+              <MobileScaledHouseFrame {...houseProps} />
 
-              {/* Idle hint */}
-              {c.idleHint && !c.showOnboarding && (
-                <div className="pointer-events-none absolute inset-x-2 bottom-2 z-20 flex justify-center">
-                  <IdleHintBanner
-                    hint={c.idleHint}
-                    onDismiss={c.dismissIdleHint}
-                  />
-                </div>
-              )}
+              {idleHintOverlay}
             </section>
 
-            {/* Inventory — capped height, scrolls internally */}
             <div className="w-full min-h-0 overflow-y-auto max-h-[150px]">
               {inventoryCard}
             </div>
           </div>
         </main>
-      ) : (
-        /* ======== DESKTOP LAYOUT (1100px+) ======== */
+      )}
+      {!mobile && !tablet && (
         <main
-          data-testid="dh-main"
+          data-testid={DIGITAL_HOUSE_TEST_ID.main}
           className="dh-game-main relative flex min-h-0 w-full flex-1 items-start justify-center overflow-hidden px-4 py-3 xl:px-6 xl:py-4"
         >
           <div className="my-auto flex min-h-0 max-h-full w-full max-w-[1800px] items-start gap-4 xl:gap-5">
             <section
-              data-testid="dh-house-panel"
+              data-testid={DIGITAL_HOUSE_TEST_ID.housePanel}
               className="dh-house-panel relative flex min-h-0 flex-1 items-center justify-center self-stretch overflow-visible p-2 xl:p-3"
             >
-              <ScaledHouseFrame {...c.houseProps} />
+              <ScaledHouseFrame {...houseProps} />
 
-              {/* Idle hint */}
-              {c.idleHint && !c.showOnboarding && (
-                <div className="pointer-events-none absolute inset-x-2 bottom-2 z-20 flex justify-center">
-                  <IdleHintBanner
-                    hint={c.idleHint}
-                    onDismiss={c.dismissIdleHint}
-                  />
-                </div>
-              )}
+              {idleHintOverlay}
             </section>
 
             <aside
               data-testid="dh-rail"
-              ref={c.railRef}
+              ref={railRef}
               className="dh-sidebar-panel relative flex min-h-0 w-[380px] shrink-0 flex-col gap-3 self-stretch overflow-hidden p-1 xl:w-[440px] xl:gap-4 xl:p-2 2xl:w-[500px]"
             >
               {scoreHud}
@@ -242,43 +234,43 @@ export function DigitalHouse() {
         </main>
       )}
 
-      {/* ======== Overlays ======== */}
-
-      {c.activeToast && (
+      {activeToast && (
         <GameToast
-          key={c.activeToast.key}
+          key={activeToast.key}
           icon={
-            c.activeToast.type === "halfway" ? (
-              <Sparkles size={14} />
+            halfwayToast ? (
+              <Sparkles size={TOAST_ICON_SIZE} />
             ) : (
-              <Flame size={14} />
+              <Flame size={TOAST_ICON_SIZE} />
             )
           }
-          label={c.activeToast.label}
-          hint={c.activeToast.hint}
-          accent={c.activeToast.type === "halfway" ? "sky" : "amber"}
-          mobile={c.mobile}
-          bottomOffset={c.mobile ? 60 : 12}
+          label={activeToast.label}
+          hint={activeToast.hint}
+          accent={halfwayToast ? "sky" : "amber"}
+          mobile={mobile}
+          bottomOffset={
+            mobile ? MOBILE_TOAST_BOTTOM_OFFSET : DESKTOP_TOAST_BOTTOM_OFFSET
+          }
         />
       )}
 
-      {c.showOnboarding && (
-        <CoachMark steps={c.coachStepsConfig} onDismiss={c.dismissOnboarding} />
+      {showOnboarding && (
+        <CoachMark steps={coachStepsConfig} onDismiss={dismissOnboarding} />
       )}
 
-      {c.helpOpen && <HelpModal onDismiss={c.dismissHelp} />}
+      {helpOpen && <HelpModal onDismiss={dismissHelp} />}
 
-      {c.showEnd && (
+      {showEnd && (
         <EndSummaryModal
-          result={c.result}
-          placements={c.placements}
-          badge={c.badgeJustEarned}
-          canTryHarder={c.difficulty !== "hard"}
-          currentDifficulty={c.difficulty}
-          mobile={c.mobile}
-          onTryAgain={c.handleTryAgain}
-          onTryHarder={c.onTryHarder}
-          onDismiss={c.closeSummary}
+          result={result}
+          placements={placements}
+          badge={badgeJustEarned}
+          canTryHarder={difficulty !== DifficultyValue.Hard}
+          currentDifficulty={difficulty}
+          mobile={mobile}
+          onTryAgain={handleTryAgain}
+          onTryHarder={onTryHarder}
+          onDismiss={closeSummary}
         />
       )}
     </div>

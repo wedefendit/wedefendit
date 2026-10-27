@@ -1,26 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-/*
- * O-Tether: a case study of the Custom Solutions service, nested under
- * /services/custom-solutions. Uses the same shell as the ServiceSlug pages
- * (centered max-w-5xl column, left-aligned content, Card hero, border-t section
- * dividers) so it reads as a sibling of the other service pages. Copy lives in
- * data/services/custom-solutions/o-tether.json (sourced from docs/o-tether/);
- * feature-card icons are the original inline SVGs from the source guide.
- */
-
 import Link from "next/link";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Fragment } from "react";
@@ -41,12 +18,11 @@ import {
 import { Meta, PageContainer, BreadCrumbs } from "@/components";
 import { Card } from "@/components/Card";
 import { oTetherProductLd, generateBreadCrumbJsonLd } from "@/lib/json-ld";
+import { SITE_URL } from "@/lib/og";
 import showcase from "@/data/services/custom-solutions/o-tether.json";
 
-const CANONICAL =
-  "https://www.wedefendit.com/services/custom-solutions/o-tether";
+const CANONICAL = `${SITE_URL}/services/custom-solutions/o-tether`;
 
-// lucide glyphs referenced by name in the data (architecture layers + flow).
 const ICONS: Readonly<Record<string, LucideIcon>> = {
   Cable,
   BrickWall,
@@ -67,7 +43,6 @@ function Glyph({
   return <Component className={className} aria-hidden />;
 }
 
-/** Left-aligned section header (eyebrow + title), matching the page rhythm. */
 function SectionHead({
   eyebrow,
   title,
@@ -100,6 +75,11 @@ const PRIMARY_BTN =
   "inline-flex items-center justify-center gap-2 rounded-lg bg-accent-fill px-6 py-3 font-semibold text-accent-contrast shadow-card transition hover:bg-accent-fill-hover hover:shadow-card-hover";
 const SECONDARY_BTN =
   "inline-flex items-center justify-center gap-2 rounded-lg border border-hairline px-6 py-3 font-semibold text-ink transition hover:border-border-accent hover:text-accent";
+const SMALL_ICON_CLASS = "h-5 w-5";
+const ITEM_HEADING_CLASS = "font-semibold text-ink";
+const OT_CLASS = { itemText: "min-w-0", flowRightArrow: "hidden h-5 w-5 sm:block", flowDownArrow: "h-5 w-5 rotate-90 sm:hidden" };
+const OT_SECTION_ID = { overview: "ot-overview", architecture: "ot-architecture", flow: "ot-flow", features: "ot-features" };
+const SVG_VALUES: Readonly<{ round: "round" }> = { round: "round" };
 
 export default function OTetherCaseStudy() {
   const { hero, overview, flow, features, architecture, cta } = showcase;
@@ -121,12 +101,10 @@ export default function OTetherCaseStudy() {
       />
 
       <PageContainer>
-        {/* Breadcrumbs: contained, above the full-bleed hero */}
         <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
-          <BreadCrumbs items={crumbs} baseUrl="https://www.wedefendit.com" />
+          <BreadCrumbs items={crumbs} baseUrl={SITE_URL} />
         </div>
 
-        {/* Hero: full-bleed, like the other heroes */}
         <HeroBanner
           dark={hero.image.src}
           light="/img/services/o-tether-hero-light.jpg"
@@ -151,7 +129,7 @@ export default function OTetherCaseStudy() {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap md:justify-end">
             <Link href={cta.primary.href} className={PRIMARY_BTN}>
               {cta.primary.label}
-              <ArrowRight className="h-5 w-5" aria-hidden />
+              <ArrowRight className={SMALL_ICON_CLASS} aria-hidden />
             </Link>
             <Link href={cta.secondary.href} className={SECONDARY_BTN}>
               {cta.secondary.label}
@@ -161,10 +139,9 @@ export default function OTetherCaseStudy() {
 
         <div className="max-w-5xl mx-auto w-full py-8 sm:py-10 space-y-8 sm:space-y-10 px-3 sm:px-6 text-left">
 
-          {/* ── The problem ───────────────────────────────────────── */}
-          <section className={SECTION} aria-labelledby="ot-overview">
+          <section className={SECTION} aria-labelledby={OT_SECTION_ID.overview}>
             <SectionHead
-              id="ot-overview"
+              id={OT_SECTION_ID.overview}
               eyebrow={overview.eyebrow}
               title={overview.title}
             />
@@ -180,10 +157,9 @@ export default function OTetherCaseStudy() {
             </div>
           </section>
 
-          {/* ── What we built (architecture) ──────────────────────── */}
-          <section className={SECTION} aria-labelledby="ot-architecture">
+          <section className={SECTION} aria-labelledby={OT_SECTION_ID.architecture}>
             <SectionHead
-              id="ot-architecture"
+              id={OT_SECTION_ID.architecture}
               eyebrow={architecture.eyebrow}
               title={architecture.title}
             />
@@ -198,9 +174,9 @@ export default function OTetherCaseStudy() {
                 >
                   <div className="flex items-start gap-4">
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-border-accent bg-surface text-accent">
-                      <Glyph name={layer.icon} className="h-5 w-5" />
+                      <Glyph name={layer.icon} className={SMALL_ICON_CLASS} />
                     </span>
-                    <div className="min-w-0">
+                    <div className={OT_CLASS.itemText}>
                       <div className="flex items-baseline gap-2">
                         <span className="text-eyebrow font-semibold tracking-eyebrow text-accent">
                           {layer.tag}
@@ -233,18 +209,17 @@ export default function OTetherCaseStudy() {
             </ul>
           </section>
 
-          {/* ── How it connects (data flow) ───────────────────────── */}
-          <section className={SECTION} aria-labelledby="ot-flow">
-            <SectionHead id="ot-flow" eyebrow={flow.eyebrow} title={flow.title} />
+          <section className={SECTION} aria-labelledby={OT_SECTION_ID.flow}>
+            <SectionHead id={OT_SECTION_ID.flow} eyebrow={flow.eyebrow} title={flow.title} />
             <ol className="mt-6 flex list-none flex-col gap-3 p-0 sm:flex-row sm:items-stretch">
               {flow.nodes.map((node, index) => (
                 <Fragment key={node.label}>
                   <li className="flex flex-1 items-center gap-3 rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-4 sm:flex-col sm:items-start">
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-border-accent bg-surface text-accent">
-                      <Glyph name={node.icon} className="h-5 w-5" />
+                      <Glyph name={node.icon} className={SMALL_ICON_CLASS} />
                     </span>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-ink">{node.label}</div>
+                    <div className={OT_CLASS.itemText}>
+                      <div className={ITEM_HEADING_CLASS}>{node.label}</div>
                       <div className="text-sm text-ink-muted">{node.sub}</div>
                     </div>
                   </li>
@@ -253,8 +228,8 @@ export default function OTetherCaseStudy() {
                       aria-hidden
                       className="flex flex-shrink-0 items-center justify-center text-ink-dim"
                     >
-                      <ArrowRight className="hidden h-5 w-5 sm:block" />
-                      <ArrowRight className="h-5 w-5 rotate-90 sm:hidden" />
+                      <ArrowRight className={OT_CLASS.flowRightArrow} />
+                      <ArrowRight className={OT_CLASS.flowDownArrow} />
                     </li>
                   )}
                 </Fragment>
@@ -263,10 +238,9 @@ export default function OTetherCaseStudy() {
             <p className="mt-4 text-sm text-ink-muted">{flow.caption}</p>
           </section>
 
-          {/* ── What's protecting you (doc feature cards) ─────────── */}
-          <section className={SECTION} aria-labelledby="ot-features">
+          <section className={SECTION} aria-labelledby={OT_SECTION_ID.features}>
             <SectionHead
-              id="ot-features"
+              id={OT_SECTION_ID.features}
               eyebrow={features.eyebrow}
               title={features.title}
             />
@@ -281,15 +255,15 @@ export default function OTetherCaseStudy() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={1.25}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    strokeLinecap={SVG_VALUES.round}
+                    strokeLinejoin={SVG_VALUES.round}
                     className="h-9 w-9 text-accent"
                     aria-hidden
                   >
                     <path d={feature.iconPath} />
                   </svg>
                   <div>
-                    <h3 className="font-semibold text-ink">{feature.name}</h3>
+                    <h3 className={ITEM_HEADING_CLASS}>{feature.name}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                       {feature.description}
                     </p>
@@ -299,7 +273,6 @@ export default function OTetherCaseStudy() {
             </ul>
           </section>
 
-          {/* ── CTA ───────────────────────────────────────────────── */}
           <Card as="section" wash className="relative overflow-hidden p-6 text-center sm:p-10">
             <h2 className="text-h2 tracking-h2 font-semibold text-ink text-balance">
               {cta.title}
@@ -310,7 +283,7 @@ export default function OTetherCaseStudy() {
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link href={cta.primary.href} className={PRIMARY_BTN}>
                 {cta.primary.label}
-                <ArrowRight className="h-5 w-5" aria-hidden />
+                <ArrowRight className={SMALL_ICON_CLASS} aria-hidden />
               </Link>
               <Link href={cta.secondary.href} className={SECONDARY_BTN}>
                 {cta.secondary.label}

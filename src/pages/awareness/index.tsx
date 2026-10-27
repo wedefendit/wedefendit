@@ -1,17 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import Link from "next/link";
 import {
   PageContainer,
@@ -20,11 +6,15 @@ import {
   ElderlyScamsList,
 } from "@/components";
 import { generateFAQPageLd, localBusinessLd } from "@/lib/json-ld";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import { Card } from "@/components/Card";
 import { HeroBanner } from "@/components/HeroBanner";
+
+const SVG_VALUES: Readonly<{ round: "round" }> = { round: "round" };
+const GROUP_ELIGIBILITY = "Free for groups of 25 or more. Individual training is available as a paid service.";
+
 export default function AwarenessPage() {
-  const canonical = "https://www.wedefendit.com/awareness";
+  const canonical = `${SITE_URL}/awareness`;
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -34,7 +24,7 @@ export default function AwarenessPage() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://www.wedefendit.com/",
+        item: `${SITE_URL}/`,
       },
       { "@type": "ListItem", position: 2, name: "Awareness", item: canonical },
     ],
@@ -49,7 +39,7 @@ export default function AwarenessPage() {
       "@type": "ImageObject",
       url: ogImageUrl("Online Safety and Scam Prevention for Seniors"),
     },
-    about: localBusinessLd, // from your json-ld.ts shared definition
+    about: localBusinessLd,
   };
 
   const faqLd = generateFAQPageLd([
@@ -80,7 +70,6 @@ export default function AwarenessPage() {
       />
 
       <PageContainer>
-        {/* Breadcrumbs: contained, above the full-bleed hero */}
         <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
           <nav
             aria-label="Breadcrumb"
@@ -102,7 +91,6 @@ export default function AwarenessPage() {
           </nav>
         </div>
 
-        {/* Hero: full-bleed, The Villages image */}
         <HeroBanner
           dark="/img/locations/the-villages-hero-dark.jpg"
           light="/img/locations/the-villages-hero-light.jpg"
@@ -122,7 +110,6 @@ export default function AwarenessPage() {
         </HeroBanner>
 
         <div className="max-w-5xl mx-auto w-full py-8 sm:py-10 space-y-6 sm:space-y-7 px-3 sm:px-6 text-center sm:text-left">
-          {/* Best Practices */}
           <section
             className="pt-6 sm:pt-8 first:pt-0 border-t border-hairline first:border-t-0 text-center"
             aria-labelledby="best-practices"
@@ -130,7 +117,6 @@ export default function AwarenessPage() {
             <SafetyTipsList />
           </section>
 
-          {/* Scam Education */}
           <section
             className="pt-6 sm:pt-8 first:pt-0 border-t border-hairline first:border-t-0 text-center"
             aria-labelledby="top-scams"
@@ -138,7 +124,6 @@ export default function AwarenessPage() {
             <ElderlyScamsList />
           </section>
 
-          {/* CTA */}
           <section className="pt-6 sm:pt-8 border-t border-hairline">
             <Card wash className="relative overflow-hidden p-8 text-center">
               <div className="relative">
@@ -172,15 +157,14 @@ export default function AwarenessPage() {
                     aria-hidden
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap={SVG_VALUES.round}
+                      strokeLinejoin={SVG_VALUES.round}
                       d="M17 8l4 4m0 0l-4 4m4-4H3"
                     />
                   </svg>
                 </Link>
                 <p className="mt-4 text-sm text-ink-muted">
-                  Free for groups of 25 or more. Individual training is available
-                  as a paid service.
+                  {GROUP_ELIGIBILITY}
                 </p>
               </div>
             </Card>

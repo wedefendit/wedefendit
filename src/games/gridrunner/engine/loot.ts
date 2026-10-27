@@ -1,15 +1,16 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
+import {
+  RarityValue,
+  ToolTypeValue,
+  type Rarity,
+  type ToolInstance,
+  type ToolType,
+} from "./types";
 
-import type { Rarity, ToolInstance, ToolType } from "./types";
-
-/* ------------------------------------------------------------------ */
-/*  Base tool definitions (GDD §6.3)                                  */
-/* ------------------------------------------------------------------ */
+export enum BaseToolIdValue { Nmap = "nmap", Wireshark = "wireshark", Metasploit = "metasploit", FirewallRule = "firewall-rule", BurpSuite = "burp-suite", YaraRules = "yara-rules", Mimikatz = "mimikatz", Hashcat = "hashcat", Ghidra = "ghidra", CobaltStrike = "cobalt-strike", SnortSuricata = "snort-suricata", ZeroDay = "zero-day" }
+export type BaseToolId = `${BaseToolIdValue}`;
 
 interface BaseToolDef {
-  id: string;
+  id: BaseToolId;
   name: string;
   type: ToolType;
   basePower: number;
@@ -20,108 +21,108 @@ interface BaseToolDef {
 
 const BASE_TOOLS: BaseToolDef[] = [
   {
-    id: "nmap",
+    id: BaseToolIdValue.Nmap,
     name: "Nmap",
-    type: "recon",
+    type: ToolTypeValue.Recon,
     basePower: 15,
     baseAccuracy: 95,
     baseEnergy: 5,
     description: "Scans networks for open ports and services",
   },
   {
-    id: "wireshark",
+    id: BaseToolIdValue.Wireshark,
     name: "Wireshark",
-    type: "recon",
+    type: ToolTypeValue.Recon,
     basePower: 10,
     baseAccuracy: 100,
     baseEnergy: 3,
     description: "Analyzes network traffic",
   },
   {
-    id: "metasploit",
+    id: BaseToolIdValue.Metasploit,
     name: "Metasploit",
-    type: "exploit",
+    type: ToolTypeValue.Exploit,
     basePower: 35,
     baseAccuracy: 75,
     baseEnergy: 15,
     description: "Tests vulnerabilities by running controlled exploits",
   },
   {
-    id: "firewall-rule",
+    id: BaseToolIdValue.FirewallRule,
     name: "Firewall Rule",
-    type: "defense",
+    type: ToolTypeValue.Defense,
     basePower: 12,
     baseAccuracy: 85,
     baseEnergy: 8,
     description: "Controls network traffic and can block unwanted connections",
   },
   {
-    id: "burp-suite",
+    id: BaseToolIdValue.BurpSuite,
     name: "Burp Suite",
-    type: "recon",
+    type: ToolTypeValue.Recon,
     basePower: 25,
     baseAccuracy: 90,
     baseEnergy: 10,
     description: "Tests web applications for security weaknesses",
   },
   {
-    id: "yara-rules",
+    id: BaseToolIdValue.YaraRules,
     name: "YARA Rules",
-    type: "defense",
+    type: ToolTypeValue.Defense,
     basePower: 0,
     baseAccuracy: 90,
     baseEnergy: 6,
     description: "Matches files against patterns used to identify malware",
   },
   {
-    id: "mimikatz",
+    id: BaseToolIdValue.Mimikatz,
     name: "Mimikatz",
-    type: "persistence",
+    type: ToolTypeValue.Persistence,
     basePower: 40,
     baseAccuracy: 80,
     baseEnergy: 18,
     description: "Extracts credentials from Windows memory",
   },
   {
-    id: "hashcat",
+    id: BaseToolIdValue.Hashcat,
     name: "Hashcat",
-    type: "exploit",
+    type: ToolTypeValue.Exploit,
     basePower: 30,
     baseAccuracy: 85,
     baseEnergy: 12,
     description: "Tests password hashes by trying possible passwords",
   },
   {
-    id: "ghidra",
+    id: BaseToolIdValue.Ghidra,
     name: "Ghidra",
-    type: "recon",
+    type: ToolTypeValue.Recon,
     basePower: 20,
     baseAccuracy: 95,
     baseEnergy: 8,
     description: "Analyzes compiled software",
   },
   {
-    id: "cobalt-strike",
+    id: BaseToolIdValue.CobaltStrike,
     name: "Cobalt Strike",
-    type: "exploit",
+    type: ToolTypeValue.Exploit,
     basePower: 45,
     baseAccuracy: 70,
     baseEnergy: 20,
     description: "Simulates adversary activity and command-and-control operations",
   },
   {
-    id: "snort-suricata",
+    id: BaseToolIdValue.SnortSuricata,
     name: "Snort/Suricata",
-    type: "defense",
+    type: ToolTypeValue.Defense,
     basePower: 0,
     baseAccuracy: 88,
     baseEnergy: 12,
     description: "Detects and, in some configurations, blocks suspicious network traffic",
   },
   {
-    id: "zero-day",
+    id: BaseToolIdValue.ZeroDay,
     name: "Zero-Day",
-    type: "exploit",
+    type: ToolTypeValue.Exploit,
     basePower: 60,
     baseAccuracy: 50,
     baseEnergy: 30,
@@ -129,39 +130,38 @@ const BASE_TOOLS: BaseToolDef[] = [
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Rarity system (GDD §6.2)                                         */
-/* ------------------------------------------------------------------ */
-
 interface RarityDef {
   multiplierMin: number;
   multiplierMax: number;
   dropWeight: number;
+  label: string;
+  textClass: string;
+  borderClass: string;
+  scrapValue: number;
 }
 
-const RARITY_TABLE: Record<Rarity, RarityDef> = {
-  common: { multiplierMin: 0.8, multiplierMax: 1.0, dropWeight: 55 },
-  uncommon: { multiplierMin: 0.9, multiplierMax: 1.15, dropWeight: 25 },
-  rare: { multiplierMin: 1.0, multiplierMax: 1.3, dropWeight: 13 },
-  epic: { multiplierMin: 1.1, multiplierMax: 1.5, dropWeight: 5 },
-  legendary: { multiplierMin: 1.3, multiplierMax: 1.7, dropWeight: 2 },
+export const RARITY_DEFINITIONS: Record<Rarity, RarityDef> = {
+  [RarityValue.Common]: { multiplierMin: 0.8, multiplierMax: 1.0, dropWeight: 55, label: "Common", textClass: "text-[#e0e0e0]", borderClass: "border-[#e0e0e0]/30", scrapValue: 3 },
+  [RarityValue.Uncommon]: { multiplierMin: 0.9, multiplierMax: 1.15, dropWeight: 25, label: "Uncommon", textClass: "text-[#00ff41]", borderClass: "border-[#00ff41]/30", scrapValue: 8 },
+  [RarityValue.Rare]: { multiplierMin: 1.0, multiplierMax: 1.3, dropWeight: 13, label: "Rare", textClass: "text-[#4da6ff]", borderClass: "border-[#4da6ff]/30", scrapValue: 20 },
+  [RarityValue.Epic]: { multiplierMin: 1.1, multiplierMax: 1.5, dropWeight: 5, label: "Epic", textClass: "text-[#a855f7]", borderClass: "border-[#a855f7]/30", scrapValue: 50 },
+  [RarityValue.Legendary]: { multiplierMin: 1.3, multiplierMax: 1.7, dropWeight: 2, label: "Legendary", textClass: "text-[#ff9500]", borderClass: "border-[#ff9500]/30", scrapValue: 120 },
 };
 
-const RARITY_ORDER: Rarity[] = [
-  "common",
-  "uncommon",
-  "rare",
-  "epic",
-  "legendary",
+const RARITY_ORDER: Rarity[] = Object.values(RarityValue);
+const RARITY_UNLOCKS: ReadonlyArray<Readonly<{ minLevel: number; rarity: Rarity }>> = [
+  { minLevel: 15, rarity: RarityValue.Legendary },
+  { minLevel: 10, rarity: RarityValue.Epic },
+  { minLevel: 5, rarity: RarityValue.Rare },
+  { minLevel: 3, rarity: RarityValue.Uncommon },
 ];
+const TOOL_LIMITS = { accuracy: 100 };
 
-/** Level-gated rarity access (GDD §5.4) */
 function maxRarityForLevel(level: number): Rarity {
-  if (level >= 15) return "legendary";
-  if (level >= 10) return "epic";
-  if (level >= 5) return "rare";
-  if (level >= 3) return "uncommon";
-  return "common";
+  return (
+    RARITY_UNLOCKS.find((unlock) => level >= unlock.minLevel)?.rarity ??
+    RarityValue.Common
+  );
 }
 
 function rollRarity(playerLevel: number): Rarity {
@@ -170,33 +170,28 @@ function rollRarity(playerLevel: number): Rarity {
 
   let totalWeight = 0;
   for (const r of available) {
-    totalWeight += RARITY_TABLE[r].dropWeight;
+    totalWeight += RARITY_DEFINITIONS[r].dropWeight;
   }
 
   let roll = Math.random() * totalWeight;
   for (const r of available) {
-    roll -= RARITY_TABLE[r].dropWeight;
+    roll -= RARITY_DEFINITIONS[r].dropWeight;
     if (roll <= 0) return r;
   }
-  return "common";
+  return RarityValue.Common;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Tool generation                                                   */
-/* ------------------------------------------------------------------ */
 
 let instanceCounter = 0;
 
 function rollStat(base: number, rarity: Rarity): number {
-  const def = RARITY_TABLE[rarity];
+  const def = RARITY_DEFINITIONS[rarity];
   const mult =
     def.multiplierMin + Math.random() * (def.multiplierMax - def.multiplierMin);
   return Math.max(1, Math.round(base * mult));
 }
 
 function rollEnergy(base: number, rarity: Rarity): number {
-  // Energy: lower is better, so invert the multiplier
-  const def = RARITY_TABLE[rarity];
+  const def = RARITY_DEFINITIONS[rarity];
   const mult =
     def.multiplierMax - Math.random() * (def.multiplierMax - def.multiplierMin);
   return Math.max(1, Math.round(base * mult));
@@ -214,7 +209,10 @@ export function generateTool(playerLevel: number): ToolInstance {
     baseToolId: baseTool.id,
     rarity,
     power: rollStat(baseTool.basePower, rarity),
-    accuracy: Math.min(100, rollStat(baseTool.baseAccuracy, rarity)),
+    accuracy: Math.min(
+      TOOL_LIMITS.accuracy,
+      rollStat(baseTool.baseAccuracy, rarity),
+    ),
     energyCost: rollEnergy(baseTool.baseEnergy, rarity),
     prefix: null,
     suffix: null,
@@ -222,7 +220,6 @@ export function generateTool(playerLevel: number): ToolInstance {
   };
 }
 
-/** Roll whether loot drops (60% random, 100% boss) and generate if so */
 export function rollLootDrop(
   playerLevel: number,
   isBoss: boolean,
@@ -231,7 +228,6 @@ export function rollLootDrop(
   return generateTool(playerLevel);
 }
 
-/** Create a specific Common-rarity tool with base stats (used by shop) */
 export function createCommonTool(baseId: string): ToolInstance | null {
   const baseTool = BASE_TOOLS.find((t) => t.id === baseId);
   if (!baseTool) return null;
@@ -239,7 +235,7 @@ export function createCommonTool(baseId: string): ToolInstance | null {
   return {
     id: `${baseTool.id}-${Date.now()}-${instanceCounter}`,
     baseToolId: baseTool.id,
-    rarity: "common",
+    rarity: RarityValue.Common,
     power: baseTool.basePower,
     accuracy: baseTool.baseAccuracy,
     energyCost: baseTool.baseEnergy,
@@ -249,7 +245,6 @@ export function createCommonTool(baseId: string): ToolInstance | null {
   };
 }
 
-/** Get full base tool definition (used by shop for display) */
 export function getBaseTool(baseId: string): {
   id: string;
   name: string;
@@ -262,18 +257,6 @@ export function getBaseTool(baseId: string): {
   return BASE_TOOLS.find((t) => t.id === baseId) ?? null;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Display helpers                                                   */
-/* ------------------------------------------------------------------ */
-
-const RARITY_LABEL: Record<Rarity, string> = {
-  common: "Common",
-  uncommon: "Uncommon",
-  rare: "Rare",
-  epic: "Epic",
-  legendary: "Legendary",
-};
-
 const TOOL_NAMES: Record<string, string> = {};
 for (const t of BASE_TOOLS) {
   TOOL_NAMES[t.id] = t.name;
@@ -281,14 +264,9 @@ for (const t of BASE_TOOLS) {
 
 export function toolDisplayName(tool: ToolInstance): string {
   const name = TOOL_NAMES[tool.baseToolId] ?? tool.baseToolId;
-  return `${RARITY_LABEL[tool.rarity]} ${name}`;
+  return `${RARITY_DEFINITIONS[tool.rarity].label} ${name}`;
 }
 
-export function rarityLabel(rarity: Rarity): string {
-  return RARITY_LABEL[rarity];
-}
-
-/** Get base tool info (name, description, type) for the Identity Disc */
 export function getToolInfo(
   baseToolId: string,
 ): { name: string; description: string; type: ToolType } | null {

@@ -1,24 +1,24 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import Head from "next/head";
 import { LegalPage } from "@/components";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import data from "../../../data/company-info.json";
 
 const { phone, email, address } = data.contact || {};
 const { street, city, state, zip } = address || {};
+const CANONICAL = `${SITE_URL}/terms`;
+const SOCIAL_TITLE = "Website Terms & Conditions | Defend I.T.";
+const OG_IMAGE = ogImageUrl("Terms & Conditions");
+const AGE_POLICY = "The minimum age to use our Site is 18 years old. By using this Site, users agree they are over 18. We do not assume legal responsibility for false age claims.";
+const WARRANTY = {
+  hardwareLabel: "Hardware Repairs (90 Days):",
+  hardwareBody: "New parts installed are warrantied against defects for ninety (90) days.",
+  serviceLabel: "General Service & Repairs (30 Days):",
+  serviceBody: "Most standard repairs and services are warrantied for thirty (30) days.",
+  softwareLabel: "Virus & Software Repair (14 Days):",
+  softwareBody: "Due to the nature of software, virus and malware removal services are warrantied for fourteen (14) days.",
+};
+const EFFECTIVE_DATE = "27th day of September, 2026";
+const LEGAL_CLASS = { heading: "text-h3 font-semibold uppercase border-b border-hairline my-4", list: "list-disc ml-6 my-2", link: "text-accent underline", paragraphSpacing: "mb-6" };
 
 export default function Terms() {
   return (
@@ -32,23 +32,23 @@ export default function Terms() {
         <meta name="robots" content="noindex, follow" />
         <meta
           property="og:title"
-          content="Website Terms & Conditions | Defend I.T."
+          content={SOCIAL_TITLE}
         />
         <meta
           property="og:description"
           content="Understand your rights and responsibilities when using this website. Simple, fair terms written for humans."
         />
-        <meta property="og:url" content="https://www.wedefendit.com/terms" />
+        <meta property="og:url" content={CANONICAL} />
         <meta property="og:type" content="article" />
         <meta
           property="og:image"
-          content={ogImageUrl("Terms & Conditions")}
+          content={OG_IMAGE}
         />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Website Terms & Conditions | Defend I.T."
+          content={SOCIAL_TITLE}
         />
         <meta
           name="twitter:description"
@@ -56,10 +56,10 @@ export default function Terms() {
         />
         <meta
           name="twitter:image"
-          content={ogImageUrl("Terms & Conditions")}
+          content={OG_IMAGE}
         />
 
-        <link rel="canonical" href="https://www.wedefendit.com/terms" />
+        <link rel="canonical" href={CANONICAL} />
         <meta
           name="keywords"
           content="Defend I.T. Solutions, terms and conditions, website terms, legal terms, cybersecurity, IT support, Ocala, The Villages"
@@ -70,7 +70,7 @@ export default function Terms() {
           Terms and Conditions
         </h1>
 
-        <p className="mb-6">
+        <p className={LEGAL_CLASS.paragraphSpacing}>
           These terms and conditions (the &quot;Terms and Conditions&quot;)
           govern the use of <strong>www.wedefendit.com</strong> (the
           &quot;Site&quot;). This Site is owned and operated by Defend I.T.
@@ -79,7 +79,7 @@ export default function Terms() {
           residential and small business clients.
         </p>
 
-        <p className="mb-6">
+        <p className={LEGAL_CLASS.paragraphSpacing}>
           By using this Site, you agree that you have read and understand these
           Terms and Conditions and agree to abide by them at all times.
           <br />
@@ -90,7 +90,7 @@ export default function Terms() {
           </strong>
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Intellectual Property
         </h2>
         <p>
@@ -101,20 +101,18 @@ export default function Terms() {
           our Site.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Age Restrictions
         </h2>
         <p>
-          The minimum age to use our Site is 18 years old. By using this Site,
-          users agree they are over 18. We do not assume legal responsibility
-          for false age claims.
+          {AGE_POLICY}
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Acceptable Use
         </h2>
         <p>You agree to use our Site legally and not to:</p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={LEGAL_CLASS.list}>
           <li>Harass or mistreat other users</li>
           <li>Violate others&apos; rights</li>
           <li>Violate intellectual property rights</li>
@@ -128,7 +126,7 @@ export default function Terms() {
           terminate access and pursue legal action.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Limitation of Liability
         </h2>
         <p>
@@ -136,26 +134,22 @@ export default function Terms() {
           claims, damages, or expenses arising from your use of the Site.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Service Warranty
         </h2>
         <p>
           We offer a warranty on parts and labor related to the specific repair
           performed, with the period varying by the type of service:
         </p>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={LEGAL_CLASS.list}>
           <li>
-            <strong>Hardware Repairs (90 Days):</strong> New parts installed are
-            warrantied against defects for ninety (90) days.
+            <strong>{WARRANTY.hardwareLabel}</strong> {WARRANTY.hardwareBody}
           </li>
           <li>
-            <strong>General Service &amp; Repairs (30 Days):</strong> Most
-            standard repairs and services are warrantied for thirty (30) days.
+            <strong>{WARRANTY.serviceLabel}</strong> {WARRANTY.serviceBody}
           </li>
           <li>
-            <strong>Virus &amp; Software Repair (14 Days):</strong> Due to the
-            nature of software, virus and malware removal services are
-            warrantied for fourteen (14) days.
+            <strong>{WARRANTY.softwareLabel}</strong> {WARRANTY.softwareBody}
           </li>
         </ul>
         <p>
@@ -169,19 +163,19 @@ export default function Terms() {
           differs from this summary.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">Indemnity</h2>
+        <h2 className={LEGAL_CLASS.heading}>Indemnity</h2>
         <p>
           You agree to indemnify and hold harmless Defend I.T. Solutions, LLC and
           affiliates from claims and liabilities arising from your use of the
           Site or violation of these Terms.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Applicable Law
         </h2>
         <p>These Terms are governed by the laws of the State of Florida.</p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Dispute Resolution
         </h2>
         <p>
@@ -194,10 +188,10 @@ export default function Terms() {
           injunctive relief or intellectual property matters.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Additional Terms
         </h2>
-        <ul className="list-disc ml-6 my-2">
+        <ul className={LEGAL_CLASS.list}>
           <li>
             <strong>Service Scope Disclaimer:</strong> Info is general and not a
             service guarantee. Actual services are subject to assessment and
@@ -217,7 +211,7 @@ export default function Terms() {
           </li>
         </ul>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Severability
         </h2>
         <p>
@@ -225,13 +219,13 @@ export default function Terms() {
           rest remain in effect.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">Changes</h2>
+        <h2 className={LEGAL_CLASS.heading}>Changes</h2>
         <p>
           These Terms may be updated. We&apos;ll notify users via email or post
           changes on the Site.
         </p>
 
-        <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+        <h2 className={LEGAL_CLASS.heading}>
           Contact Details
         </h2>
         <p>
@@ -241,14 +235,14 @@ export default function Terms() {
             href={`mailto:${email}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-accent underline"
+            className={LEGAL_CLASS.link}
           >
             {email}
           </a>
           <br />
           <a
-            href={`tel:+${phone.replace(/[^0-9]/g, "")}`}
-            className="text-accent underline"
+            href={`tel:+${phone.replace(/\D/g, "")}`}
+            className={LEGAL_CLASS.link}
           >
             {phone}
           </a>
@@ -262,7 +256,7 @@ export default function Terms() {
           )}
         </p>
         <p className="text-left mt-8">
-          <strong>Effective Date:</strong> 27th day of September, 2026
+          <strong>Effective Date:</strong> {EFFECTIVE_DATE}
         </p>
       </LegalPage>
     </>

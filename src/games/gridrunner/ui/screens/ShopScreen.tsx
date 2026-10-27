@@ -1,7 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 "use client";
 
 import { useState } from "react";
@@ -9,7 +5,23 @@ import type { PlayerState } from "../../engine/types";
 import { SHOP_ITEMS, type ShopItem } from "../../engine/shop";
 import { getBaseTool } from "../../engine/loot";
 import { OverlayShell } from "../shared/OverlayShell";
-import { TYPE_BADGE, TYPE_LABELS } from "../shared/theme";
+import { TOOL_TYPE_PRESENTATION } from "../shared/theme";
+
+const FLASH_TIMING = { errorMs: 1500, successMs: 1200 };
+
+function purchaseButtonLabel(
+  levelLocked: boolean,
+  inventoryFull: boolean,
+  price: number,
+): string {
+  if (levelLocked) return "---";
+  return inventoryFull ? "FULL" : `BUY ${price}`;
+}
+
+function purchaseFailureMessage(tooPoor: boolean, inventoryFull: boolean): string {
+  if (tooPoor) return "NOT ENOUGH BITS";
+  return inventoryFull ? "INVENTORY FULL" : "LEVEL TOO LOW";
+}
 
 type ShopScreenProps = Readonly<{
   onClose: () => void;
@@ -31,17 +43,18 @@ function ShopRow({
 }>) {
   const base = getBaseTool(item.baseToolId);
   if (!base) return null;
+  const typePresentation = TOOL_TYPE_PRESENTATION[base.type];
 
   const levelLocked = player.level < item.minLevel;
   const tooPoor = bits < item.price;
   const disabled = levelLocked || tooPoor || inventoryFull;
 
   return (
-    <div className={`rounded-sm border bg-[#0f1b2d] p-2.5 ${TYPE_BADGE[base.type]?.split(" ")[1] ?? "border-[#1a3a4a]"}`}>
+    <div className={`rounded-sm border bg-[#0f1b2d] p-2.5 ${typePresentation.badgeClass.split(" ")[1]}`}>
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-bold text-[#e0e0e0]">{base.name}</span>
-        <span className={`rounded-sm border px-1.5 py-0.5 text-[10px] font-bold tracking-widest ${TYPE_BADGE[base.type]}`}>
-          {TYPE_LABELS[base.type]}
+        <span className={`rounded-sm border px-1.5 py-0.5 text-[10px] font-bold tracking-widest ${typePresentation.badgeClass}`}>
+          {typePresentation.label}
         </span>
       </div>
       {levelLocked ? (
@@ -61,7 +74,7 @@ function ShopRow({
           data-testid={`gr-shop-buy-${item.baseToolId}`}
           className="gr-font-mono min-h-[32px] rounded-sm border border-[#00f0ff] bg-[#0f1b2d] px-3 py-1 text-xs font-bold tracking-widest text-[#00f0ff] active:brightness-150 disabled:border-[#1a3a4a] disabled:text-[#4a5568]"
         >
-          {levelLocked ? "---" : inventoryFull ? "FULL" : `BUY ${item.price}`}
+          {purchaseButtonLabel(levelLocked, inventoryFull, item.price)}
         </button>
       </div>
     </div>
@@ -77,14 +90,14 @@ export function ShopScreen({ onClose, player, bits, inventoryFull, onBuy }: Shop
     if (player.level < item.minLevel || bits < item.price || inventoryFull) {
       setFlash({
         id: baseToolId,
-        msg: bits < item.price ? "NOT ENOUGH BITS" : inventoryFull ? "INVENTORY FULL" : "LEVEL TOO LOW",
+        msg: purchaseFailureMessage(bits < item.price, inventoryFull),
       });
-      globalThis.setTimeout(() => setFlash(null), 1500);
+      globalThis.setTimeout(() => setFlash(null), FLASH_TIMING.errorMs);
       return;
     }
     onBuy(baseToolId);
     setFlash({ id: baseToolId, msg: "PURCHASED" });
-    globalThis.setTimeout(() => setFlash(null), 1200);
+    globalThis.setTimeout(() => setFlash(null), FLASH_TIMING.successMs);
   }
 
   return (

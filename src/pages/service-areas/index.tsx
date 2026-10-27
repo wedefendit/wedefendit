@@ -1,33 +1,15 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-// Service-areas hub. Lists the available location landing pages and provides the
-// internal link into each /service-areas/<city>. The list is read from
-// data/locations/*.json at build time via lib/location-page.
-
 import type { GetStaticProps } from "next";
 import Link from "next/link";
 import { Meta, PageContainer, BreadCrumbs } from "@/components";
 import { HeroBanner } from "@/components/HeroBanner";
+import { SITE_URL } from "@/lib/og";
 import {
   getStaticLocationsIndexProps,
   type LocationSummary,
 } from "@/lib/location-page";
 
-const BASE_URL = "https://www.wedefendit.com";
-const CANONICAL = `${BASE_URL}/service-areas`;
-const TOUCH = { touchAction: "manipulation" } as const;
+const CANONICAL = `${SITE_URL}/service-areas`;
+const TOUCH: Readonly<{ touchAction: "manipulation" }> = { touchAction: "manipulation" };
 const AREA_LINK =
   "flex h-full flex-col gap-1 rounded-feature border border-hairline bg-surface bg-[image:var(--wash)] p-5 transition hover:border-border-accent touch-manipulation";
 
@@ -48,12 +30,10 @@ export default function ServiceAreasIndex({ locations }: ServiceAreasIndexProps)
       />
 
       <PageContainer>
-        {/* Breadcrumbs: contained, above the full-bleed hero */}
         <div className="mx-auto w-full max-w-6xl px-4 pt-1 sm:px-6">
-          <BreadCrumbs items={crumbs} baseUrl={BASE_URL} />
+          <BreadCrumbs items={crumbs} baseUrl={SITE_URL} />
         </div>
 
-        {/* Hero: full-bleed, like the other pages (about illustration) */}
         <HeroBanner
           dark="/img/about/about-hero-dark.jpg"
           light="/img/about/about-hero-light.jpg"

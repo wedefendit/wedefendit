@@ -1,17 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import type {
   BadgeTier,
   EarnedBadge,
@@ -74,7 +60,7 @@ function sanitizeBadges(value: unknown): EarnedBadge[] {
   return out;
 }
 
-export async function getState(): Promise<GamesState> {
+function readState(): GamesState {
   if (!isBrowser()) return cloneEmpty();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -93,29 +79,28 @@ export async function getState(): Promise<GamesState> {
   }
 }
 
-export async function setState(state: GamesState): Promise<void> {
-  if (!isBrowser()) return;
+export function getState(): Promise<GamesState> {
+  return Promise.resolve(readState());
+}
+
+export function setState(state: GamesState): Promise<void> {
+  if (!isBrowser()) return Promise.resolve();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
-    // Quota or privacy mode — silently ignore. V1 is best-effort local only.
+    return Promise.resolve();
   }
+  return Promise.resolve();
 }
 
-export async function clearState(): Promise<void> {
-  if (!isBrowser()) return;
+export function clearState(): Promise<void> {
+  if (!isBrowser()) return Promise.resolve();
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // ignore
+    return Promise.resolve();
   }
-}
-
-export async function getScore(
-  gameId: string,
-): Promise<GameScore | undefined> {
-  const state = await getState();
-  return state.scores[gameId];
+  return Promise.resolve();
 }
 
 export async function setScore(score: GameScore): Promise<GamesState> {
@@ -138,34 +123,17 @@ export async function setScore(score: GameScore): Promise<GamesState> {
 export async function clearScore(gameId: string): Promise<GamesState> {
   const state = await getState();
   if (!(gameId in state.scores)) return state;
-  const { [gameId]: _removed, ...rest } = state.scores;
-  void _removed;
+  const rest = { ...state.scores };
+  delete rest[gameId];
   const next: GamesState = { ...state, scores: rest };
   await setState(next);
   return next;
-}
-
-export async function getBadges(): Promise<EarnedBadge[]> {
-  const state = await getState();
-  return state.badges;
-}
-
-export async function hasBadge(badgeId: string): Promise<boolean> {
-  const state = await getState();
-  return state.badges.some((b) => b.id === badgeId);
 }
 
 export async function addBadge(badge: EarnedBadge): Promise<GamesState> {
   const state = await getState();
   if (state.badges.some((b) => b.id === badge.id)) return state;
   const next: GamesState = { ...state, badges: [...state.badges, badge] };
-  await setState(next);
-  return next;
-}
-
-export async function clearBadges(): Promise<GamesState> {
-  const state = await getState();
-  const next: GamesState = { ...state, badges: [] };
   await setState(next);
   return next;
 }
@@ -191,7 +159,7 @@ export async function setGamePreference(
     preferences: {
       ...state.preferences,
       [gameId]: {
-        ...(state.preferences[gameId] ?? {}),
+        ...state.preferences[gameId],
         [key]: value,
       },
     },
@@ -200,22 +168,4 @@ export async function setGamePreference(
   return next;
 }
 
-export async function clearGamePreference(
-  gameId: string,
-  key: string,
-): Promise<GamesState> {
-  const state = await getState();
-  const existing = state.preferences[gameId];
-  if (!existing || !(key in existing)) return state;
-  const { [key]: _removed, ...rest } = existing;
-  void _removed;
-  const nextPreferences = { ...state.preferences };
-  if (Object.keys(rest).length === 0) delete nextPreferences[gameId];
-  else nextPreferences[gameId] = rest;
-  const next: GamesState = { ...state, preferences: nextPreferences };
-  await setState(next);
-  return next;
-}
-
-export const STORAGE_KEY_NAME = STORAGE_KEY;
 export { EMPTY_STATE };

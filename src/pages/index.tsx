@@ -1,16 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
 import { ShieldCheck, Wrench, House, Phone, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { localBusinessLd } from "@/lib/json-ld";
@@ -19,8 +6,15 @@ import { Meta, PageContainer } from "@/components";
 import { InteractiveTraining } from "@/components/InteractiveTraining";
 import { Card } from "@/components/Card";
 import { ThemedImage } from "@/components/ThemedImage";
+import { SITE_URL } from "@/lib/og";
 
 const { contact } = companyInfo;
+const HOME_PATH = { contact: "/contact", services: "/services" };
+const CONTENT_SECTION_CLASS = "w-full py-12 sm:py-16";
+const CONTENT_CONTAINER_CLASS = "mx-auto w-full max-w-6xl px-5 sm:px-6";
+const HOME_CLASS = { sectionTitle: "text-h2 tracking-h2 font-semibold text-ink" };
+const PRIMARY_ICON_CLASS = "w-5 h-5";
+const SMALL_ARROW_CLASS = "h-4 w-4";
 
 type BenefitCardProps = Readonly<{
   icon: React.ReactNode;
@@ -85,15 +79,13 @@ export default function Home() {
       <Meta
         title="Central Florida Cybersecurity and Tech Support | Defend I.T. Solutions"
         description="Local computer repair, virus removal, Wi-Fi help, scam protection, and cybersecurity for homes and small businesses in Ocala, Belleview, and The Villages."
-        ogImageTitle="Cybersecurity & Tech Support"
-        url="https://www.wedefendit.com/"
-        canonical="https://www.wedefendit.com/"
+        url={`${SITE_URL}/`}
+        canonical={`${SITE_URL}/`}
         keywords="computer repair Ocala FL, virus removal The Villages FL, scam protection Belleview FL, Wi-Fi help Central Florida, on-site tech support Ocala, password manager setup Central Florida, local tech support"
         structuredData={localBusinessLd}
       />
 
       <PageContainer>
-        {/* Hero: full-bleed image with overlaid copy */}
         <section className="relative isolate -mx-3 flex min-h-[20rem] w-full items-start overflow-hidden sm:mx-0 sm:min-h-[34rem] sm:items-center lg:min-h-[40rem]">
           <ThemedImage
             dark="/img/home/home-hero-dark.jpg"
@@ -103,8 +95,6 @@ export default function Home() {
             priority
             className="object-cover object-bottom"
           />
-          {/* Readability scrim on the left where the copy sits, plus top/bottom
-              fades so the image dissolves into the bg (light + dark). */}
           <div className="absolute inset-0 bg-gradient-to-t from-ground via-ground/75 to-ground/40 lg:hidden" />
           <div className="absolute inset-0 hidden bg-gradient-to-r from-ground via-ground/85 to-transparent to-80% lg:block" />
           <div className="absolute inset-0 bg-gradient-to-t from-ground to-transparent to-[22%]" />
@@ -125,25 +115,23 @@ export default function Home() {
                 your options, and the cost before work begins.
               </p>
 
-              {/* Primary CTA */}
               <div className="mt-6 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
                 <Link
-                  href="/contact"
+                  href={HOME_PATH.contact}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent-fill px-6 py-3.5 text-base font-semibold text-accent-contrast shadow-lg transition-all hover:bg-accent-fill-hover hover:shadow-xl sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
                 >
-                  <Phone className="w-5 h-5" />
+                  <Phone className={PRIMARY_ICON_CLASS} />
                   Request Local Help
                 </Link>
                 <Link
-                  href="/services"
+                  href={HOME_PATH.services}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-hairline bg-ground/50 px-6 py-3.5 text-base font-semibold text-ink backdrop-blur-sm transition-all hover:border-accent sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
                 >
                   View Services
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className={PRIMARY_ICON_CLASS} />
                 </Link>
               </div>
 
-              {/* Trust badges */}
               <ul className="mt-6 flex flex-wrap gap-2.5">
                 {[
                   "Florida LLC & Insured",
@@ -164,11 +152,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* What We Do Section */}
-        <section className="w-full py-12 sm:py-16">
-          <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
+        <section className={CONTENT_SECTION_CLASS}>
+          <div className={CONTENT_CONTAINER_CLASS}>
             <div className="max-w-[42rem]">
-              <h2 className="text-h2 tracking-h2 font-semibold text-ink">
+              <h2 className={HOME_CLASS.sectionTitle}>
                 Local Cybersecurity and Tech Support Services
               </h2>
               <p className="mt-4 text-ink-muted leading-relaxed">
@@ -186,18 +173,17 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 sm:py-16">
-          <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
+        <section className={CONTENT_SECTION_CLASS}>
+          <div className={CONTENT_CONTAINER_CLASS}>
             <InteractiveTraining />
           </div>
         </section>
 
-        {/* Why: copy + checklist beside a phone card */}
-        <section className="w-full py-12 sm:py-16">
-          <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
+        <section className={CONTENT_SECTION_CLASS}>
+          <div className={CONTENT_CONTAINER_CLASS}>
             <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
               <div>
-                <h2 className="text-h2 tracking-h2 font-semibold text-ink">
+                <h2 className={HOME_CLASS.sectionTitle}>
                   Why Choose Defend I.T. Solutions
                 </h2>
 
@@ -234,16 +220,15 @@ export default function Home() {
                     About Defend I.T. Solutions
                   </Link>
                   <Link
-                    href="/services"
+                    href={HOME_PATH.services}
                     className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-hairline px-5 py-3 font-semibold text-ink transition hover:border-accent"
                   >
                     View Services
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className={SMALL_ARROW_CLASS} />
                   </Link>
                 </div>
               </div>
 
-              {/* Phone card */}
               <Card wash className="px-6 py-9 text-center sm:px-8">
                 <p className="text-eyebrow font-semibold uppercase tracking-eyebrow text-accent">
                   Talk to a Local Technician
@@ -263,11 +248,11 @@ export default function Home() {
                   Call Now
                 </a>
                 <Link
-                  href="/contact"
+                  href={HOME_PATH.contact}
                   className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent transition hover:underline"
                 >
                   More Contact Options
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className={SMALL_ARROW_CLASS} />
                 </Link>
               </Card>
             </div>

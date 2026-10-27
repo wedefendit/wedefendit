@@ -1,19 +1,26 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 "use client";
 
 import { useEffect, useRef } from "react";
-import type {
-  BattleState,
-  PlayerState,
-  ToolInstance,
+import {
+  BattlePhaseValue,
+  type BattleState,
+  type PlayerState,
+  type ToolInstance,
 } from "../../engine/types";
-import { toolDisplayName } from "../../engine/loot";
+import {
+  BaseToolIdValue,
+  RARITY_DEFINITIONS,
+  toolDisplayName,
+} from "../../engine/loot";
+import { TutorialStepValue, type TutorialStep } from "../../engine/game-state";
 import { HpBar } from "../shared/HpBar";
-import { TAG_COLORS, RARITY_TEXT } from "../shared/theme";
+import { TAG_COLORS } from "../shared/theme";
 import { TutorialPrompt } from "./TutorialPrompt";
+
+const COMBATANT_DETAILS_CLASS = "flex min-w-0 flex-1 flex-col gap-0.5";
+const PORTRAIT_CLASS = "shrink-0";
+const SHORTCUT_CLASS = "text-[#d0d8e0]";
+const BATTLE_VALUES: Readonly<{ button: "button" }> = { button: "button" };
 
 type BattleScreenProps = Readonly<{
   battle: BattleState;
@@ -23,17 +30,12 @@ type BattleScreenProps = Readonly<{
   onUseTool: (tool: ToolInstance) => void;
   onRun: () => void;
   onBattleEnd: () => void;
-  /** 0 = no tutorial, 1-3 = active tutorial step. */
-  tutorialStep?: 0 | 1 | 2 | 3;
+  tutorialStep?: TutorialStep;
   onAdvanceTutorial?: () => void;
 }>;
 
-/* ------------------------------------------------------------------ */
-/*  Sub-components                                                    */
-/* ------------------------------------------------------------------ */
-
 function LogLine({ line }: Readonly<{ line: string }>) {
-  const tagMatch = line.match(/\[T\d+\]\s+\[(\w+)\]/);
+  const tagMatch = /\[T\d+\]\s+\[(\w+)\]/.exec(line);
   const tag = tagMatch?.[1] ?? "";
   const colorClass = TAG_COLORS[tag] ?? "text-[#6688aa]";
   const prefixEnd = line.indexOf("]", line.indexOf("]") + 1) + 1;
@@ -48,8 +50,15 @@ function LogLine({ line }: Readonly<{ line: string }>) {
   );
 }
 
+function logLineKey(line: string, occurrences: Map<string, number>): string {
+  const occurrence = (occurrences.get(line) ?? 0) + 1;
+  occurrences.set(line, occurrence);
+  return `${line}-${occurrence}`;
+}
+
 function BattleLog({ log }: Readonly<{ log: string[] }>) {
   const endRef = useRef<HTMLDivElement>(null);
+  const occurrences = new Map<string, number>();
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [log.length]);
@@ -59,17 +68,13 @@ function BattleLog({ log }: Readonly<{ log: string[] }>) {
       data-testid="gr-battle-log"
       className="gr-font-mono min-h-[3.5rem] max-h-24 overflow-y-auto rounded-sm border border-[#1a3a4a] bg-[#060a12] px-2 py-1 text-xs"
     >
-      {log.map((line, i) => (
-        <LogLine key={i} line={line} />
+      {log.map((line) => (
+        <LogLine key={logLineKey(line, occurrences)} line={line} />
       ))}
       <div ref={endRef} />
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Main screen                                                       */
-/* ------------------------------------------------------------------ */
 
 export function BattleScreen({
   battle,
@@ -79,11 +84,11 @@ export function BattleScreen({
   onUseTool,
   onRun,
   onBattleEnd,
-  tutorialStep = 0,
+  tutorialStep = TutorialStepValue.Inactive,
   onAdvanceTutorial,
 }: BattleScreenProps) {
-  const isOver = battle.phase === "won" || battle.phase === "lost";
-  const isPlayerTurn = battle.phase === "player_turn";
+  const isOver = battle.phase === BattlePhaseValue.Won || battle.phase === BattlePhaseValue.Lost;
+  const isPlayerTurn = battle.phase === BattlePhaseValue.PlayerTurn;
 
   return (
     <section
@@ -91,34 +96,30 @@ export function BattleScreen({
       aria-label="Battle"
       className="flex flex-1 flex-col overflow-hidden bg-[#0a0e1a] p-2"
     >
-      {/* Arena -- enemy top-right, player bottom-left */}
       <div className="relative flex flex-1 min-h-0 flex-col justify-between px-2 py-1">
-        {/* Enemy: top-right with HP */}
         <div className="flex items-start justify-end gap-2">
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className={COMBATANT_DETAILS_CLASS}>
             <span className="gr-font-mono text-xs font-bold text-[#ff003c]">
               {battle.enemy.def.name}
             </span>
             <HpBar current={battle.enemy.hp} max={battle.enemy.maxHp} color="red" label="HP" />
           </div>
-          <figure className="shrink-0">
+          <figure className={PORTRAIT_CLASS}>
             <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#ff003c] text-base font-bold text-[#0a0e1a] shadow-[0_0_12px_#ff003c44]">
               {battle.enemy.def.name.charAt(0).toUpperCase()}
             </div>
           </figure>
         </div>
 
-        {/* Spacer for future battle animations */}
         <div className="flex-1" />
 
-        {/* Player: bottom-left with HP + EN */}
         <div className="flex items-end gap-2">
-          <figure className="shrink-0">
+          <figure className={PORTRAIT_CLASS}>
             <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#00f0ff] text-base font-bold text-[#0a0e1a] shadow-[0_0_12px_#00f0ff]">
               OP
             </div>
           </figure>
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className={COMBATANT_DETAILS_CLASS}>
             <span className="gr-font-mono text-xs font-bold text-[#00f0ff]">
               {playerName} Lv.{player.level}
             </span>
@@ -128,11 +129,9 @@ export function BattleScreen({
         </div>
       </div>
 
-      {/* Compact log */}
       <BattleLog log={battle.log} />
 
-      {/* Tutorial prompt -- shows above the tool grid during onboarding */}
-      {tutorialStep > 0 && onAdvanceTutorial && (
+      {tutorialStep > TutorialStepValue.Inactive && onAdvanceTutorial && (
         <div className="pt-1">
           <TutorialPrompt
             step={tutorialStep as 1 | 2 | 3}
@@ -141,7 +140,6 @@ export function BattleScreen({
         </div>
       )}
 
-      {/* Tools: 2x2 grid + RUN row */}
       {!isOver && (
         <>
           <nav
@@ -152,11 +150,12 @@ export function BattleScreen({
             {equippedTools.map((tool, i) => {
               if (!tool) return null;
               const dimmed =
-                tutorialStep === 1 && tool.baseToolId !== "nmap";
+                tutorialStep === TutorialStepValue.Scan &&
+                tool.baseToolId !== BaseToolIdValue.Nmap;
               return (
                 <button
                   key={tool.id}
-                  type="button"
+                  type={BATTLE_VALUES.button}
                   data-testid={`gr-battle-tool-${i}`}
                   disabled={
                     !isPlayerTurn ||
@@ -166,7 +165,7 @@ export function BattleScreen({
                   onClick={() => onUseTool(tool)}
                   className="gr-font-mono min-h-[44px] rounded-sm border border-[#00f0ff] bg-[#0f1b2d] px-2 py-1.5 text-center text-xs font-bold uppercase text-[#00f0ff] transition-opacity disabled:opacity-30"
                 >
-                  <span className="text-[#d0d8e0]">[{i + 1}]</span>{" "}
+                  <span className={SHORTCUT_CLASS}>[{i + 1}]</span>{" "}
                   {tool.baseToolId}{" "}
                   <span className="opacity-70">{tool.energyCost}EN</span>
                 </button>
@@ -174,35 +173,34 @@ export function BattleScreen({
             })}
           </nav>
           <button
-            type="button"
+            type={BATTLE_VALUES.button}
             data-testid="gr-battle-run"
             disabled={!isPlayerTurn}
             onClick={onRun}
             className="gr-font-mono mt-1 min-h-[44px] w-full shrink-0 rounded-sm border border-[#ff6b00] bg-[#0f1b2d] px-2 py-1.5 text-center text-xs font-bold uppercase text-[#ff6b00] transition-opacity disabled:opacity-30"
           >
-            <span className="text-[#d0d8e0]">[5]</span> RUN
+            <span className={SHORTCUT_CLASS}>[5]</span> RUN
           </button>
         </>
       )}
 
-      {/* Win / Lose result */}
       {isOver && (
         <div
           data-testid="gr-battle-result"
           className={`flex shrink-0 flex-col items-center gap-2 rounded-sm border-2 bg-[#0f1b2d] p-3 ${
-            battle.phase === "won" ? "border-[#00ff41]" : "border-[#ff003c]"
+            battle.phase === BattlePhaseValue.Won ? "border-[#00ff41]" : "border-[#ff003c]"
           }`}
         >
           <p
             className={`gr-font-display text-base font-bold tracking-widest ${
-              battle.phase === "won" ? "text-[#00ff41]" : "text-[#ff003c]"
+              battle.phase === BattlePhaseValue.Won ? "text-[#00ff41]" : "text-[#ff003c]"
             }`}
           >
-            {battle.phase === "won"
+            {battle.phase === BattlePhaseValue.Won
               ? "THREAT NEUTRALIZED"
               : "SYSTEM COMPROMISED"}
           </p>
-          {battle.phase === "won" && (
+          {battle.phase === BattlePhaseValue.Won && (
             <div className="flex flex-col items-center gap-1">
               <p className="gr-font-mono text-xs font-semibold text-[#00f0ff]">
                 +{battle.xpEarned} XP | +{battle.bitsEarned} Bits
@@ -214,7 +212,7 @@ export function BattleScreen({
               )}
               {battle.lootDrop && (
                 <p
-                  className={`gr-font-mono text-xs font-semibold ${RARITY_TEXT[battle.lootDrop.rarity]}`}
+                  className={`gr-font-mono text-xs font-semibold ${RARITY_DEFINITIONS[battle.lootDrop.rarity].textClass}`}
                 >
                   LOOT: {toolDisplayName(battle.lootDrop)}
                 </p>
@@ -222,7 +220,7 @@ export function BattleScreen({
             </div>
           )}
           <button
-            type="button"
+            type={BATTLE_VALUES.button}
             data-testid="gr-battle-continue"
             onClick={onBattleEnd}
             className="gr-font-mono mt-1 rounded-sm border-2 border-[#00f0ff] bg-[#0f1b2d] px-6 py-2 text-xs font-bold uppercase tracking-widest text-[#00f0ff]"

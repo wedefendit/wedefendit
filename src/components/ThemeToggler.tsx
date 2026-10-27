@@ -1,39 +1,41 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Sun, Moon } from "lucide-react";
 
-type Theme = "light" | "dark";
+enum ThemeValue { Light = "light", Dark = "dark" }
+type Theme = `${ThemeValue}`;
+enum PlacementValue { Fixed = "fixed", Inline = "inline" }
 
 type ThemeToggleProps = Readonly<{
-  placement?: "fixed" | "inline";
+  placement?: `${PlacementValue}`;
 }>;
+const THEME_CLASS = { icon: "w-5 h-5" };
 
-export function ThemeToggle({ placement = "fixed" }: ThemeToggleProps) {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<Theme>("dark");
+function subscribeTheme(): () => void {
+  return () => {};
+}
+
+function clientMounted(): boolean {
+  return true;
+}
+
+function serverMounted(): boolean {
+  return false;
+}
+
+function storedTheme(): Theme {
+  const stored = localStorage.getItem("theme");
+  return stored === ThemeValue.Light || stored === ThemeValue.Dark ? stored : ThemeValue.Dark;
+}
+
+export function ThemeToggle({ placement = PlacementValue.Fixed }: ThemeToggleProps) {
+  const mounted = useSyncExternalStore(subscribeTheme, clientMounted, serverMounted);
+  const stored = useSyncExternalStore(subscribeTheme, storedTheme, () => ThemeValue.Dark);
+  const [themeOverride, setThemeOverride] = useState<Theme | null>(null);
+  const theme = themeOverride ?? stored;
 
   const applyTheme = (t: Theme) => {
-    document.documentElement.classList.toggle("dark", t === "dark");
+    document.documentElement.classList.toggle(ThemeValue.Dark, t === ThemeValue.Dark);
   };
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem("theme") as Theme;
-    setTheme(stored === "light" || stored === "dark" ? stored : "dark");
-  }, []);
 
   useEffect(() => {
     if (!mounted) return;
@@ -42,17 +44,17 @@ export function ThemeToggle({ placement = "fixed" }: ThemeToggleProps) {
   }, [theme, mounted]);
 
   if (!mounted) {
-    return placement === "inline" ? (
+    return placement === PlacementValue.Inline ? (
       <span aria-hidden className="inline-flex h-8 w-8 shrink-0" />
     ) : null;
   }
 
   const toggleTheme = () =>
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    setThemeOverride(theme === ThemeValue.Light ? ThemeValue.Dark : ThemeValue.Light);
 
-  const next = theme === "light" ? "dark" : "light";
+  const next = theme === ThemeValue.Light ? ThemeValue.Dark : ThemeValue.Light;
   const buttonClass =
-    placement === "inline"
+    placement === PlacementValue.Inline
       ? "inline-flex h-8 w-8 items-center justify-center rounded-full border border-hairline bg-surface p-1.5 text-ink shadow-sm transition-colors hover:cursor-pointer hover:border-border-accent hover:bg-surface-hover hover:drop-shadow-[0_0_12px_rgba(56,189,248,0.5)]"
       : "fixed bottom-1 left-2 z-[150] rounded-full bg-surface p-2 text-xl text-ink shadow-md transition-colors hover:cursor-pointer hover:bg-surface-hover hover:drop-shadow-[0_0_12px_rgba(56,189,248,0.5)] lg:bottom-auto lg:left-auto lg:right-4 lg:top-2 lg:z-[60]";
 
@@ -65,10 +67,10 @@ export function ThemeToggle({ placement = "fixed" }: ThemeToggleProps) {
       className={`${buttonClass} touch-manipulation`}
       style={{ touchAction: "manipulation" }}
     >
-      {theme === "light" ? (
-        <Moon className="w-5 h-5" />
+      {theme === ThemeValue.Light ? (
+        <Moon className={THEME_CLASS.icon} />
       ) : (
-        <Sun className="w-5 h-5" />
+        <Sun className={THEME_CLASS.icon} />
       )}
     </button>
   );

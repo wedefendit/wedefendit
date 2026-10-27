@@ -1,9 +1,5 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 import { describe, expect, it } from "vitest";
-import { applyRegen } from "./useGridRunner";
+import { applyRegen } from "../engine/game-state";
 import type { PlayerState } from "../engine/types";
 
 function basePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
@@ -26,7 +22,6 @@ describe("applyRegen", () => {
     const result = applyRegen(basePlayer());
     expect(result.integrity).toBe(52);
     expect(result.compute).toBe(31);
-    // Untouched fields
     expect(result.maxIntegrity).toBe(100);
     expect(result.level).toBe(1);
   });

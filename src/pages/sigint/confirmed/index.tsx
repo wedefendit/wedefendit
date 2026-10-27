@@ -1,8 +1,11 @@
 import { Check, Globe, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Meta, PageContainer } from "@/components";
+import { SITE_URL } from "@/lib/og";
 
-const DEMO_URL = "https://sigint.atropeano.com";
+const SIGINT_LINK = { demo: "https://sigint.atropeano.com" };
+const CANONICAL = `${SITE_URL}/sigint/confirmed`;
+const TOUCH: Readonly<{ touchAction: "manipulation" }> = { touchAction: "manipulation" };
 
 export default function ConfirmedPage() {
   return (
@@ -10,8 +13,8 @@ export default function ConfirmedPage() {
       <Meta
         title="Email Confirmed | SIGINT Dashboard"
         description="Your email address is confirmed for SIGINT Dashboard project updates."
-        url="https://www.wedefendit.com/sigint/confirmed"
-        canonical="https://www.wedefendit.com/sigint/confirmed"
+        url={CANONICAL}
+        canonical={CANONICAL}
         noindex
       />
 
@@ -36,10 +39,10 @@ export default function ConfirmedPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href={DEMO_URL}
+              href={SIGINT_LINK.demo}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ touchAction: "manipulation" }}
+              style={TOUCH}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 rounded-lg border border-success/40 hover:border-success bg-success/10 hover:bg-success/20 text-ink text-base sm:text-lg font-medium transition-all touch-manipulation"
             >
               <Globe className="w-5 h-5" />
@@ -47,7 +50,7 @@ export default function ConfirmedPage() {
             </a>
             <Link
               href="/sigint"
-              style={{ touchAction: "manipulation" }}
+              style={TOUCH}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 rounded-lg text-accent hover:text-accent-hover text-base sm:text-lg font-medium transition-colors touch-manipulation"
             >
               Back to SIGINT

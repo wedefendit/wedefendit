@@ -1,17 +1,3 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import {
   generateBreadCrumbJsonLd,
   generateFAQPageLd,
@@ -20,10 +6,9 @@ import {
   localBusinessLd,
 } from "@/lib/json-ld";
 import Link from "next/link";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import { ThemedImage } from "@/components/ThemedImage";
 import { Lightbulb } from "lucide-react";
-import * as Icons from "lucide-react";
 import type { ReactNode } from "react";
 import {
   PageContainer,
@@ -35,6 +20,7 @@ import {
 import { Card } from "@/components/Card";
 import { DomeGrid } from "@/components/DomeGrid";
 import { HowItWorks } from "@/components/HowItWorks";
+import { serviceIcon } from "./Card";
 
 export type ServiceContent = {
   id: string;
@@ -68,6 +54,8 @@ export type ServiceSlugProps = Readonly<{
 }>;
 
 const INLINE_LINK_PATTERN = /\[([^[\]]+)\]\((\/[^)\s]+)\)/g;
+
+const DETAIL_LIST_CLASS = "mt-2 space-y-2";
 
 function renderInlineLinks(text: string): ReactNode {
   const matches = [...text.matchAll(INLINE_LINK_PATTERN)];
@@ -123,7 +111,7 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
 
   const breadcrumbLd = generateBreadCrumbJsonLd({
     items: crumbs,
-    baseUrl: "https://www.wedefendit.com",
+    baseUrl: SITE_URL,
   });
 
   const serviceLd = generateServiceLd({
@@ -131,7 +119,7 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
     image: ogImageUrl(service.title),
     keywords: service.keywords,
     description: service.metaDescription || service.description,
-    url: `https://www.wedefendit.com${service.url}`,
+    url: `${SITE_URL}${service.url}`,
     areaServed: service.serviceArea,
     provider: { "@type": "Organization", name: "Defend I.T. Solutions" },
     offers: [
@@ -161,12 +149,10 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
       ? generateRelatedServiceLd(internalLinks, isRemote)
       : null;
 
-  const hasDYK =
-    typeof first?.heading === "string" &&
-    first.heading.toLowerCase().includes("did you know");
+  const hasDYK = Boolean(first?.heading.toLowerCase().includes("did you know"));
   const sections = hasDYK ? rest : service.sections;
 
-  const canonical = `https://www.wedefendit.com${service.url}`;
+  const canonical = `${SITE_URL}${service.url}`;
   const metaTitle =
     service.metaTitle || `${service.title} | Defend I.T. Solutions`;
   const metaDescription = service.metaDescription || service.description;
@@ -183,7 +169,6 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
       <Meta
         title={metaTitle}
         description={metaDescription}
-        ogImageTitle={service.title}
         imageAlt={`${service.title}, Defend I.T. Solutions`}
         url={canonical}
         canonical={canonical}
@@ -196,14 +181,12 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
 
       <PageContainer>
         <div className="max-w-5xl mx-auto w-full py-8 sm:py-10 space-y-6 sm:space-y-7 px-3 sm:px-6 text-left">
-          <BreadCrumbs items={crumbs} baseUrl="https://www.wedefendit.com" />
+          <BreadCrumbs items={crumbs} baseUrl={SITE_URL} />
 
-          {/* Hero Section with Icons */}
           <Card
             wash
             className="relative overflow-hidden px-5 py-6 sm:px-6 sm:py-8"
           >
-            {/* Decorative constellation-dome behind the copy */}
             <DomeGrid className="pointer-events-none absolute inset-x-0 top-0 h-[calc(100%+3rem)] w-full text-accent opacity-55 dark:opacity-100" />
 
             <div className="relative space-y-5">
@@ -218,8 +201,7 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                       .split("-")
                       .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
                       .join("");
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const LucideIcon = (Icons as any)[name];
+                    const LucideIcon = serviceIcon(name);
                     return LucideIcon ? (
                       <div
                         key={iconName}
@@ -251,13 +233,13 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
                 {first!.heading}
               </h2>
               {Array.isArray(first!.paragraph) ? (
-                <div className="mt-2 space-y-2">
-                  {first!.paragraph.map((t, i) => (
+                <div className={DETAIL_LIST_CLASS}>
+                  {first!.paragraph.map((text) => (
                     <p
-                      key={i}
+                      key={`${first!.heading}-${text}`}
                       className="text-sm sm:text-base text-ink-muted"
                     >
-                      {renderInlineLinks(t)}
+                      {renderInlineLinks(text)}
                     </p>
                   ))}
                 </div>
@@ -271,9 +253,9 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
             </div>
           )}
 
-          {sections.map((section, idx) => (
+          {sections.map((section) => (
             <section
-              key={idx}
+              key={`${service.id}-${section.heading}`}
               className="pt-6 sm:pt-8 first:pt-0 border-t border-gray-200/60 dark:border-gray-700/60 first:border-t-0"
             >
               <h2 className="text-xl font-semibold sm:text-2xl">
@@ -282,10 +264,10 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
 
               {section.paragraph &&
                 (Array.isArray(section.paragraph) ? (
-                  <div className="mt-2 space-y-2">
-                    {section.paragraph.map((text, i) => (
+                  <div className={DETAIL_LIST_CLASS}>
+                    {section.paragraph.map((text) => (
                       <p
-                        key={i}
+                        key={`${section.heading}-${text}`}
                         className="text-ink-muted text-sm sm:text-base"
                       >
                         {renderInlineLinks(text)}
@@ -300,8 +282,8 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
 
               {section.items && (
                 <ul className="mt-3 list-disc pl-5 sm:pl-6 text-ink-muted text-sm sm:text-base space-y-2 marker:text-accent">
-                  {section.items.map((item, i) => (
-                    <li key={i}>{renderInlineLinks(item)}</li>
+                  {section.items.map((item) => (
+                    <li key={`${section.heading}-${item}`}>{renderInlineLinks(item)}</li>
                   ))}
                 </ul>
               )}
@@ -338,7 +320,6 @@ export function ServiceSlug({ service, related, remote }: ServiceSlugProps) {
             </div>
           )}
 
-          {/* How It Works */}
           <HowItWorks />
 
           <div className="mt-10 w-full flex flex-col items-stretch sm:items-center justify-center gap-6 sm:gap-8 text-left sm:text-center">

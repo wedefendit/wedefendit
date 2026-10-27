@@ -1,44 +1,7 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
 import { useState } from "react";
-import {
-  Send,
-  Check,
-  Loader2,
-  Mail,
-  User,
-  MessageSquare,
-  Tag,
-} from "lucide-react";
+import { Check, Loader2, Mail, MessageSquare, Send, Tag, User } from "lucide-react";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
-
-const TOPICS = [
-  { value: "general", label: "General Question" },
-  { value: "computer_repair", label: "Computer Repair" },
-  { value: "virus_removal", label: "Virus and Malware Removal" },
-  { value: "network_security", label: "Home Network and Wi-Fi Security" },
-  { value: "scam_protection", label: "Scam and Fraud Protection" },
-  { value: "data_recovery", label: "Data Recovery and Backup Help" },
-  { value: "onsite_support", label: "On-Site Tech Support" },
-  { value: "remote_support", label: "Remote Support" },
-  { value: "smart_home", label: "Smart Home Setup and Security" },
-  { value: "sigint_pro", label: "SIGINT Pro" },
-  { value: "sigint_enterprise", label: "SIGINT Enterprise" },
-  { value: "sigint_community", label: "SIGINT Community Edition" },
-  { value: "other", label: "Other" },
-];
+import { CONTACT_LIMITS, CONTACT_TOPICS, ContactTopicValue, isContactTopic, isValidContactEmail, type ContactTopic } from "../../lib/contact-topics";
 
 // text-base at the base viewport prevents iOS Safari auto-zoom on focus.
 const FIELD_BASE =
@@ -49,23 +12,33 @@ const FIELD_ERROR =
 const LABEL = "block text-sm font-medium text-ink-muted mb-1";
 const FIELD_ICON =
   "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-dim pointer-events-none";
+const FIELD_WRAPPER_CLASS = "relative";
+const FIELD_ERROR_TEXT_CLASS = "mt-1 text-xs text-danger";
+const SUCCESS_CLASS = "flex flex-col items-center justify-center gap-3 py-10 px-6 rounded-lg bg-success/10 border border-success/40";
+const CONTACT_FIELD = {
+  topic: "contact-topic",
+  name: "contact-name",
+  nameError: "contact-name-error",
+  email: "contact-email",
+  emailError: "contact-email-error",
+  message: "contact-message",
+  messageError: "contact-message-error",
+};
+const CONTACT_VALUES: Readonly<{ alert: "alert"; button: "button" }> = { alert: "alert", button: "button" };
 
-type ContactFormProps = Readonly<{
-  defaultTopic?: string;
-  className?: string;
-}>;
+enum ContactFormStatusValue { Idle = "idle", Loading = "loading", Success = "success", Error = "error" }
+
+type ContactFormProps = Readonly<{ defaultTopic?: ContactTopic; className?: string }>;
 
 export function ContactForm({
-  defaultTopic = "general",
+  defaultTopic = ContactTopicValue.General,
   className = "",
 }: ContactFormProps) {
   const [topic, setTopic] = useState(defaultTopic);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [status, setStatus] = useState(ContactFormStatusValue.Idle);
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { execute } = useRecaptcha();
@@ -75,19 +48,19 @@ export function ContactForm({
 
     if (!email.trim()) {
       errors.email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    } else if (!isValidContactEmail(email.trim())) {
       errors.email = "Enter a valid email address.";
     }
 
     if (!message.trim()) {
       errors.message = "Message is required.";
-    } else if (message.trim().length < 10) {
+    } else if (message.trim().length < CONTACT_LIMITS.messageMin) {
       errors.message = "Enter at least 10 characters.";
-    } else if (message.length > 5000) {
+    } else if (message.length > CONTACT_LIMITS.messageMax) {
       errors.message = "Message cannot exceed 5,000 characters.";
     }
 
-    if (name.trim().length > 100) {
+    if (name.trim().length > CONTACT_LIMITS.nameLength) {
       errors.name = "Name cannot exceed 100 characters.";
     }
 
@@ -99,7 +72,7 @@ export function ContactForm({
     e.preventDefault();
     if (!validate()) return;
 
-    setStatus("loading");
+    setStatus(ContactFormStatusValue.Loading);
     setErrorMsg("");
 
     try {
@@ -118,7 +91,7 @@ export function ContactForm({
       });
 
       if (res.ok) {
-        setStatus("success");
+        setStatus(ContactFormStatusValue.Success);
         setEmail("");
         setName("");
         setMessage("");
@@ -126,19 +99,20 @@ export function ContactForm({
       } else {
         const data = await res.json().catch(() => ({}));
         setErrorMsg(data.error || "We could not send your message. Please try again.");
-        setStatus("error");
+        setStatus(ContactFormStatusValue.Error);
       }
     } catch {
       setErrorMsg("Network error. Please try again.");
-      setStatus("error");
+      setStatus(ContactFormStatusValue.Error);
     }
   };
 
-  if (status === "success") {
+  if (status === ContactFormStatusValue.Success) {
     return (
       <div
-        role="status"
-        className={`flex flex-col items-center justify-center gap-3 py-10 px-6 rounded-lg bg-success/10 border border-success/40 ${className}`}
+        aria-live="polite"
+        aria-atomic="true"
+        className={`${SUCCESS_CLASS} ${className}`}
       >
         <Check className="w-8 h-8 text-success" />
         <p className="text-success font-semibold">Message sent.</p>
@@ -146,8 +120,8 @@ export function ContactForm({
           We will reply as soon as possible.
         </p>
         <button
-          type="button"
-          onClick={() => setStatus("idle")}
+          type={CONTACT_VALUES.button}
+          onClick={() => setStatus(ContactFormStatusValue.Idle)}
           className="mt-2 text-sm text-accent hover:text-accent-hover hover:underline transition-colors"
         >
           Send Another Message
@@ -159,37 +133,39 @@ export function ContactForm({
   return (
     <div className={className}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Topic */}
         <div>
-          <label htmlFor="contact-topic" className={LABEL}>
+          <label htmlFor={CONTACT_FIELD.topic} className={LABEL}>
             Topic
           </label>
-          <div className="relative">
+          <div className={FIELD_WRAPPER_CLASS}>
             <Tag className={FIELD_ICON} />
             <select
-              id="contact-topic"
+              id={CONTACT_FIELD.topic}
               value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              onChange={(event) => {
+                if (isContactTopic(event.target.value)) {
+                  setTopic(event.target.value);
+                }
+              }}
               className={`${FIELD_BASE} ${FIELD_OK} appearance-none`}
             >
-              {TOPICS.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
+              {Object.values(ContactTopicValue).map((value) => (
+                <option key={value} value={value}>
+                  {CONTACT_TOPICS[value].formLabel}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Name */}
         <div>
-          <label htmlFor="contact-name" className={LABEL}>
+          <label htmlFor={CONTACT_FIELD.name} className={LABEL}>
             Name <span className="text-ink-dim font-normal">(optional)</span>
           </label>
-          <div className="relative">
+          <div className={FIELD_WRAPPER_CLASS}>
             <User className={FIELD_ICON} />
             <input
-              id="contact-name"
+              id={CONTACT_FIELD.name}
               type="text"
               value={name}
               onChange={(e) => {
@@ -198,28 +174,27 @@ export function ContactForm({
                   setFieldErrors((p) => ({ ...p, name: "" }));
               }}
               placeholder="Your name"
-              maxLength={100}
+              maxLength={CONTACT_LIMITS.nameLength}
               aria-invalid={fieldErrors.name ? true : undefined}
-              aria-describedby={fieldErrors.name ? "contact-name-error" : undefined}
+              aria-describedby={fieldErrors.name ? CONTACT_FIELD.nameError : undefined}
               className={`${FIELD_BASE} ${FIELD_OK}`}
             />
           </div>
           {fieldErrors.name && (
-            <p id="contact-name-error" role="alert" className="mt-1 text-xs text-danger">
+            <p id={CONTACT_FIELD.nameError} role={CONTACT_VALUES.alert} className={FIELD_ERROR_TEXT_CLASS}>
               {fieldErrors.name}
             </p>
           )}
         </div>
 
-        {/* Email */}
         <div>
-          <label htmlFor="contact-email" className={LABEL}>
+          <label htmlFor={CONTACT_FIELD.email} className={LABEL}>
             Email
           </label>
-          <div className="relative">
+          <div className={FIELD_WRAPPER_CLASS}>
             <Mail className={FIELD_ICON} />
             <input
-              id="contact-email"
+              id={CONTACT_FIELD.email}
               type="email"
               required
               value={email}
@@ -227,12 +202,14 @@ export function ContactForm({
                 setEmail(e.target.value);
                 if (fieldErrors.email)
                   setFieldErrors((p) => ({ ...p, email: "" }));
-                if (status === "error") setStatus("idle");
+                if (status === ContactFormStatusValue.Error) {
+                  setStatus(ContactFormStatusValue.Idle);
+                }
               }}
               placeholder="your@email.com"
               aria-invalid={fieldErrors.email ? true : undefined}
               aria-describedby={
-                fieldErrors.email ? "contact-email-error" : undefined
+                fieldErrors.email ? CONTACT_FIELD.emailError : undefined
               }
               className={`${FIELD_BASE} ${
                 fieldErrors.email ? FIELD_ERROR : FIELD_OK
@@ -240,35 +217,36 @@ export function ContactForm({
             />
           </div>
           {fieldErrors.email && (
-            <p id="contact-email-error" role="alert" className="mt-1 text-xs text-danger">
+            <p id={CONTACT_FIELD.emailError} role={CONTACT_VALUES.alert} className={FIELD_ERROR_TEXT_CLASS}>
               {fieldErrors.email}
             </p>
           )}
         </div>
 
-        {/* Message */}
         <div>
-          <label htmlFor="contact-message" className={LABEL}>
+          <label htmlFor={CONTACT_FIELD.message} className={LABEL}>
             Message
           </label>
-          <div className="relative">
+          <div className={FIELD_WRAPPER_CLASS}>
             <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-ink-dim pointer-events-none" />
             <textarea
-              id="contact-message"
+              id={CONTACT_FIELD.message}
               required
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
                 if (fieldErrors.message)
                   setFieldErrors((p) => ({ ...p, message: "" }));
-                if (status === "error") setStatus("idle");
+                if (status === ContactFormStatusValue.Error) {
+                  setStatus(ContactFormStatusValue.Idle);
+                }
               }}
               placeholder="Describe the problem and the help you need."
               rows={5}
-              maxLength={5000}
+              maxLength={CONTACT_LIMITS.messageMax}
               aria-invalid={fieldErrors.message ? true : undefined}
               aria-describedby={
-                fieldErrors.message ? "contact-message-error" : undefined
+                fieldErrors.message ? CONTACT_FIELD.messageError : undefined
               }
               className={`${FIELD_BASE} resize-y ${
                 fieldErrors.message ? FIELD_ERROR : FIELD_OK
@@ -277,24 +255,23 @@ export function ContactForm({
           </div>
           <div className="flex justify-between mt-1">
             {fieldErrors.message ? (
-              <p id="contact-message-error" role="alert" className="text-xs text-danger">
+              <p id={CONTACT_FIELD.messageError} role={CONTACT_VALUES.alert} className="text-xs text-danger">
                 {fieldErrors.message}
               </p>
             ) : (
               <span />
             )}
-            <p className="text-xs text-ink-dim">{message.length}/5000</p>
+            <p className="text-xs text-ink-dim">{message.length}/{CONTACT_LIMITS.messageMax}</p>
           </div>
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
-          disabled={status === "loading"}
+          disabled={status === ContactFormStatusValue.Loading}
           style={{ touchAction: "manipulation" }}
           className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-accent-fill text-accent-contrast font-semibold shadow-lg hover:bg-accent-fill-hover hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
         >
-          {status === "loading" ? (
+          {status === ContactFormStatusValue.Loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <Send className="w-4 h-4" />
@@ -302,8 +279,8 @@ export function ContactForm({
           Send Message
         </button>
 
-        {status === "error" && (
-          <p role="alert" className="text-xs text-danger text-center">
+        {status === ContactFormStatusValue.Error && (
+          <p role={CONTACT_VALUES.alert} className="text-xs text-danger text-center">
             {errorMsg}
           </p>
         )}

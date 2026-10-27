@@ -8,10 +8,10 @@ import {
   mergeRoomZones,
   reconcilePlacementsWithRoomZones,
   resolveEarnedBadge,
-  shouldAutoOpenHelp,
   toggleSelectedDevice,
 } from "./DigitalHouse.controller";
-import { emptyPlacements } from "./model";
+import { DifficultyValue } from "../shared/types";
+import { BadgeJustEarnedValue, emptyPlacements } from "./model";
 
 describe("digital house controller helpers", () => {
   it("merges user zone overrides only for rooms that are not preassigned", () => {
@@ -116,23 +116,32 @@ describe("digital house controller helpers", () => {
     expect(setback.nextToast).toBeNull();
   });
 
-  it("keeps help preference behavior explicit", () => {
-    expect(shouldAutoOpenHelp(undefined)).toBe(true);
-    expect(shouldAutoOpenHelp(false)).toBe(true);
-    expect(shouldAutoOpenHelp(true)).toBe(false);
-  });
-
   it("resolves badge awards without duplicating earned badges", () => {
     expect(
-      resolveEarnedBadge({ difficulty: "easy", total: 45, hadRookie: false, hadArchitect: false }),
-    ).toBe("rookie");
+      resolveEarnedBadge({
+        difficulty: DifficultyValue.Easy,
+        total: 45,
+        hadRookie: false,
+        hadArchitect: false,
+      }),
+    ).toBe(BadgeJustEarnedValue.Rookie);
 
     expect(
-      resolveEarnedBadge({ difficulty: "hard", total: 75, hadRookie: false, hadArchitect: false }),
-    ).toBe("architect");
+      resolveEarnedBadge({
+        difficulty: DifficultyValue.Hard,
+        total: 75,
+        hadRookie: false,
+        hadArchitect: false,
+      }),
+    ).toBe(BadgeJustEarnedValue.Architect);
 
     expect(
-      resolveEarnedBadge({ difficulty: "hard", total: 75, hadRookie: true, hadArchitect: true }),
+      resolveEarnedBadge({
+        difficulty: DifficultyValue.Hard,
+        total: 75,
+        hadRookie: true,
+        hadArchitect: true,
+      }),
     ).toBeNull();
   });
 });

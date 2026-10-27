@@ -1,13 +1,9 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 "use client";
 
 import { useState } from "react";
-import type { ToolInstance } from "../../engine/types";
+import { ToolTypeValue, type ToolInstance } from "../../engine/types";
 import { getToolInfo } from "../../engine/loot";
-import { TYPE_TEXT } from "../shared/theme";
+import { GRIDRUNNER_DETAIL_TEXT_CLASS, TOOL_TYPE_PRESENTATION } from "../shared/theme";
 
 type DiscScreenProps = Readonly<{
   onClose: () => void;
@@ -15,33 +11,24 @@ type DiscScreenProps = Readonly<{
   inventory: ToolInstance[];
 }>;
 
-type TabId = "tools" | "types" | "threats" | "killchain" | "intel";
+enum DiscTabValue { Tools = "tools", Types = "types", Threats = "threats", Killchain = "killchain", Intel = "intel" }
+type DiscTab = `${DiscTabValue}`;
 
-const TABS: Readonly<{ id: TabId; label: string; available: boolean }>[] = [
-  { id: "tools", label: "TOOLS", available: true },
-  { id: "types", label: "TYPES", available: true },
-  { id: "threats", label: "THREATS", available: false },
-  { id: "killchain", label: "CHAIN", available: false },
-  { id: "intel", label: "INTEL", available: false },
+const TABS: Readonly<{ id: DiscTab; label: string; available: boolean }>[] = [
+  { id: DiscTabValue.Tools, label: "TOOLS", available: true },
+  { id: DiscTabValue.Types, label: "TYPES", available: true },
+  { id: DiscTabValue.Threats, label: "THREATS", available: false },
+  { id: DiscTabValue.Killchain, label: "CHAIN", available: false },
+  { id: DiscTabValue.Intel, label: "INTEL", available: false },
 ];
+const DISC_VALUES: Readonly<{ button: "button" }> = { button: "button" };
+const TAB_STACK_CLASS = "flex flex-col gap-2";
+const EXPANDED_DETAIL_CLASS = "mt-2 border-t border-[#1a3a4a] pt-2";
 
-const TYPE_CHART = [
-  { type: "Recon", strong: "Persistence (1.5x)", weak: "Defense (0.75x)", color: "text-[#00f0ff]", desc: "Scanning and information gathering. Know your target before you strike." },
-  { type: "Exploit", strong: "Defense (1.5x)", weak: "Persistence (0.75x)", color: "text-[#ff5c72]", desc: "Direct attacks that break through defenses. High risk, high reward." },
-  { type: "Defense", strong: "Exploit (1.5x)", weak: "Recon (0.75x)", color: "text-[#00ff41]", desc: "Shields and detection. Blocks incoming attacks and reveals threats." },
-  { type: "Persistence", strong: "Recon (1.5x)", weak: "Exploit (0.75x)", color: "text-[#ff00de]", desc: "Maintaining access. Slow damage over time that is hard to remove." },
-] as const;
-
-const TYPE_DESCRIPTIONS: Record<string, string> = {
-  recon: "Security teams use reconnaissance to map systems and identify weaknesses. In battle, Recon is strong against Persistence but weak against Defense.",
-  exploit: "Penetration testers use controlled exploits to confirm that a vulnerability can be used. In battle, Exploit is strong against Defense but weak against Persistence.",
-  defense: "Defensive tools help block, detect, and investigate attacks. In battle, Defense is strong against Exploit but weak against Recon.",
-  persistence: "Threat actors use persistence techniques to maintain access after a compromise. In battle, Persistence is strong against Recon but weak against Exploit.",
-};
-
-/* ------------------------------------------------------------------ */
-/*  Tabs                                                              */
-/* ------------------------------------------------------------------ */
+function tabStatusClass(active: boolean, available: boolean): string {
+  if (active) return "border-b-2 border-[#00f0ff] text-[#00f0ff]";
+  return available ? "text-[#aabbcc]" : "text-[#4a5568] opacity-50";
+}
 
 function ToolsTab({ equippedTools, inventory }: Readonly<{ equippedTools: (ToolInstance | null)[]; inventory: ToolInstance[] }>) {
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -57,27 +44,27 @@ function ToolsTab({ equippedTools, inventory }: Readonly<{ equippedTools: (ToolI
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-xs text-[#aabbcc]">Select a tool to learn about it. These entries cover tools used by security professionals and threat actors.</p>
+    <div className={TAB_STACK_CLASS}>
+      <p className={GRIDRUNNER_DETAIL_TEXT_CLASS}>Select a tool to learn about it. These entries cover tools used by security professionals and threat actors.</p>
       {uniqueTools.map((tool) => {
         const info = getToolInfo(tool.baseToolId);
         const isOpen = expanded === tool.baseToolId;
-        const typeColor = TYPE_TEXT[tool.type] ?? "text-[#aabbcc]";
+        const typePresentation = TOOL_TYPE_PRESENTATION[tool.type];
         return (
           <button
             key={tool.baseToolId}
-            type="button"
+            type={DISC_VALUES.button}
             onClick={() => setExpanded(isOpen ? null : tool.baseToolId)}
             className="w-full rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-3 py-2.5 text-left transition-colors hover:border-[#00f0ff]/50"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-[#e0e0e0]">{info?.name ?? tool.baseToolId}</span>
-              <span className={`text-xs font-bold ${typeColor}`}>{info?.type.toUpperCase() ?? "UNKNOWN"}</span>
+              <span className={`text-xs font-bold ${typePresentation.textClass}`}>{info?.type.toUpperCase() ?? "UNKNOWN"}</span>
             </div>
             <p className="mt-1 text-xs text-[#00f0ff]">{info?.description ?? "Unknown tool"}</p>
             {isOpen && (
-              <div className="mt-2 border-t border-[#1a3a4a] pt-2">
-                <p className="text-xs text-[#aabbcc]">{TYPE_DESCRIPTIONS[tool.type]}</p>
+              <div className={EXPANDED_DETAIL_CLASS}>
+                <p className={GRIDRUNNER_DETAIL_TEXT_CLASS}>{typePresentation.toolDescription}</p>
               </div>
             )}
           </button>
@@ -90,25 +77,26 @@ function ToolsTab({ equippedTools, inventory }: Readonly<{ equippedTools: (ToolI
 function TypesTab() {
   const [expanded, setExpanded] = useState<string | null>(null);
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-xs text-[#aabbcc]">Each tool has a type. Match it to the enemy weakness for bonus damage.</p>
-      {TYPE_CHART.map((row) => {
-        const isOpen = expanded === row.type;
+    <div className={TAB_STACK_CLASS}>
+      <p className={GRIDRUNNER_DETAIL_TEXT_CLASS}>Each tool has a type. Match it to the enemy weakness for bonus damage.</p>
+      {Object.values(ToolTypeValue).map((type) => {
+        const row = TOOL_TYPE_PRESENTATION[type];
+        const isOpen = expanded === type;
         return (
           <button
-            key={row.type}
-            type="button"
-            onClick={() => setExpanded(isOpen ? null : row.type)}
+            key={type}
+            type={DISC_VALUES.button}
+            onClick={() => setExpanded(isOpen ? null : type)}
             className="w-full rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-3 py-2.5 text-left transition-colors hover:border-[#00f0ff]/50"
           >
-            <span className={`text-sm font-bold ${row.color}`}>{row.type}</span>
+            <span className={`text-sm font-bold ${row.textClass}`}>{row.title}</span>
             <div className="mt-1 flex flex-col gap-0.5 text-xs">
               <span className="text-[#00ff41]">Strong vs {row.strong}</span>
               <span className="text-[#ff5c72]">Weak vs {row.weak}</span>
             </div>
             {isOpen && (
-              <div className="mt-2 border-t border-[#1a3a4a] pt-2">
-                <p className="text-xs text-[#aabbcc]">{row.desc}</p>
+              <div className={EXPANDED_DETAIL_CLASS}>
+                <p className={GRIDRUNNER_DETAIL_TEXT_CLASS}>{row.chartDescription}</p>
               </div>
             )}
           </button>
@@ -118,18 +106,15 @@ function TypesTab() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Main                                                              */
-/* ------------------------------------------------------------------ */
-
 export function DiscScreen({ onClose, equippedTools, inventory }: DiscScreenProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("tools");
+  const [activeTab, setActiveTab] = useState<DiscTab>(DiscTabValue.Tools);
+  const activeTabAvailable = TABS.find((tab) => tab.id === activeTab)?.available;
 
   return (
     <div data-testid="gr-disc-overlay" className="absolute inset-0 z-40 flex flex-col bg-[#0a0e1a]/95">
       <header className="flex shrink-0 items-center justify-between border-b border-[#00f0ff] px-3 py-2">
         <h2 className="gr-font-display text-base font-bold tracking-widest text-[#00f0ff]">IDENTITY DISC</h2>
-        <button type="button" onClick={onClose} className="gr-font-mono rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-2 py-1 text-xs text-[#aabbcc] active:brightness-150">
+        <button type={DISC_VALUES.button} onClick={onClose} className="gr-font-mono rounded-sm border border-[#1a3a4a] bg-[#0f1b2d] px-2 py-1 text-xs text-[#aabbcc] active:brightness-150">
           BACK
         </button>
       </header>
@@ -138,13 +123,9 @@ export function DiscScreen({ onClose, equippedTools, inventory }: DiscScreenProp
         {TABS.map((tab) => (
           <button
             key={tab.id}
-            type="button"
+            type={DISC_VALUES.button}
             onClick={() => tab.available && setActiveTab(tab.id)}
-            className={`gr-font-mono flex-1 px-1 py-2 text-xs font-bold tracking-wider transition-colors ${
-              activeTab === tab.id
-                ? "border-b-2 border-[#00f0ff] text-[#00f0ff]"
-                : tab.available ? "text-[#aabbcc]" : "text-[#4a5568] opacity-50"
-            }`}
+            className={`gr-font-mono flex-1 px-1 py-2 text-xs font-bold tracking-wider transition-colors ${tabStatusClass(activeTab === tab.id, tab.available)}`}
           >
             {tab.label}
           </button>
@@ -152,9 +133,9 @@ export function DiscScreen({ onClose, equippedTools, inventory }: DiscScreenProp
       </nav>
 
       <div className="gr-font-mono flex-1 overflow-y-auto p-3">
-        {activeTab === "tools" && <ToolsTab equippedTools={equippedTools} inventory={inventory} />}
-        {activeTab === "types" && <TypesTab />}
-        {(activeTab === "threats" || activeTab === "killchain" || activeTab === "intel") && (
+        {activeTab === DiscTabValue.Tools && <ToolsTab equippedTools={equippedTools} inventory={inventory} />}
+        {activeTab === DiscTabValue.Types && <TypesTab />}
+        {activeTabAvailable === false && (
           <div className="flex flex-1 items-center justify-center">
             <p className="gr-font-mono text-sm text-[#aabbcc]">LOCKED. Keep playing to unlock.</p>
           </div>

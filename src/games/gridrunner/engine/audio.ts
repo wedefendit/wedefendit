@@ -1,37 +1,10 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
+import { GameScreenValue, type GameScreen } from "./types";
 
-import type { GameScreen } from "./types";
+export enum SfxIdValue { Step = "step", MenuOpen = "menu-open", MenuClose = "menu-close", Bits = "bits", LevelUp = "level-up", LootDrop = "loot-drop", Encounter = "encounter", Hit = "hit", Miss = "miss", Critical = "critical", ToolRecon = "tool-recon", ToolExploit = "tool-exploit", ToolDefense = "tool-defense", ToolPersistence = "tool-persistence" }
+export type SfxId = `${SfxIdValue}`;
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                             */
-/* ------------------------------------------------------------------ */
-
-export type SfxId =
-  | "step"
-  | "menu-open"
-  | "menu-close"
-  | "bits"
-  | "level-up"
-  | "loot-drop"
-  | "encounter"
-  | "hit"
-  | "miss"
-  | "critical"
-  | "tool-recon"
-  | "tool-exploit"
-  | "tool-defense"
-  | "tool-persistence";
-
-export type MusicSlot =
-  | "title"
-  | "overworld"
-  | "interior-safe"
-  | "interior-deep"
-  | "battle"
-  | "boss"
-  | "final";
+export enum MusicSlotValue { Title = "title", Overworld = "overworld", InteriorSafe = "interior-safe", InteriorDeep = "interior-deep", Battle = "battle", Boss = "boss", Final = "final" }
+export type MusicSlot = `${MusicSlotValue}`;
 
 export interface AudioSettings {
   masterVolume: number;
@@ -40,12 +13,15 @@ export interface AudioSettings {
   muted: boolean;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Constants                                                         */
-/* ------------------------------------------------------------------ */
-
 const AUDIO_SETTINGS_KEY = "dis-gridrunner-audio";
 const CROSSFADE_MS = 1500;
+const MILLISECONDS_PER_SECOND = 1000;
+const SOURCE_CLEANUP_GRACE_MS = 100;
+const VOLUME_MIN = 0;
+const VOLUME_MAX = 100;
+
+enum AudioContextStateValue { Running = "running", Closed = "closed", Suspended = "suspended" }
+enum AudioErrorValue { EmptyPool = "Cannot pick from empty pool" }
 
 export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
   masterVolume: 78,
@@ -53,133 +29,117 @@ export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
   sfxVolume: 42,
   muted: false,
 };
-/* ------------------------------------------------------------------ */
-/*  SFX Manifest                                                      */
-/* ------------------------------------------------------------------ */
-
 export const SFX_MANIFEST: Record<SfxId, readonly string[]> = {
-  step: ["/audio/sfx/step/UIClick_UI Click 33_CB Sounddesign_ACTIVATION2.wav"],
-  "menu-open": [
+  [SfxIdValue.Step]: ["/audio/sfx/step/UIClick_UI Click 33_CB Sounddesign_ACTIVATION2.wav"],
+  [SfxIdValue.MenuOpen]: [
     "/audio/sfx/menu-open/UIMisc_Feedback 36 up_CB Sounddesign_ACTIVATION2.wav",
   ],
-  "menu-close": [
+  [SfxIdValue.MenuClose]: [
     "/audio/sfx/menu-close/Bluezone_BC0304_retrofuturistic_computer_button_013.wav",
     "/audio/sfx/menu-close/UIClick_UI Click 33_CB Sounddesign_ACTIVATION2.wav",
     "/audio/sfx/menu-close/UI_Window_MEDIUM_SlideMetal_02_CLOSED.wav",
   ],
-  bits: [
+  [SfxIdValue.Bits]: [
     "/audio/sfx/bits/Bluezone_BC0303_futuristic_user_interface_high_tech_beep_038.wav",
   ],
-  "level-up": ["/audio/sfx/level-up/UIAlert_Confirm Middle 12_RSCPC_USIN.wav"],
-  "loot-drop": [
+  [SfxIdValue.LevelUp]: ["/audio/sfx/level-up/UIAlert_Confirm Middle 12_RSCPC_USIN.wav"],
+  [SfxIdValue.LootDrop]: [
     "/audio/sfx/loot-drop/TOONPop_Syringe Pop 4_RogueWaves_KawaiiUI.wav",
   ],
-  encounter: [
+  [SfxIdValue.Encounter]: [
     "/audio/sfx/encounter/Bluezone_BC0303_futuristic_user_interface_data_glitch_003.wav",
     "/audio/sfx/encounter/Bluezone_BC0299_electricity_surge_discharge_electrical_arc_crackling_002_01.wav",
   ],
-  hit: [
+  [SfxIdValue.Hit]: [
     "/audio/sfx/hit/Bluezone_BC0297_stone_impact_hammer_015.wav",
     "/audio/sfx/hit/FGHTImpt_Fight Combo x4_RogueWaves_AnimeStudio.wav",
     "/audio/sfx/hit/SCIMech_Mech Processed Metal 27_RSCPC_SFEW.wav",
   ],
-  miss: [
+  [SfxIdValue.Miss]: [
     "/audio/sfx/miss/Bluezone_BC0300_alien_interface_sci_fi_transition_004.wav",
     "/audio/sfx/miss/Bluezone_BC0300_alien_interface_sci_fi_transition_008.wav",
     "/audio/sfx/miss/Bluezone_BC0303_futuristic_user_interface_transition_006.wav",
   ],
-  critical: [
+  [SfxIdValue.Critical]: [
     "/audio/sfx/critical/Bluezone_BC0294_modern_cinematic_impact_percussion_009.wav",
   ],
-  "tool-recon": [
+  [SfxIdValue.ToolRecon]: [
     "/audio/sfx/tool-recon/Bluezone_BC0300_alien_interface_sci_fi_texture_003.wav",
     "/audio/sfx/tool-recon/SCIMisc_Ping 18_RSCPC_PX.wav",
   ],
-  "tool-exploit": [
+  [SfxIdValue.ToolExploit]: [
     "/audio/sfx/tool-exploit/Bluezone_BC0295_sci_fi_weapon_gun_shot_008.wav",
     "/audio/sfx/tool-exploit/Bluezone_BC0296_steampunk_weapon_flare_shot_explosion_003.wav",
     "/audio/sfx/tool-exploit/SCIMisc_Zap Short 14_RSCPC_PX.wav",
     "/audio/sfx/tool-exploit/WEAPSwrd_Mecha Energy Sword Cut_RogueWaves_AnimeStudio.wav",
   ],
-  "tool-defense": [
+  [SfxIdValue.ToolDefense]: [
     "/audio/sfx/tool-defense/DSGNMisc_Charge Down Classic 1_RogueWaves_AnimeStudio.wav",
   ],
-  "tool-persistence": [
+  [SfxIdValue.ToolPersistence]: [
     "/audio/sfx/tool-persistence/Bluezone_BC0299_electricity_texture_sizzling_crackling_006.wav",
     "/audio/sfx/tool-persistence/Bluezone_BC0300_alien_interface_sci_fi_texture_003.wav",
     "/audio/sfx/tool-persistence/Bluezone_BC0300_alien_interface_sci_fi_texture_046.wav",
   ],
 };
 
-/* ------------------------------------------------------------------ */
-/*  Music Manifest                                                    */
-/* ------------------------------------------------------------------ */
-
 export const MUSIC_MANIFEST: Record<MusicSlot, readonly string[]> = {
-  title: ["/audio/music/title/Karl Casey - Malibu Moon.mp3"],
-  overworld: [
+  [MusicSlotValue.Title]: ["/audio/music/title/Karl Casey - Malibu Moon.mp3"],
+  [MusicSlotValue.Overworld]: [
     "/audio/music/overworld/Karl Casey - Eternal Youth.mp3",
     "/audio/music/overworld/Karl Casey - Midnight Empire.mp3",
     "/audio/music/overworld/Karl Casey - Moonlight.mp3",
     "/audio/music/overworld/Karl Casey - Nightscapes.mp3",
     "/audio/music/overworld/Karl Casey - Sunset Drive.mp3",
   ],
-  "interior-safe": [
+  [MusicSlotValue.InteriorSafe]: [
     "/audio/music/interior-safe/Karl Casey - Aurora.mp3",
     "/audio/music/interior-safe/Karl Casey - Conspiracy.mp3",
     "/audio/music/interior-safe/Karl Casey - Crystal Cola.mp3",
     "/audio/music/interior-safe/Karl Casey - Headlights in the Fog.mp3",
     "/audio/music/interior-safe/Karl Casey - Slice of Paradise.mp3",
   ],
-  "interior-deep": [
+  [MusicSlotValue.InteriorDeep]: [
     "/audio/music/interior-deep/Karl Casey - Ghost in the Algorithm.mp3",
     "/audio/music/interior-deep/Karl Casey - Mysterious Transmission.mp3",
     "/audio/music/interior-deep/Karl Casey - Secret Society.mp3",
     "/audio/music/interior-deep/Karl Casey - Surveillance.mp3",
     "/audio/music/interior-deep/Karl Casey - The Stalker.mp3",
   ],
-  battle: [
+  [MusicSlotValue.Battle]: [
     "/audio/music/battle/Karl Casey - Burnt Circuit.mp3",
     "/audio/music/battle/Karl Casey - Chrome Cobra.mp3",
     "/audio/music/battle/Karl Casey - Cosmic Death Machine.mp3",
     "/audio/music/battle/Karl Casey - Gears of War.mp3",
     "/audio/music/battle/Karl Casey - Kiss of Death.mp3",
   ],
-  boss: [
+  [MusicSlotValue.Boss]: [
     "/audio/music/boss/Karl Casey - Dead Channel.mp3",
     "/audio/music/boss/Karl Casey - Soul Eater.mp3",
     "/audio/music/boss/Karl Casey - The Taste of Blood.mp3",
   ],
-  final: ["/audio/music/final/Karl Casey - Nemesis.mp3"],
+  [MusicSlotValue.Final]: ["/audio/music/final/Karl Casey - Nemesis.mp3"],
 };
-
-/* ------------------------------------------------------------------ */
-/*  Zone → Music Slot Mapping                                         */
-/* ------------------------------------------------------------------ */
 
 const ZONE_MUSIC: Record<string, MusicSlot> = {
-  arcade: "interior-safe",
-  bank: "interior-deep",
-  hospital: "interior-deep",
-  powerplant: "interior-deep",
-  government: "interior-deep",
-  portauthority: "interior-deep",
-  university: "interior-safe",
-  oilrefinery: "interior-deep",
-  telecomtower: "interior-deep",
-  datacenter: "interior-deep",
-  satellitestation: "interior-deep",
-  embassy: "interior-deep",
-  researchlab: "interior-deep",
-  gridcore: "interior-deep",
+  arcade: MusicSlotValue.InteriorSafe,
+  bank: MusicSlotValue.InteriorDeep,
+  hospital: MusicSlotValue.InteriorDeep,
+  powerplant: MusicSlotValue.InteriorDeep,
+  government: MusicSlotValue.InteriorDeep,
+  portauthority: MusicSlotValue.InteriorDeep,
+  university: MusicSlotValue.InteriorSafe,
+  oilrefinery: MusicSlotValue.InteriorDeep,
+  telecomtower: MusicSlotValue.InteriorDeep,
+  datacenter: MusicSlotValue.InteriorDeep,
+  satellitestation: MusicSlotValue.InteriorDeep,
+  embassy: MusicSlotValue.InteriorDeep,
+  researchlab: MusicSlotValue.InteriorDeep,
+  gridcore: MusicSlotValue.InteriorDeep,
 };
 
-/* ------------------------------------------------------------------ */
-/*  Pure Functions (testable)                                         */
-/* ------------------------------------------------------------------ */
-
 export function pickRandom<T>(pool: readonly T[]): T {
-  if (pool.length === 0) throw new Error("Cannot pick from empty pool");
+  if (pool.length === 0) throw new Error(AudioErrorValue.EmptyPool);
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -193,37 +153,21 @@ export function resolveTrackName(path: string): string {
   return withoutExt;
 }
 
-export function computeEffectiveGain(
-  master: number,
-  channel: number,
-  muted: boolean,
-): number {
-  if (muted) return 0;
-  const m = toGain(master);
-  const c = toGain(channel);
-  return m * c;
-}
-
 export function getMusicSlot(
   screen: GameScreen,
   zone: string,
   isBoss: boolean,
 ): MusicSlot | null {
-  if (screen === "title") return "title";
-  if (screen === "overworld") return "overworld";
-  if (screen === "battle") {
-    if (isBoss) return "boss";
-    return "battle";
+  if (screen === GameScreenValue.Title) return screen;
+  if (screen === GameScreenValue.Overworld) return screen;
+  if (screen === GameScreenValue.Battle) {
+    return isBoss ? MusicSlotValue.Boss : MusicSlotValue.Battle;
   }
-  if (screen === "building") {
-    return ZONE_MUSIC[zone] ?? "interior-safe";
+  if (screen === GameScreenValue.Building) {
+    return ZONE_MUSIC[zone] ?? MusicSlotValue.InteriorSafe;
   }
   return null;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Settings Persistence                                              */
-/* ------------------------------------------------------------------ */
 
 export function loadAudioSettings(): AudioSettings {
   try {
@@ -256,14 +200,8 @@ export function loadAudioSettings(): AudioSettings {
 export function saveAudioSettings(settings: AudioSettings): void {
   try {
     localStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settings));
-  } catch {
-    /* quota or privacy mode */
-  }
+  } catch {}
 }
-
-/* ------------------------------------------------------------------ */
-/*  Audio Engine State                                                */
-/* ------------------------------------------------------------------ */
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
@@ -278,13 +216,9 @@ let currentMusicGainNode: GainNode | null = null;
 let currentMusicPath: string | null = null;
 let currentMusicSlot: MusicSlot | null = null;
 
-/* ------------------------------------------------------------------ */
-/*  Engine Lifecycle                                                  */
-/* ------------------------------------------------------------------ */
-
 export function initAudio(): boolean {
   if (initialized) return true;
-  if (typeof globalThis.AudioContext === "undefined") return false;
+  if (globalThis.AudioContext === undefined) return false;
 
   ctx = new AudioContext();
   masterGain = ctx.createGain();
@@ -298,12 +232,12 @@ export function initAudio(): boolean {
   settings = loadAudioSettings();
   applyGains();
   initialized = true;
-  return ctx.state === "running";
+  return ctx.state === AudioContextStateValue.Running;
 }
 
 export function destroyAudio(): void {
   stopMusic();
-  if (ctx && ctx.state !== "closed") {
+  if (ctx && ctx.state !== AudioContextStateValue.Closed) {
     ctx.close().catch(() => {});
   }
   ctx = null;
@@ -314,12 +248,8 @@ export function destroyAudio(): void {
   initialized = false;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Gain Management                                                   */
-/* ------------------------------------------------------------------ */
-
 function toGain(value: number): number {
-  return (Math.min(Math.max(value, 0), 100) / 100) ** 2;
+  return (Math.min(Math.max(value, VOLUME_MIN), VOLUME_MAX) / VOLUME_MAX) ** 2;
 }
 
 function applyGains(): void {
@@ -343,10 +273,6 @@ export function getSettings(): AudioSettings {
   return { ...settings };
 }
 
-/* ------------------------------------------------------------------ */
-/*  Buffer Loading                                                    */
-/* ------------------------------------------------------------------ */
-
 async function loadBuffer(path: string): Promise<AudioBuffer | null> {
   if (!ctx) return null;
 
@@ -365,10 +291,6 @@ async function loadBuffer(path: string): Promise<AudioBuffer | null> {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/*  SFX Playback                                                      */
-/* ------------------------------------------------------------------ */
-
 export function playSfx(id: SfxId): void {
   if (!ctx || !sfxGain || !initialized) return;
   if (settings.muted) return;
@@ -378,7 +300,7 @@ export function playSfx(id: SfxId): void {
 
   const path = pickRandom(pool);
 
-  loadBuffer(path).then((buffer) => {
+  void loadBuffer(path).then((buffer) => {
     if (!buffer || !ctx || !sfxGain) return;
     const source = ctx.createBufferSource();
     source.buffer = buffer;
@@ -387,17 +309,11 @@ export function playSfx(id: SfxId): void {
   });
 }
 
-/* ------------------------------------------------------------------ */
-/*  Music Playback                                                    */
-/* ------------------------------------------------------------------ */
-
 function stopMusic(): void {
   if (currentMusicSource) {
     try {
       currentMusicSource.stop();
-    } catch {
-      /* already stopped */
-    }
+    } catch {}
     currentMusicSource.disconnect();
     currentMusicSource = null;
   }
@@ -409,9 +325,8 @@ function stopMusic(): void {
   currentMusicSlot = null;
 }
 
-/** Start offset per slot (seconds). Title track skips the intro. */
 const SLOT_OFFSET: Partial<Record<MusicSlot, number>> = {
-  title: 5,
+  [MusicSlotValue.Title]: 5,
 };
 
 export function playMusic(slot: MusicSlot): void {
@@ -429,10 +344,9 @@ export function playMusic(slot: MusicSlot): void {
 function crossfadeTo(path: string, slot: MusicSlot, offset = 0): void {
   if (!ctx || !musicGain) return;
 
-  const fadeSeconds = CROSSFADE_MS / 1000;
+  const fadeSeconds = CROSSFADE_MS / MILLISECONDS_PER_SECOND;
   const now = ctx.currentTime;
 
-  // Fade out old
   if (currentMusicGainNode && currentMusicSource) {
     const oldGain = currentMusicGainNode;
     const oldSource = currentMusicSource;
@@ -441,12 +355,10 @@ function crossfadeTo(path: string, slot: MusicSlot, offset = 0): void {
     setTimeout(() => {
       try {
         oldSource.stop();
-      } catch {
-        /* already stopped */
-      }
+      } catch {}
       oldSource.disconnect();
       oldGain.disconnect();
-    }, CROSSFADE_MS + 100);
+    }, CROSSFADE_MS + SOURCE_CLEANUP_GRACE_MS);
   }
 
   currentMusicSource = null;
@@ -454,8 +366,7 @@ function crossfadeTo(path: string, slot: MusicSlot, offset = 0): void {
   currentMusicPath = path;
   currentMusicSlot = slot;
 
-  // Fade in new
-  loadBuffer(path).then((buffer) => {
+  void loadBuffer(path).then((buffer) => {
     if (!buffer || !ctx || !musicGain) return;
     if (currentMusicPath !== path) return;
 
@@ -486,10 +397,6 @@ export function stopMusicPlayback(): void {
   stopMusic();
 }
 
-/* ------------------------------------------------------------------ */
-/*  Pause / Resume                                                    */
-/* ------------------------------------------------------------------ */
-
 export function pauseAudio(): void {
   if (!ctx || !musicGain) return;
   const t = ctx.currentTime;
@@ -499,7 +406,7 @@ export function pauseAudio(): void {
 
 export function resumeAudio(): void {
   if (!ctx || !musicGain) return;
-  if (ctx.state === "suspended") {
+  if (ctx.state === AudioContextStateValue.Suspended) {
     ctx.resume().catch(() => {});
     applyGains();
   }
@@ -509,15 +416,7 @@ export function resumeAudio(): void {
   musicGain.gain.linearRampToValueAtTime(target, t + 0.2);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Track Info                                                        */
-/* ------------------------------------------------------------------ */
-
 export function getCurrentTrackName(): string | null {
   if (!currentMusicPath) return null;
   return resolveTrackName(currentMusicPath);
-}
-
-export function getCurrentMusicSlot(): MusicSlot | null {
-  return currentMusicSlot;
 }

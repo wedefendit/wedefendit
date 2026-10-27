@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Difficulty } from "../shared/types";
+import { DifficultyValue, type Difficulty } from "../shared/types";
 import { useGameShell } from "../shared/GameShell";
 import { getGamePreference, setGamePreference } from "../shared/storage";
 import {
   DEVICES,
   ROOM_ZONE_ASSIGNMENTS,
+  SCORING_INTERNALS,
+  ZoneIdValue,
   calculateScore,
+  isTrusted,
   type Device,
   type DeviceId,
   type DevicePlacement,
@@ -15,15 +18,15 @@ import {
 import {
   inventoryColumnsForRail,
   isCompactDesktopLayout,
+  ViewportBandValue,
   widthToBand,
 } from "./layout";
 import {
+  BadgeJustEarnedValue,
   DIGITAL_HOUSE_GAME_ID,
+  DIGITAL_HOUSE_BADGES,
   ONBOARDING_PREF_KEY,
-  HOME_NETWORK_ROOKIE,
-  NETWORK_ARCHITECT,
-  RISKY_DEVICE_IDS,
-  TRUSTED_DEVICE_IDS,
+  ToastTypeValue,
   emptyPlacements,
   nextDifficulty,
   coachSteps,
@@ -31,15 +34,42 @@ import {
   type BadgeJustEarned,
   type LastPlacement,
   type PlacementMap,
-  type ScoreDelta,
+  type ScoreAnimationDelta,
   type ViewportProfile,
   type ZoneBlockedFeedback,
 } from "./model";
 import { buildOpenRiskItems } from "./summary";
 import type { DeviceIconTone } from "./ui/DeviceIcon";
 import { useIdleHint, type IdleSnapshot } from "./hooks/useIdleHint";
+import { useTouchDrag } from "./hooks/useTouchDrag";
 
-// ======== Pure helpers (exported for tests — unchanged) ========
+const ACTIVATION_STREAK = 3;
+const HALFWAY_DEVICE_COUNT = 5;
+const MOBILE_MAX_HEIGHT = 500;
+const ONBOARDING_DELAY_MS = 400;
+const SUMMARY_DELAY_MS = 900;
+const TOAST_DURATION_MS = 2200;
+const ZONE_BLOCKED_DURATION_MS = 2500;
+const CATEGORY_TONE: DeviceIconTone = "category";
+const NEUTRAL_TONE: DeviceIconTone = "neutral";
+
+enum BrowserEventValue {
+  Change = "change",
+  Resize = "resize",
+}
+
+type ToastWithoutKey = Omit<NonNullable<ActiveToast>, "key">;
+
+const TOAST_COPY: Record<ToastTypeValue, Readonly<{ label: string; hint: string }>> = {
+  [ToastTypeValue.Halfway]: {
+    label: "Halfway there",
+    hint: "5 of 10 placed",
+  },
+  [ToastTypeValue.Streak]: {
+    label: "Nice rhythm",
+    hint: "Nice rhythm",
+  },
+};
 
 export function mergeRoomZones(
   preassigned: Record<RoomId, ZoneId | null>,
@@ -117,7 +147,7 @@ export function deriveRiskyRooms(placements: PlacementMap): Set<RoomId> {
   const byRoom = new Map<RoomId, DeviceId[]>();
   for (const d of DEVICES) {
     const p = placements[d.id];
-    if (p?.zoneId !== "main") continue;
+    if (p?.zoneId !== ZoneIdValue.Main) continue;
     const l = byRoom.get(p.roomId) ?? [];
     l.push(d.id);
     byRoom.set(p.roomId, l);
@@ -125,16 +155,12 @@ export function deriveRiskyRooms(placements: PlacementMap): Set<RoomId> {
   const risky = new Set<RoomId>();
   for (const [rid, ids] of byRoom) {
     if (
-      ids.some((id) => TRUSTED_DEVICE_IDS.has(id)) &&
-      ids.some((id) => RISKY_DEVICE_IDS.has(id))
+      ids.some(isTrusted) &&
+      ids.some((id) => !isTrusted(id))
     )
       risky.add(rid);
   }
   return risky;
-}
-
-export function shouldAutoOpenHelp(pref: boolean | undefined): boolean {
-  return pref !== true;
 }
 
 export function buildScoreFeedback({
@@ -156,36 +182,35 @@ export function buildScoreFeedback({
       delta,
       nextStreak: streak,
       nextHalfwayShown: halfwayShown,
-      nextToast: null as Omit<NonNullable<ActiveToast>, "key"> | null,
+      nextToast: null as ToastWithoutKey | null,
     };
   const ns = delta > 0 ? streak + 1 : 0;
-  if (!halfwayShown && placedCount === 5 && delta > 0)
+  if (!halfwayShown && placedCount === HALFWAY_DEVICE_COUNT && delta > 0)
     return {
       delta,
       nextStreak: ns,
       nextHalfwayShown: true,
       nextToast: {
-        type: "halfway",
-        label: "Halfway there",
-        hint: "5 of 10 placed",
-      } as Omit<NonNullable<ActiveToast>, "key">,
+        type: ToastTypeValue.Halfway,
+        ...TOAST_COPY[ToastTypeValue.Halfway],
+      } as ToastWithoutKey,
     };
-  if (ns >= 3)
+  if (ns >= ACTIVATION_STREAK)
     return {
       delta,
       nextStreak: ns,
       nextHalfwayShown: halfwayShown,
       nextToast: {
-        type: "streak",
+        type: ToastTypeValue.Streak,
         label: `${ns}× streak`,
-        hint: "Nice rhythm",
-      } as Omit<NonNullable<ActiveToast>, "key">,
+        hint: TOAST_COPY[ToastTypeValue.Streak].hint,
+      } as ToastWithoutKey,
     };
   return {
     delta,
     nextStreak: ns,
     nextHalfwayShown: halfwayShown,
-    nextToast: null as Omit<NonNullable<ActiveToast>, "key"> | null,
+    nextToast: null as ToastWithoutKey | null,
   };
 }
 
@@ -201,18 +226,23 @@ export function resolveEarnedBadge({
   hadArchitect: boolean;
 }): BadgeJustEarned {
   let b: BadgeJustEarned = null;
-  if (!hadRookie) b = "rookie";
-  if (difficulty === "hard" && total >= 70 && !hadArchitect) b = "architect";
+  if (!hadRookie) b = BadgeJustEarnedValue.Rookie;
+  if (
+    difficulty === DifficultyValue.Hard &&
+    total >=
+      DIGITAL_HOUSE_BADGES[BadgeJustEarnedValue.Architect].minScore &&
+    !hadArchitect
+  ) {
+    b = BadgeJustEarnedValue.Architect;
+  }
   return b;
 }
-
-// ======== Viewport hook (unchanged) ========
 
 function useViewportProfile(): ViewportProfile {
   const [p, setP] = useState<ViewportProfile>({
     width: 0,
     height: 0,
-    band: "phone",
+    band: ViewportBandValue.Phone,
     isCoarsePointer: false,
   });
   useEffect(() => {
@@ -229,139 +259,31 @@ function useViewportProfile(): ViewportProfile {
       });
     };
     const bind = (q: MediaQueryList, fn: () => void) => {
-      if (typeof q.addEventListener === "function") {
-        q.addEventListener("change", fn);
-        return () => q.removeEventListener("change", fn);
-      }
-      q.addListener(fn);
-      return () => q.removeListener(fn);
+      q.addEventListener(BrowserEventValue.Change, fn);
+      return () => q.removeEventListener(BrowserEventValue.Change, fn);
     };
     update();
     const u1 = bind(cq, update),
       u2 = bind(hq, update);
-    globalThis.addEventListener("resize", update);
+    globalThis.addEventListener(BrowserEventValue.Resize, update);
     return () => {
       u1();
       u2();
-      globalThis.removeEventListener("resize", update);
+      globalThis.removeEventListener(BrowserEventValue.Resize, update);
     };
   }, []);
   return p;
 }
 
-// ======== Touch drag (unchanged) ========
-
-type TouchDragState = {
-  deviceId: DeviceId;
-  ghost: HTMLElement;
-  currentRoom: RoomId | null;
-};
-
-function useTouchDrag(
-  onPlace: (did: DeviceId, rid: RoomId) => void,
-  onHoverRoom: (rid: RoomId | null) => void,
-) {
-  const stateRef = useRef<TouchDragState | null>(null);
-  const onPlaceRef = useRef(onPlace);
-  const onHoverRef = useRef(onHoverRoom);
-  onPlaceRef.current = onPlace;
-  onHoverRef.current = onHoverRoom;
-
-  const startDrag = useCallback((deviceId: DeviceId, originTouch: Touch) => {
-    const ghost = document.createElement("div");
-    ghost.style.cssText =
-      "position:fixed;z-index:9999;pointer-events:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%) scale(1.1);";
-
-    // Clone the actual device icon from the DOM
-    const card = document.querySelector(
-      `[data-testid="dh-device-${deviceId}"]`,
-    );
-    const iconSpan = card?.querySelector("span");
-    if (iconSpan) {
-      const clone = iconSpan.cloneNode(true) as HTMLElement;
-      clone.style.width = "44px";
-      clone.style.height = "44px";
-      clone.style.borderRadius = "12px";
-      // Grab the computed background so we keep the category color
-      const bg = getComputedStyle(iconSpan).backgroundColor;
-      clone.style.backgroundColor = bg;
-      clone.style.boxShadow = `0 8px 24px ${bg.replace(")", ", 0.55)").replace("rgb(", "rgba(")}`;
-      ghost.appendChild(clone);
-    } else {
-      // Fallback: plain blue box
-      ghost.style.background = "rgba(56,189,248,0.85)";
-      ghost.style.border = "2px solid #0ea5e9";
-      ghost.style.boxShadow = "0 8px 24px rgba(56,189,248,0.5)";
-    }
-    ghost.style.left = originTouch.clientX + "px";
-    ghost.style.top = originTouch.clientY + "px";
-    document.body.appendChild(ghost);
-    stateRef.current = { deviceId, ghost, currentRoom: null };
-    const onMove = (e: TouchEvent) => {
-      const s = stateRef.current;
-      if (!s) return;
-      const t = e.touches[0];
-      if (!t) return;
-      e.preventDefault();
-      s.ghost.style.left = t.clientX + "px";
-      s.ghost.style.top = t.clientY + "px";
-      const el = document.elementFromPoint(t.clientX, t.clientY);
-      let rid: RoomId | null = null;
-      if (el) {
-        const re = el.closest(
-          "[data-testid^='dh-room-']",
-        ) as HTMLElement | null;
-        if (re) {
-          const m = (re.getAttribute("data-testid") ?? "").match(
-            /^dh-room-(.+)$/,
-          );
-          if (m?.[1] && !m[1].startsWith("zone")) rid = m[1] as RoomId;
-        }
-      }
-      if (rid !== s.currentRoom) {
-        s.currentRoom = rid;
-        onHoverRef.current(rid);
-      }
-    };
-    const onEnd = () => {
-      const s = stateRef.current;
-      if (s) {
-        s.ghost.remove();
-        if (s.currentRoom) onPlaceRef.current(s.deviceId, s.currentRoom);
-        onHoverRef.current(null);
-        stateRef.current = null;
-      }
-      document.removeEventListener("touchmove", onMove, { capture: true });
-      document.removeEventListener("touchend", onEnd);
-      document.removeEventListener("touchcancel", onEnd);
-    };
-    document.addEventListener("touchmove", onMove, {
-      passive: false,
-      capture: true,
-    });
-    document.addEventListener("touchend", onEnd);
-    document.addEventListener("touchcancel", onEnd);
-  }, []);
-
-  const handleTouchStart = useCallback(
-    (deviceId: DeviceId, e: React.TouchEvent) => {
-      const t = e.nativeEvent.touches[0];
-      if (!t) return;
-      startDrag(deviceId, t);
-    },
-    [startDrag],
-  );
-
-  return { handleTouchStart };
-}
-
-// ======== Main controller ========
-
 export function useDigitalHouseController() {
   const viewport = useViewportProfile();
-  const mobile = viewport.band === "phone" || viewport.height < 500;
+  const mobile =
+    viewport.band === ViewportBandValue.Phone ||
+    viewport.height < MOBILE_MAX_HEIGHT;
   const tablet =
-    !mobile && viewport.width < 1100 && viewport.height > viewport.width;
+    !mobile &&
+    isCompactDesktopLayout(viewport.width) &&
+    viewport.height > viewport.width;
   const allowDrag = true;
   const {
     difficulty,
@@ -384,7 +306,7 @@ export function useDigitalHouseController() {
   const [userZoneOverrides, setUserZoneOverrides] = useState<
     Partial<Record<RoomId, ZoneId>>
   >({});
-  const [scoreDelta, setScoreDelta] = useState<ScoreDelta>(null);
+  const [scoreDelta, setScoreDelta] = useState<ScoreAnimationDelta>(null);
   const [halfwayShown, setHalfwayShown] = useState(false);
   const [streak, setStreak] = useState(0);
   const [activeToast, setActiveToast] = useState<ActiveToast>(null);
@@ -393,24 +315,21 @@ export function useDigitalHouseController() {
   const [openZoneRoom, setOpenZoneRoom] = useState<RoomId | null>(null);
   const [railWidth, setRailWidth] = useState(0);
   const railRef = useRef<HTMLDivElement | null>(null);
-  const prevTotalRef = useRef(50);
+  const prevTotalRef = useRef(SCORING_INTERNALS.STARTING_SCORE);
   const deltaKeyRef = useRef(0);
   const hasRecordedRef = useRef(false);
 
-  // NEW: zone-blocked feedback
   const [zoneBlocked, setZoneBlocked] = useState<ZoneBlockedFeedback | null>(
     null,
   );
   const zbKeyRef = useRef(0);
 
-  // NEW: onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
   const coachStepsConfig = useMemo(
     () => coachSteps(difficulty, mobile),
     [difficulty, mobile],
   );
 
-  // NEW: track whether user has assigned any zone this run
   const [hasAssignedZone, setHasAssignedZone] = useState(false);
 
   const preassignedZones = useMemo(
@@ -422,21 +341,19 @@ export function useDigitalHouseController() {
     [preassignedZones, userZoneOverrides],
   );
   const compactDesktop = !mobile && isCompactDesktopLayout(viewport.width);
-  const houseZoneControls = difficulty !== "easy";
+  const houseZoneControls = difficulty !== DifficultyValue.Easy;
   const deviceTone: DeviceIconTone =
-    difficulty === "easy" ? "category" : "neutral";
-  const guidedDeviceCards = difficulty === "easy";
+    difficulty === DifficultyValue.Easy ? CATEGORY_TONE : NEUTRAL_TONE;
+  const guidedDeviceCards = difficulty === DifficultyValue.Easy;
   const inventoryColumns: 2 | 3 | 4 = tablet
     ? 3
     : inventoryColumnsForRail(viewport.width, railWidth);
 
-  // NEW: has unzoned rooms (for idle hint)
   const hasUnzonedRooms = useMemo(
-    () => Object.values(roomZones).some((z) => z === null),
+    () => Object.values(roomZones).includes(null),
     [roomZones],
   );
 
-  // Reset on difficulty/shell reset
   useEffect(() => {
     setPlacements(emptyPlacements());
     setSelectedId(null);
@@ -452,35 +369,18 @@ export function useDigitalHouseController() {
     setOpenZoneRoom(null);
     setZoneBlocked(null);
     setHasAssignedZone(false);
-    prevTotalRef.current = 50;
+    prevTotalRef.current = SCORING_INTERNALS.STARTING_SCORE;
     deltaKeyRef.current = 0;
     toastKeyRef.current = 0;
-    hasRecordedRef.current = 0 as unknown as boolean;
     hasRecordedRef.current = false;
   }, [resetCount, difficulty]);
 
-  // Re-zone placements when room zones change
   useEffect(() => {
-    setPlacements((prev) => {
-      let changed = false;
-      const next: PlacementMap = { ...prev };
-      for (const d of DEVICES) {
-        const p = prev[d.id];
-        if (!p) continue;
-        const nz = roomZones[p.roomId];
-        if (nz === null) {
-          next[d.id] = null;
-          changed = true;
-        } else if (nz !== p.zoneId) {
-          next[d.id] = { roomId: p.roomId, zoneId: nz };
-          changed = true;
-        }
-      }
-      return changed ? next : prev;
-    });
+    setPlacements((prev) =>
+      reconcilePlacementsWithRoomZones(prev, roomZones),
+    );
   }, [roomZones]);
 
-  // Scoring
   const scoringPlacements: DevicePlacement[] = useMemo(() => {
     const out: DevicePlacement[] = [];
     for (const d of DEVICES) {
@@ -498,11 +398,7 @@ export function useDigitalHouseController() {
     [difficulty, result],
   );
 
-  const placedIds = useMemo(() => {
-    const s = new Set<DeviceId>();
-    for (const d of DEVICES) if (placements[d.id]) s.add(d.id);
-    return s;
-  }, [placements]);
+  const placedIds = useMemo(() => buildPlacedIds(placements), [placements]);
   const isComplete = placedIds.size === DEVICES.length;
   const riskyRooms = useMemo(() => deriveRiskyRooms(placements), [placements]);
   const devicesByRoom = useMemo(
@@ -511,7 +407,6 @@ export function useDigitalHouseController() {
   );
   const placedZones = useMemo(() => buildPlacedZones(placements), [placements]);
 
-  // NEW: selected device info for analysis strip
   const selectedDevice = useMemo(() => {
     if (!selectedId) return null;
     const d = DEVICES.find((dev) => dev.id === selectedId);
@@ -519,46 +414,46 @@ export function useDigitalHouseController() {
     return { id: d.id, name: d.name, description: d.description };
   }, [selectedId]);
 
-  // Score feedback (toast, delta, streak)
   useEffect(() => {
     const prev = prevTotalRef.current;
-    const delta = result.total - prev;
+    const feedback = buildScoreFeedback({
+      previousTotal: prev,
+      nextTotal: result.total,
+      streak,
+      halfwayShown,
+      placedCount: placedIds.size,
+    });
     prevTotalRef.current = result.total;
-    if (delta === 0) return;
+    if (feedback.delta === 0) return;
     deltaKeyRef.current += 1;
-    setScoreDelta({ key: deltaKeyRef.current, value: delta });
-    const showToast = (
-      type: "halfway" | "streak",
-      label: string,
-      hint: string,
-    ) => {
+    setScoreDelta({ key: deltaKeyRef.current, value: feedback.delta });
+    setStreak(feedback.nextStreak);
+    setHalfwayShown(feedback.nextHalfwayShown);
+    if (feedback.nextToast) {
       toastKeyRef.current += 1;
-      setActiveToast({ key: toastKeyRef.current, type, label, hint });
-    };
-    const nextStreak = delta > 0 ? streak + 1 : 0;
-    setStreak(nextStreak);
-    if (!halfwayShown && placedIds.size === 5 && delta > 0) {
-      setHalfwayShown(true);
-      showToast("halfway", "Halfway there", "5 of 10 placed");
-    } else if (nextStreak >= 3)
-      showToast("streak", `${nextStreak}× streak`, "Nice rhythm");
+      setActiveToast({ key: toastKeyRef.current, ...feedback.nextToast });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result.total]);
 
   useEffect(() => {
     if (!activeToast) return;
-    const t = globalThis.setTimeout(() => setActiveToast(null), 2200);
+    const t = globalThis.setTimeout(
+      () => setActiveToast(null),
+      TOAST_DURATION_MS,
+    );
     return () => globalThis.clearTimeout(t);
-  }, [activeToast?.key]);
+  }, [activeToast]);
 
-  // Auto-dismiss zone-blocked feedback
   useEffect(() => {
     if (!zoneBlocked) return;
-    const t = globalThis.setTimeout(() => setZoneBlocked(null), 2500);
+    const t = globalThis.setTimeout(
+      () => setZoneBlocked(null),
+      ZONE_BLOCKED_DURATION_MS,
+    );
     return () => globalThis.clearTimeout(t);
-  }, [zoneBlocked?.key]);
+  }, [zoneBlocked]);
 
-  // Completion
   useEffect(() => {
     if (!isComplete || hasRecordedRef.current) return;
     hasRecordedRef.current = true;
@@ -571,17 +466,29 @@ export function useDigitalHouseController() {
         recovery: result.recovery,
       },
     });
-    const hadRookie = hasBadge(HOME_NETWORK_ROOKIE.id);
-    awardBadge(HOME_NETWORK_ROOKIE);
-    let newBadge: BadgeJustEarned = null;
-    if (!hadRookie) newBadge = "rookie";
-    if (difficulty === "hard" && result.total >= 70) {
-      const hadArch = hasBadge(NETWORK_ARCHITECT.id);
-      awardBadge(NETWORK_ARCHITECT);
-      if (!hadArch) newBadge = "architect";
+    const rookie = DIGITAL_HOUSE_BADGES[BadgeJustEarnedValue.Rookie];
+    const architect = DIGITAL_HOUSE_BADGES[BadgeJustEarnedValue.Architect];
+    const hadRookie = hasBadge(rookie.id);
+    const hadArchitect = hasBadge(architect.id);
+    awardBadge(rookie);
+    if (
+      difficulty === DifficultyValue.Hard &&
+      result.total >= architect.minScore
+    ) {
+      awardBadge(architect);
     }
-    setBadgeJustEarned(newBadge);
-    const t = globalThis.setTimeout(() => setShowEnd(true), 900);
+    setBadgeJustEarned(
+      resolveEarnedBadge({
+        difficulty,
+        total: result.total,
+        hadRookie,
+        hadArchitect,
+      }),
+    );
+    const t = globalThis.setTimeout(
+      () => setShowEnd(true),
+      SUMMARY_DELAY_MS,
+    );
     return () => globalThis.clearTimeout(t);
   }, [
     isComplete,
@@ -595,12 +502,9 @@ export function useDigitalHouseController() {
     hasBadge,
   ]);
 
-  // ======== Handlers ========
-
   const placeDevice = useCallback(
     (deviceId: DeviceId, roomId: RoomId) => {
       const zoneId = roomZones[roomId];
-      // FIX: instead of silently returning, show feedback
       if (!zoneId) {
         zbKeyRef.current += 1;
         setZoneBlocked({ key: zbKeyRef.current, roomId });
@@ -623,7 +527,7 @@ export function useDigitalHouseController() {
   }, []);
 
   const handleSelect = useCallback((deviceId: DeviceId) => {
-    setSelectedId((prev) => (prev === deviceId ? null : deviceId));
+    setSelectedId((prev) => toggleSelectedDevice(prev, deviceId));
     setLastPlacement(null);
     setOpenZoneRoom(null);
   }, []);
@@ -639,7 +543,7 @@ export function useDigitalHouseController() {
   const assignZone = useCallback((roomId: RoomId, zoneId: ZoneId) => {
     setUserZoneOverrides((prev) => ({ ...prev, [roomId]: zoneId }));
     setOpenZoneRoom(null);
-    setHasAssignedZone(true); // NEW: track zone assignment
+    setHasAssignedZone(true);
   }, []);
 
   const onTryHarder = useCallback(() => {
@@ -651,7 +555,6 @@ export function useDigitalHouseController() {
     shellReset();
   }, [shellReset]);
 
-  // Rail width measurement (desktop only)
   useEffect(() => {
     if (mobile) {
       setRailWidth(0);
@@ -671,16 +574,20 @@ export function useDigitalHouseController() {
     if (!houseZoneControls) setOpenZoneRoom(null);
   }, [houseZoneControls]);
 
-  // NEW: Onboarding (replaces auto-help-modal)
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof globalThis.setTimeout> | null = null;
-    getGamePreference<boolean>(DIGITAL_HOUSE_GAME_ID, ONBOARDING_PREF_KEY).then(
+    void getGamePreference<boolean>(
+      DIGITAL_HOUSE_GAME_ID,
+      ONBOARDING_PREF_KEY,
+    ).then(
       (pref) => {
         if (cancelled) return;
-        if (pref === true) return; // user dismissed with "don't show again"
-        // Small delay so DOM is ready for spotlight measurement
-        timer = globalThis.setTimeout(() => setShowOnboarding(true), 400);
+        if (pref === true) return;
+        timer = globalThis.setTimeout(
+          () => setShowOnboarding(true),
+          ONBOARDING_DELAY_MS,
+        );
       },
     );
     return () => {
@@ -700,7 +607,6 @@ export function useDigitalHouseController() {
   }, []);
 
   const dismissHelp = useCallback((dontShowAgain: boolean) => {
-    // Keep the old help pref for the help button
     if (dontShowAgain)
       void setGamePreference(
         DIGITAL_HOUSE_GAME_ID,
@@ -718,7 +624,6 @@ export function useDigitalHouseController() {
     handleReset();
   }, [handleReset]);
 
-  // NEW: idle hint integration
   const idleSnap: IdleSnapshot = useMemo(
     () => ({
       placedCount: placedIds.size,
@@ -801,7 +706,6 @@ export function useDigitalHouseController() {
     returnDevice,
     totalDevices: DEVICES.length,
     riskCount,
-    // NEW exports
     showOnboarding,
     coachStepsConfig,
     dismissOnboarding,

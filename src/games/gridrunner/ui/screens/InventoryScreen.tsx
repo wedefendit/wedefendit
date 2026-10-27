@@ -1,11 +1,9 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-*/
-
 import type { ToolInstance } from "../../engine/types";
-import { toolDisplayName } from "../../engine/loot";
+import { RARITY_DEFINITIONS, toolDisplayName } from "../../engine/loot";
 import { OverlayShell } from "../shared/OverlayShell";
-import { RARITY_TEXT, RARITY_BORDER, SCRAP_VALUES, TYPE_LABELS } from "../shared/theme";
+import { GRIDRUNNER_DETAIL_TEXT_CLASS, TOOL_TYPE_PRESENTATION } from "../shared/theme";
+
+const INVENTORY_VALUES: Readonly<{ button: "button" }> = { button: "button" };
 
 type InventoryScreenProps = Readonly<{
   onClose: () => void;
@@ -22,6 +20,13 @@ export function InventoryScreen({
   onEquip,
   onScrap,
 }: InventoryScreenProps) {
+  const slots = equippedTools.map((tool, index) => ({
+    tool,
+    index,
+    number: index + 1,
+    rowKey: tool?.id ?? `empty-${index}`,
+    actionKey: `slot-${index}`,
+  }));
   return (
     <OverlayShell
       testId="gr-inventory-overlay"
@@ -33,27 +38,27 @@ export function InventoryScreen({
         EQUIPPED
       </h3>
       <div className="mb-3 flex flex-col gap-1">
-        {equippedTools.map((tool, i) => (
+        {slots.map((slot) => (
           <div
-            key={tool?.id ?? `empty-${i}`}
+            key={slot.rowKey}
             className={`rounded-sm border bg-[#0f1b2d] px-2.5 py-2 ${
-              tool
-                ? RARITY_BORDER[tool.rarity]
+              slot.tool
+                ? RARITY_DEFINITIONS[slot.tool.rarity].borderClass
                 : "border-dashed border-[#1a3a4a]"
             }`}
           >
-            {tool ? (
+            {slot.tool ? (
               <div className="flex flex-col">
-                <span className={`text-sm font-bold ${RARITY_TEXT[tool.rarity]}`}>
-                  Slot {i + 1}: {toolDisplayName(tool)}
+                <span className={`text-sm font-bold ${RARITY_DEFINITIONS[slot.tool.rarity].textClass}`}>
+                  Slot {slot.number}: {toolDisplayName(slot.tool)}
                 </span>
-                <span className="text-xs text-[#aabbcc]">
-                  {TYPE_LABELS[tool.type]} · Pwr {tool.power} · Acc {tool.accuracy}% · EN {tool.energyCost}
+                <span className={GRIDRUNNER_DETAIL_TEXT_CLASS}>
+                  {TOOL_TYPE_PRESENTATION[slot.tool.type].label} · Pwr {slot.tool.power} · Acc {slot.tool.accuracy}% · EN {slot.tool.energyCost}
                 </span>
               </div>
             ) : (
               <span className="text-xs text-[#4a5568]">
-                Slot {i + 1} · Empty
+                Slot {slot.number} · Empty
               </span>
             )}
           </div>
@@ -64,7 +69,7 @@ export function InventoryScreen({
         BACKPACK ({inventory.length})
       </h3>
       {inventory.length === 0 ? (
-        <p className="text-xs text-[#aabbcc]">
+        <p className={GRIDRUNNER_DETAIL_TEXT_CLASS}>
           No items. Win battles to collect loot.
         </p>
       ) : (
@@ -72,32 +77,32 @@ export function InventoryScreen({
           {inventory.map((tool) => (
             <div
               key={tool.id}
-              className={`rounded-sm border bg-[#0f1b2d] px-2.5 py-2 ${RARITY_BORDER[tool.rarity]}`}
+              className={`rounded-sm border bg-[#0f1b2d] px-2.5 py-2 ${RARITY_DEFINITIONS[tool.rarity].borderClass}`}
             >
               <div className="flex flex-col gap-1">
-                <span className={`text-sm font-bold ${RARITY_TEXT[tool.rarity]}`}>
+                <span className={`text-sm font-bold ${RARITY_DEFINITIONS[tool.rarity].textClass}`}>
                   {toolDisplayName(tool)}
                 </span>
-                <span className="text-xs text-[#aabbcc]">
-                  {TYPE_LABELS[tool.type]} · Pwr {tool.power} · Acc {tool.accuracy}% · EN {tool.energyCost}
+                <span className={GRIDRUNNER_DETAIL_TEXT_CLASS}>
+                  {TOOL_TYPE_PRESENTATION[tool.type].label} · Pwr {tool.power} · Acc {tool.accuracy}% · EN {tool.energyCost}
                 </span>
                 <div className="flex flex-wrap gap-1 pt-1">
-                  {equippedTools.map((_, i) => (
+                  {slots.map((slot) => (
                     <button
-                      key={i}
-                      type="button"
-                      onClick={() => onEquip(tool.id, i)}
+                      key={slot.actionKey}
+                      type={INVENTORY_VALUES.button}
+                      onClick={() => onEquip(tool.id, slot.index)}
                       className="rounded-sm border border-[#00f0ff] bg-[#0a1220] px-2.5 py-1.5 text-xs font-bold text-[#00f0ff] active:brightness-150"
                     >
-                      Equip Slot {i + 1}
+                      Equip Slot {slot.number}
                     </button>
                   ))}
                   <button
-                    type="button"
+                    type={INVENTORY_VALUES.button}
                     onClick={() => onScrap(tool.id)}
                     className="rounded-sm border border-[#ff003c] bg-[#0a1220] px-2.5 py-1.5 text-xs font-bold text-[#ff003c] active:brightness-150"
                   >
-                    Scrap +{SCRAP_VALUES[tool.rarity] ?? 3}
+                    Scrap +{RARITY_DEFINITIONS[tool.rarity].scrapValue}
                   </button>
                 </div>
               </div>

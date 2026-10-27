@@ -1,11 +1,18 @@
 import Head from "next/head";
 import { LegalPage } from "@/components";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import companyInfo from "../../../data/company-info.json";
 
 const { contact } = companyInfo;
 const { email, privacy_email, address } = contact;
 const { street, city, state, zip } = address || {};
+const CANONICAL = `${SITE_URL}/privacy`;
+const SOCIAL_TITLE = "Privacy Policy | Defend I.T.";
+const OG_IMAGE = ogImageUrl("Privacy Policy");
+const EFFECTIVE_DATE = "26th day of March, 2026";
+const CHILDREN_POLICY = "The minimum age to use our website is 13 years of age. We do not knowingly collect or use personal data from children under 13 years of age. If we learn that we have collected personal data from a child under 13 years of age, the personal data will be deleted as soon as possible. If a child under 13 years of age has provided us with personal data their parent or guardian may contact our privacy officer.";
+const LIABILITY_SCOPE = "The company is not liable for indirect or consequential damages, including data loss, downtime, or third-party service issues. Liability is limited to the amount paid for services within the previous 30 days.";
+const LEGAL_CLASS = { heading: "text-h3 font-semibold uppercase border-b border-hairline my-4", orderedList: "list-decimal ml-6 my-2", unorderedList: "list-disc ml-6 my-2", subheading: "font-semibold mt-4 mb-1 underline", link: "text-accent underline", topSpacing: "mt-2", blockSpacing: "my-2" };
 
 export default function Privacy() {
   return (
@@ -17,24 +24,24 @@ export default function Privacy() {
           content="The Defend I.T. Solutions privacy policy: what data the site collects, how it is used, who it is shared with, and your rights over it."
         />
         <meta name="robots" content="noindex, follow" />
-        <meta property="og:title" content="Privacy Policy | Defend I.T." />
+        <meta property="og:title" content={SOCIAL_TITLE} />
         <meta
           property="og:description"
           content="What we collect, how we use it, who we share it with, and your rights over your data."
         />
-        <meta property="og:url" content="https://www.wedefendit.com/privacy" />
+        <meta property="og:url" content={CANONICAL} />
         <meta property="og:type" content="article" />
-        <meta property="og:image" content={ogImageUrl("Privacy Policy")} />
+        <meta property="og:image" content={OG_IMAGE} />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Privacy Policy | Defend I.T." />
+        <meta name="twitter:title" content={SOCIAL_TITLE} />
         <meta
           name="twitter:description"
           content="What we collect, how we use it, who we share it with, and your rights over your data."
         />
-        <meta name="twitter:image" content={ogImageUrl("Privacy Policy")} />
+        <meta name="twitter:image" content={OG_IMAGE} />
 
-        <link rel="canonical" href="https://www.wedefendit.com/privacy" />
+        <link rel="canonical" href={CANONICAL} />
       </Head>
 
       <LegalPage>
@@ -48,7 +55,7 @@ export default function Privacy() {
         for residential and small business clients
         <br />
         <br />
-        <strong>Effective date:</strong> 26th day of March, 2026
+        <strong>Effective date:</strong> {EFFECTIVE_DATE}
       </p>
 
       <p className="mb-6">
@@ -57,21 +64,21 @@ export default function Privacy() {
         <br />
         <br />
         Contact:{" "}
-        <a href={`mailto:${email}`} className="text-accent underline">
+        <a href={`mailto:${email}`} className={LEGAL_CLASS.link}>
           {email}
         </a>
         <br />
         {street}, {city}, {state} {zip}
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Purpose
       </h2>
       <p>
         The purpose of this privacy policy (&quot;Privacy Policy&quot;) is to
         inform users of our Site of the following:
       </p>
-      <ol className="list-decimal ml-6 my-2">
+      <ol className={LEGAL_CLASS.orderedList}>
         <li>The personal data we will collect</li>
         <li>Use of collected data</li>
         <li>Who has access to the data collected</li>
@@ -83,11 +90,11 @@ export default function Privacy() {
         our Site.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Consent
       </h2>
       <p>By using our Site users agree that they consent to:</p>
-      <ol className="list-decimal ml-6 my-2">
+      <ol className={LEGAL_CLASS.orderedList}>
         <li>The conditions set out in this Privacy Policy</li>
         <li>
           The collection, use, and retention of the data listed in this Privacy
@@ -95,7 +102,7 @@ export default function Privacy() {
         </li>
       </ol>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Personal Data We Collect
       </h2>
       <p>
@@ -104,36 +111,36 @@ export default function Privacy() {
         listed below without notifying you first.
       </p>
 
-      <h3 className="font-semibold mt-4 mb-1 underline">
+      <h3 className={LEGAL_CLASS.subheading}>
         Data Collected Automatically
       </h3>
       <p>
         When you visit and use our Site, we may automatically collect and store
         the following information:
       </p>
-      <ul className="list-disc ml-6 my-2">
+      <ul className={LEGAL_CLASS.unorderedList}>
         <li>IP address</li>
         <li>Hardware and software details</li>
         <li>Clicked links</li>
       </ul>
 
-      <h3 className="font-semibold mt-4 mb-1 underline">
+      <h3 className={LEGAL_CLASS.subheading}>
         Data Collected in a Non-Automatic Way
       </h3>
       <p>
         We may also collect the following data when you perform certain
         functions on our Site:
       </p>
-      <ul className="list-disc ml-6 my-2">
+      <ul className={LEGAL_CLASS.unorderedList}>
         <li>First and last name</li>
         <li>Email address</li>
       </ul>
       <p>This data may be collected using the following methods:</p>
-      <ul className="list-disc ml-6 my-2">
+      <ul className={LEGAL_CLASS.unorderedList}>
         <li>Contact form submissions</li>
       </ul>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         How We Use Personal Data
       </h2>
       <p>
@@ -142,10 +149,10 @@ export default function Privacy() {
         We will not use your data beyond what we disclose in this Privacy
         Policy.
       </p>
-      <p className="mt-2">
+      <p className={LEGAL_CLASS.topSpacing}>
         The data we collect automatically is used for the following purposes:
       </p>
-      <ul className="list-disc ml-6 my-2">
+      <ul className={LEGAL_CLASS.unorderedList}>
         <li>Spam prevention and bot detection (Google reCAPTCHA)</li>
         <li>Email delivery confirmation tracking (Brevo)</li>
       </ul>
@@ -153,23 +160,23 @@ export default function Privacy() {
         The data we collect when the user performs certain functions may be used
         for the following purposes:
       </p>
-      <ul className="list-disc ml-6 my-2">
+      <ul className={LEGAL_CLASS.unorderedList}>
         <li>To respond to inquiries and communicate with potential clients</li>
       </ul>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Who We Share Personal Data With
       </h2>
-      <h3 className="font-semibold mt-4 mb-1 underline">Employees</h3>
+      <h3 className={LEGAL_CLASS.subheading}>Employees</h3>
       <p>
         We may disclose user data to any member of our organization who
         reasonably needs access to user data to achieve the purposes set out in
         this Privacy Policy.
       </p>
 
-      <h3 className="font-semibold mt-4 mb-1 underline">Third Parties</h3>
+      <h3 className={LEGAL_CLASS.subheading}>Third Parties</h3>
       <p>We may share user data with the following third parties:</p>
-      <ol className="list-decimal ml-6 my-2">
+      <ol className={LEGAL_CLASS.orderedList}>
         <li>
           <strong>Google LLC (reCAPTCHA)</strong> &mdash; IP address, browser
           and device fingerprint data &mdash; for spam prevention and bot
@@ -186,12 +193,12 @@ export default function Privacy() {
         reasonably necessary to achieve the given purpose.
       </p>
 
-      <h3 className="font-semibold mt-4 mb-1 underline">Other Disclosures</h3>
+      <h3 className={LEGAL_CLASS.subheading}>Other Disclosures</h3>
       <p>
         We will not sell or share your data with other third parties, except in
         the following cases:
       </p>
-      <ul className="list-disc ml-6 my-2">
+      <ul className={LEGAL_CLASS.unorderedList}>
         <li>If the law requires it</li>
         <li>If it is required for any legal proceeding</li>
         <li>To prove or protect our legal rights</li>
@@ -206,7 +213,7 @@ export default function Privacy() {
         policies and practices.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         How Long We Store Personal Data
       </h2>
       <p>
@@ -217,7 +224,7 @@ export default function Privacy() {
         You will be notified if your data is kept for longer than this period.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         How We Protect Your Personal Data
       </h2>
       <p>
@@ -226,7 +233,7 @@ export default function Privacy() {
         encryption. Access is restricted to authorized personnel. We do not sell
         or share personal information with third parties for marketing purposes.
       </p>
-      <p className="mt-2">
+      <p className={LEGAL_CLASS.topSpacing}>
         While we take all reasonable precautions to ensure that user data is
         secure and that users are protected, there always remains the risk of
         harm. The Internet as a whole can be insecure at times and therefore we
@@ -234,11 +241,11 @@ export default function Privacy() {
         reasonably practical.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         International Data Transfers
       </h2>
       <p>We transfer user personal data to the following countries:</p>
-      <ol className="list-decimal ml-6 my-2">
+      <ol className={LEGAL_CLASS.orderedList}>
         <li>United States</li>
         <li>France</li>
       </ol>
@@ -248,19 +255,14 @@ export default function Privacy() {
         requirements for transferring personal data internationally.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Children
       </h2>
       <p>
-        The minimum age to use our website is 13 years of age. We do not
-        knowingly collect or use personal data from children under 13 years of
-        age. If we learn that we have collected personal data from a child under
-        13 years of age, the personal data will be deleted as soon as possible.
-        If a child under 13 years of age has provided us with personal data
-        their parent or guardian may contact our privacy officer.
+        {CHILDREN_POLICY}
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         How to Access, Modify, Delete, or Challenge the Data Collected
       </h2>
       <p>
@@ -270,17 +272,17 @@ export default function Privacy() {
         data to be deleted or modified in any way, please contact our privacy
         officer here:
       </p>
-      <p className="my-2">
+      <p className={LEGAL_CLASS.blockSpacing}>
         Anthony Tropeano
         <br />
-        <a href={`mailto:${privacy_email}`} className="text-accent underline">
+        <a href={`mailto:${privacy_email}`} className={LEGAL_CLASS.link}>
           {privacy_email}
         </a>
         <br />
         {street}, {city}, {state} {zip}
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Do Not Track Notice
       </h2>
       <p>
@@ -292,7 +294,7 @@ export default function Privacy() {
         will respond to DNT signals.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         How to Opt-Out of Data Collection, Use or Disclosure
       </h2>
       <p>
@@ -300,19 +302,19 @@ export default function Privacy() {
         Modify, Delete, or Challenge the Data Collected&quot; section, we
         provide the following specific opt-out methods:
       </p>
-      <ol className="list-decimal ml-6 my-2">
+      <ol className={LEGAL_CLASS.orderedList}>
         <li>
           Receiving waiting list and product launch notification emails. You can
           opt-out by clicking the unsubscribe link at the bottom of any email or
           by emailing{" "}
-          <a href={`mailto:${privacy_email}`} className="text-accent underline">
+          <a href={`mailto:${privacy_email}`} className={LEGAL_CLASS.link}>
             {privacy_email}
           </a>
           .
         </li>
       </ol>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Cookie Policy
       </h2>
       <p>
@@ -323,8 +325,8 @@ export default function Privacy() {
         Internet browser, but this may decrease the quality of your user
         experience.
       </p>
-      <p className="mt-2">We use the following types of cookies on our Site:</p>
-      <ol className="list-decimal ml-6 my-2">
+      <p className={LEGAL_CLASS.topSpacing}>We use the following types of cookies on our Site:</p>
+      <ol className={LEGAL_CLASS.orderedList}>
         <li>
           <strong>Third-Party Cookies</strong> &mdash; Third-party cookies are
           created by a website other than ours. We may use third-party cookies
@@ -335,7 +337,7 @@ export default function Privacy() {
         </li>
       </ol>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Additional Clauses
       </h2>
       <p>
@@ -344,14 +346,11 @@ export default function Privacy() {
         solely to respond to your inquiry and will not be used for marketing
         without your explicit consent.
       </p>
-      <p className="mt-2">
-        <strong>Limitation of Liability:</strong> The company is not liable for
-        indirect or consequential damages, including data loss, downtime, or
-        third-party service issues. Liability is limited to the amount paid for
-        services within the previous 30 days.
+      <p className={LEGAL_CLASS.topSpacing}>
+        <strong>Limitation of Liability:</strong> {LIABILITY_SCOPE}
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Modifications
       </h2>
       <p>
@@ -364,17 +363,17 @@ export default function Privacy() {
         notify users by email of changes to this Privacy Policy.
       </p>
 
-      <h2 className="text-h3 font-semibold uppercase border-b border-hairline my-4">
+      <h2 className={LEGAL_CLASS.heading}>
         Contact Information
       </h2>
       <p>
         If you have any questions, concerns, or complaints, you can contact our
         privacy officer:
       </p>
-      <p className="my-2">
+      <p className={LEGAL_CLASS.blockSpacing}>
         Anthony Tropeano
         <br />
-        <a href={`mailto:${privacy_email}`} className="text-accent underline">
+        <a href={`mailto:${privacy_email}`} className={LEGAL_CLASS.link}>
           {privacy_email}
         </a>
         <br />

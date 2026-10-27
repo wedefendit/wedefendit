@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import type { ButtonHTMLAttributes } from "react";
 import type { CoachStepConfig } from "../model";
 
 export type CoachMarkProps = Readonly<{
@@ -8,6 +9,42 @@ export type CoachMarkProps = Readonly<{
 
 type Rect = { top: number; left: number; width: number; height: number };
 const PAD = 8;
+const EDGE_INSET = 6;
+const PHONE_CARD_MAX_WIDTH = 360;
+const TABLET_CARD_MAX_WIDTH = 480;
+const DESKTOP_CARD_MAX_WIDTH = 540;
+const TABLET_MIN_WIDTH = 768;
+const DESKTOP_MIN_WIDTH = 1024;
+const PHONE_CARD_GUTTER = 32;
+const WIDE_CARD_GUTTER = 48;
+const CARD_Z_INDEX = 10_002;
+const SPOTLIGHT_Z_INDEX = 10_001;
+const SPOTLIGHT_CLIP_FRAME = "0% 0%, 0% 100%, 100% 100%, 100% 0%";
+const RESIZE_EVENT = "resize";
+const KEYDOWN_EVENT = "keydown";
+const TOUCH_STYLE: React.CSSProperties = { touchAction: "manipulation" };
+
+function CoachButton(
+  props: Readonly<ButtonHTMLAttributes<HTMLButtonElement>>,
+) {
+  return <button type="button" {...props} />;
+}
+
+function cardWidth(viewportWidth: number): number {
+  if (viewportWidth >= DESKTOP_MIN_WIDTH) {
+    return Math.min(DESKTOP_CARD_MAX_WIDTH, viewportWidth - WIDE_CARD_GUTTER);
+  }
+  if (viewportWidth >= TABLET_MIN_WIDTH) {
+    return Math.min(TABLET_CARD_MAX_WIDTH, viewportWidth - WIDE_CARD_GUTTER);
+  }
+  return Math.min(PHONE_CARD_MAX_WIDTH, viewportWidth - PHONE_CARD_GUTTER);
+}
+
+function stepDotClass(index: number, currentStep: number): string {
+  if (index === currentStep) return "w-5 bg-sky-400";
+  if (index < currentStep) return "w-2 bg-sky-400/50";
+  return "w-2 bg-slate-300 dark:bg-slate-600";
+}
 
 function getTargetRect(selector: string): Rect | null {
   const el = document.querySelector(selector);
@@ -15,8 +52,7 @@ function getTargetRect(selector: string): Rect | null {
   const r = el.getBoundingClientRect();
   const vw = globalThis.innerWidth;
   const vh = globalThis.innerHeight;
-  // Extra 6px inset so the ring border + shadow don't clip at viewport edges
-  const margin = PAD + 6;
+  const margin = PAD + EDGE_INSET;
   const left = Math.max(margin, r.left - PAD);
   const top = Math.max(0, r.top - PAD);
   const right = Math.min(vw - margin, r.right + PAD);
@@ -61,21 +97,22 @@ export function CoachMark({ steps, onDismiss }: CoachMarkProps) {
   }, [current]);
 
   useLayoutEffect(() => {
-    measure();
+    const frame = globalThis.requestAnimationFrame(measure);
+    return () => globalThis.cancelAnimationFrame(frame);
   }, [measure, step]);
 
   useEffect(() => {
     const h = () => measure();
-    globalThis.addEventListener("resize", h);
-    return () => globalThis.removeEventListener("resize", h);
+    globalThis.addEventListener(RESIZE_EVENT, h);
+    return () => globalThis.removeEventListener(RESIZE_EVENT, h);
   }, [measure]);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (e.key === "Escape") onDismiss(false);
     };
-    globalThis.addEventListener("keydown", h);
-    return () => globalThis.removeEventListener("keydown", h);
+    globalThis.addEventListener(KEYDOWN_EVENT, h);
+    return () => globalThis.removeEventListener(KEYDOWN_EVENT, h);
   }, [onDismiss]);
 
   if (!current) return null;
@@ -86,33 +123,25 @@ export function CoachMark({ steps, onDismiss }: CoachMarkProps) {
   };
   const handleSkip = () => onDismiss(dontShow);
 
-  // Card positioning: centered in viewport, never clipped
-  const vw = globalThis.innerWidth || 360;
-  const cardW =
-    vw >= 1024
-      ? Math.min(540, vw - 48)
-      : vw >= 768
-        ? Math.min(480, vw - 48)
-        : Math.min(360, vw - 32);
+  const vw = globalThis.innerWidth || PHONE_CARD_MAX_WIDTH;
+  const cardW = cardWidth(vw);
   const cardStyle: React.CSSProperties = {
     position: "fixed",
-    zIndex: 10002,
+    zIndex: CARD_Z_INDEX,
     width: cardW,
     left: (vw - cardW) / 2,
     top: "50%",
     transform: "translateY(-50%)",
   };
-
-  // Card always centers in viewport
-
   return (
     <div
       style={{ animation: "dh-fadeIn 0.25s ease" }}
       className="fixed inset-0 z-[10000]"
     >
-      {/* Dim overlay with spotlight cutout */}
-      <div
-        className="absolute inset-0"
+      <CoachButton
+        aria-label="Skip walkthrough"
+        tabIndex={-1}
+        className="absolute inset-0 m-0 border-0 p-0"
         onClick={handleSkip}
         style={{
           background: "rgba(2,6,23,0.78)",
@@ -120,7 +149,7 @@ export function CoachMark({ steps, onDismiss }: CoachMarkProps) {
           ...(rect
             ? {
                 clipPath: `polygon(
-              0% 0%, 0% 100%, 100% 100%, 100% 0%,
+              ${SPOTLIGHT_CLIP_FRAME},
               ${rect.left}px 0%,
               ${rect.left}px ${rect.top + rect.height}px,
               ${rect.left + rect.width}px ${rect.top + rect.height}px,
@@ -132,7 +161,6 @@ export function CoachMark({ steps, onDismiss }: CoachMarkProps) {
             : {}),
         }}
       />
-      {/* Spotlight ring */}
       {rect && (
         <div
           aria-hidden
@@ -144,33 +172,27 @@ export function CoachMark({ steps, onDismiss }: CoachMarkProps) {
             height: rect.height,
             boxShadow:
               "0 0 0 3px rgba(56,189,248,0.15), 0 0 24px rgba(56,189,248,0.25)",
-            zIndex: 10001,
+            zIndex: SPOTLIGHT_Z_INDEX,
           }}
         />
       )}
-      {/* Card */}
-      <div
-        role="dialog"
+      <dialog
+        open
         aria-modal="true"
         aria-label={current.heading}
         style={{
           ...cardStyle,
           animation: "dh-modalRise 0.4s cubic-bezier(0.22,1.2,0.36,1)",
         }}
-        className="w-full rounded-2xl border border-slate-200/80 bg-white/96 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.25)] ring-1 ring-white/90 min-[768px]:p-6 dark:border-sky-400/25 dark:bg-slate-900/96 dark:shadow-[0_20px_60px_rgba(2,6,23,0.6)] dark:ring-white/5"
+        className="m-0 w-full rounded-2xl border border-slate-200/80 bg-white/96 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.25)] ring-1 ring-white/90 min-[768px]:p-6 dark:border-sky-400/25 dark:bg-slate-900/96 dark:shadow-[0_20px_60px_rgba(2,6,23,0.6)] dark:ring-white/5"
       >
-        {/* Step dots */}
         <div className="mb-2 flex items-center gap-1.5">
-          {steps.map((_, i) => (
+          {steps.map((stepConfig, i) => (
             <div
-              key={i}
+              key={`${stepConfig.target}:${stepConfig.heading}`}
               className={[
                 "h-1 rounded-full transition-all duration-300",
-                i === step
-                  ? "w-5 bg-sky-400"
-                  : i < step
-                    ? "w-2 bg-sky-400/50"
-                    : "w-2 bg-slate-300 dark:bg-slate-600",
+                stepDotClass(i, step),
               ].join(" ")}
             />
           ))}
@@ -191,32 +213,30 @@ export function CoachMark({ steps, onDismiss }: CoachMarkProps) {
                   onChange={(e) => setDontShow(e.currentTarget.checked)}
                   className="h-4 w-4 rounded border-slate-300 text-sky-500 focus:ring-sky-400"
                 />
-                Don&apos;t show again
+                <span>Don&apos;t show again</span>
               </label>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {!isLast && (
-              <button
-                type="button"
+              <CoachButton
                 onClick={handleSkip}
                 className="touch-manipulation px-3 py-2 text-[13px] font-semibold text-slate-500 transition-colors hover:text-slate-700 min-[768px]:text-[14px] dark:text-slate-400 dark:hover:text-slate-200"
-                style={{ touchAction: "manipulation" }}
+                style={TOUCH_STYLE}
               >
                 Skip
-              </button>
+              </CoachButton>
             )}
-            <button
-              type="button"
+            <CoachButton
               onClick={handleNext}
               className="touch-manipulation rounded-xl border border-sky-400/40 bg-sky-500/12 px-5 py-2 text-[14px] font-bold text-sky-700 transition-colors hover:bg-sky-500/18 min-[768px]:text-[15px] dark:border-sky-400/25 dark:bg-sky-500/10 dark:text-sky-200 dark:hover:bg-sky-500/20"
-              style={{ touchAction: "manipulation" }}
+              style={TOUCH_STYLE}
             >
               {isLast ? "Got it" : "Next"}
-            </button>
+            </CoachButton>
           </div>
         </div>
-      </div>
+      </dialog>
     </div>
   );
 }

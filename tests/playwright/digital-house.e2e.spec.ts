@@ -3,6 +3,21 @@ import fs from "node:fs";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
 const ROUTE = "/awareness/digital-house";
+
+enum DifficultyValue {
+  Easy = "easy",
+  Medium = "medium",
+  Hard = "hard",
+}
+
+type Difficulty = `${DifficultyValue}`;
+type Viewport = Readonly<{ width: number; height: number }>;
+
+const DESKTOP_DIFFICULTIES: ReadonlyArray<Difficulty> = [
+  DifficultyValue.Easy,
+  DifficultyValue.Medium,
+];
+
 const PHONE_VIEWPORTS = [
   { width: 275, height: 600 },
   { width: 320, height: 828 },
@@ -32,7 +47,6 @@ const DESKTOP_VIEWPORTS = [
   { width: 1024, height: 600 }, // Nest Hub
   { width: 1920, height: 1080 },
 ];
-type Difficulty = "easy" | "medium" | "hard";
 type Box = {
   x: number;
   y: number;
@@ -111,7 +125,6 @@ async function openGame(page: Page, difficulty: Difficulty) {
     difficulty === "medium" ? /med(ium)?/i : new RegExp(difficulty, "i");
   await page.getByRole("radio", { name: difficultyPattern }).click();
   await expect(page.getByTestId("dh-house-panel")).toBeVisible();
-  await page.waitForTimeout(120);
 }
 
 async function attachScreenshot(
@@ -203,8 +216,8 @@ async function roomHasDevice(page: Page, roomId: string, title: string) {
 }
 
 async function placeDevice(page: Page, deviceId: string, roomId: string) {
-  await page.getByTestId("dh-device-" + deviceId).click();
-  await page.getByTestId("dh-room-" + roomId).click();
+  await page.getByTestId("dh-device-" + deviceId).press("Enter");
+  await page.getByTestId("dh-room-" + roomId).press("Enter");
 }
 
 async function assignRoomZone(page: Page, roomId: string, zoneId: string) {
@@ -220,155 +233,197 @@ async function assignRoomZone(page: Page, roomId: string, zoneId: string) {
   );
 }
 
+function assertCommonMetrics(metrics: Metrics) {
+  expect(metrics.header).not.toBeNull();
+  expect(metrics.house).not.toBeNull();
+  expect(metrics.score).not.toBeNull();
+  expect(metrics.analysis).not.toBeNull();
+}
+
+function assertDesktopRailMetrics(metrics: Metrics) {
+  if (
+    !metrics.header ||
+    !metrics.house ||
+    !metrics.rail ||
+    !metrics.score ||
+    !metrics.analysis ||
+    !metrics.inventory
+  ) {
+    return;
+  }
+  expect(metrics.house.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
+  expect(metrics.rail.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
+  expect(metrics.house.right).toBeLessThanOrEqual(metrics.rail.x + 8);
+  expect(metrics.house.width).toBeGreaterThan(metrics.rail.width - 20);
+  expect(metrics.score.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
+  expect(metrics.analysis.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
+  expect(metrics.inventory.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
+  expect(metrics.analysis.y).toBeGreaterThanOrEqual(metrics.score.bottom - 4);
+  expect(metrics.inventory.y).toBeGreaterThanOrEqual(
+    metrics.analysis.bottom - 4,
+  );
+  expect(metrics.score.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.analysis.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.inventory.right).toBeLessThanOrEqual(
+    metrics.viewportWidth + 1,
+  );
+  expect(metrics.rail.bottom).toBeLessThanOrEqual(metrics.viewportHeight + 4);
+  expect(metrics.inventory.height).toBeLessThan(
+    metrics.inventory.scrollHeight * 2 + 40,
+  );
+}
+
+async function assertDesktopMode(page: Page, metrics: Metrics) {
+  expect(metrics.rail).not.toBeNull();
+  expect(metrics.inventory).not.toBeNull();
+  await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
+  assertDesktopRailMetrics(metrics);
+}
+
+async function assertTabletMode(page: Page, metrics: Metrics) {
+  expect(metrics.rail).toBeNull();
+  expect(metrics.inventory).not.toBeNull();
+  await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
+  if (!metrics.header || !metrics.score || !metrics.analysis) return;
+  expect(metrics.score.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
+  expect(metrics.analysis.y).toBeGreaterThanOrEqual(metrics.score.bottom - 4);
+  expect(metrics.score.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.analysis.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+}
+
+async function assertZoneControls(
+  page: Page,
+  viewport: Viewport,
+  difficulty: Difficulty,
+) {
+  if (difficulty !== DifficultyValue.Medium) return;
+  if (viewport.width >= 1280) {
+    await expect(page.getByRole("button", { name: /room zones/i })).toHaveCount(
+      0,
+    );
+  } else {
+    expect(await deviceLabelFits(page, "work-laptop")).toBeTruthy();
+    expect(await deviceLabelFits(page, "guest-phone")).toBeTruthy();
+    expect(await deviceLabelFits(page, "doorbell-camera")).toBeTruthy();
+  }
+  await expect(page.getByTestId("dh-room-zone-bedroom")).toBeVisible();
+  await expect(page.getByTestId("dh-room-zone-entry-exterior")).toBeVisible();
+}
+
+async function auditDesktopViewport(
+  page: Page,
+  testInfo: TestInfo,
+  viewport: Viewport,
+  difficulty: Difficulty,
+) {
+  await page.setViewportSize(viewport);
+  await openGame(page, difficulty);
+  const baseName = `desktop-${difficulty}-${viewport.width}x${viewport.height}`;
+  await attachScreenshot(page, testInfo, baseName);
+  const metrics = await attachMetrics(page, testInfo, baseName + "-metrics");
+  assertCommonMetrics(metrics);
+  if (layoutMode(viewport) === "desktop") {
+    await assertDesktopMode(page, metrics);
+  } else {
+    await assertTabletMode(page, metrics);
+  }
+  await assertZoneControls(page, viewport, difficulty);
+  return metrics;
+}
+
+function assertPhoneMetrics(metrics: Metrics) {
+  expect(metrics.score).not.toBeNull();
+  expect(metrics.house).not.toBeNull();
+  expect(metrics.deviceStrip).not.toBeNull();
+  expect(metrics.analysis).not.toBeNull();
+  if (
+    !metrics.score ||
+    !metrics.house ||
+    !metrics.header ||
+    !metrics.deviceStrip ||
+    !metrics.analysis
+  ) {
+    return;
+  }
+  expect(metrics.score.y).toBeGreaterThanOrEqual(metrics.header.bottom - 2);
+  expect(metrics.score.bottom).toBeLessThanOrEqual(metrics.house.y + 10);
+  expect(metrics.house.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.score.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.analysis.right).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  expect(metrics.deviceStrip.right).toBeLessThanOrEqual(
+    metrics.viewportWidth + 1,
+  );
+  expect(metrics.deviceStrip.y).toBeGreaterThanOrEqual(metrics.house.y - 2);
+}
+
+async function assertPhoneScroll(page: Page) {
+  const canScroll = await page.evaluate(() => {
+    const scrollHeight =
+      document.scrollingElement?.scrollHeight ?? document.body.scrollHeight;
+    return scrollHeight > window.innerHeight + 4;
+  });
+  const startScroll = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  if (canScroll) {
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY))
+      .toBeGreaterThan(startScroll);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+}
+
+async function exercisePhonePlacement(page: Page) {
+  await page.getByTestId("dh-room-zone-bedroom").click();
+  await expect(page.getByTestId("dh-room-zone-popover-bedroom")).toBeVisible();
+  await page.getByTestId("dh-room-zone-option-bedroom-main").click();
+  await expect(page.getByTestId("dh-room-zone-popover-bedroom")).toHaveCount(0);
+  await page.getByTestId("dh-device-personal-phone").click();
+  await page.getByTestId("dh-room-bedroom").click();
+  await expect(page.getByTestId("dh-analysis-card")).not.toContainText(
+    "Drag a device to a room to begin",
+  );
+  expect(await roomHasDevice(page, "bedroom", "Personal phone")).toBe(1);
+  await page.getByTestId("dh-device-personal-phone").click();
+  await page.getByTestId("dh-device-personal-phone").click();
+  await page.getByTestId("dh-room-office").click();
+  expect(await roomHasDevice(page, "bedroom", "Personal phone")).toBe(0);
+  expect(await roomHasDevice(page, "office", "Personal phone")).toBe(1);
+}
+
+async function auditPhoneViewport(
+  page: Page,
+  testInfo: TestInfo,
+  viewport: Viewport,
+) {
+  await page.setViewportSize(viewport);
+  await openGame(page, DifficultyValue.Medium);
+  const baseName = `phone-medium-${viewport.width}x${viewport.height}`;
+  await attachScreenshot(page, testInfo, baseName);
+  const metrics = await attachMetrics(page, testInfo, baseName + "-metrics");
+  assertPhoneMetrics(metrics);
+  await assertPhoneScroll(page);
+  await exercisePhonePlacement(page);
+  return metrics;
+}
+
 test.describe("Digital House desktop audit", () => {
   test.use({ hasTouch: false, isMobile: false });
 
   for (const viewport of DESKTOP_VIEWPORTS) {
-    for (const difficulty of ["easy", "medium"] as const) {
+    for (const difficulty of DESKTOP_DIFFICULTIES) {
       test(`desktop ${difficulty} ${viewport.width}x${viewport.height}`, async ({
         page,
       }, testInfo) => {
-        await page.setViewportSize(viewport);
-        await openGame(page, difficulty);
-
-        const baseName = `desktop-${difficulty}-${viewport.width}x${viewport.height}`;
-        await attachScreenshot(page, testInfo, baseName);
-        const metrics = await attachMetrics(
+        const metrics = await auditDesktopViewport(
           page,
           testInfo,
-          baseName + "-metrics",
+          viewport,
+          difficulty,
         );
-        const mode = layoutMode(viewport);
-
-        // No horizontal overflow
         expect(metrics.documentScrollWidth).toBeLessThanOrEqual(
           metrics.viewportWidth + 1,
         );
-
-        // Common elements always exist
-        expect(metrics.header).not.toBeNull();
-        expect(metrics.house).not.toBeNull();
-        expect(metrics.score).not.toBeNull();
-        expect(metrics.analysis).not.toBeNull();
-
-        if (mode === "desktop") {
-          // Desktop layout: house + rail side by side
-          expect(metrics.rail).not.toBeNull();
-          expect(metrics.inventory).not.toBeNull();
-          await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
-
-          if (
-            metrics.header &&
-            metrics.house &&
-            metrics.rail &&
-            metrics.score &&
-            metrics.analysis &&
-            metrics.inventory
-          ) {
-            // House and rail are side by side below the header
-            expect(metrics.house.y).toBeGreaterThanOrEqual(
-              metrics.header.bottom - 2,
-            );
-            expect(metrics.rail.y).toBeGreaterThanOrEqual(
-              metrics.header.bottom - 2,
-            );
-
-            // House is to the LEFT of the rail
-            expect(metrics.house.right).toBeLessThanOrEqual(metrics.rail.x + 8);
-
-            // House panel is wider than the rail
-            expect(metrics.house.width).toBeGreaterThan(
-              metrics.rail.width - 20,
-            );
-
-            // Score, analysis, inventory are all in the rail (right side)
-            expect(metrics.score.x).toBeGreaterThanOrEqual(metrics.rail.x - 2);
-            expect(metrics.analysis.x).toBeGreaterThanOrEqual(
-              metrics.rail.x - 2,
-            );
-            expect(metrics.inventory.x).toBeGreaterThanOrEqual(
-              metrics.rail.x - 2,
-            );
-
-            // Score is above analysis, analysis is above inventory (stacked in rail)
-            expect(metrics.analysis.y).toBeGreaterThanOrEqual(
-              metrics.score.bottom - 4,
-            );
-            expect(metrics.inventory.y).toBeGreaterThanOrEqual(
-              metrics.analysis.bottom - 4,
-            );
-
-            // Nothing overflows the viewport
-            expect(metrics.score.right).toBeLessThanOrEqual(
-              metrics.viewportWidth + 1,
-            );
-            expect(metrics.analysis.right).toBeLessThanOrEqual(
-              metrics.viewportWidth + 1,
-            );
-            expect(metrics.inventory.right).toBeLessThanOrEqual(
-              metrics.viewportWidth + 1,
-            );
-            expect(metrics.rail.bottom).toBeLessThanOrEqual(
-              metrics.viewportHeight + 4,
-            );
-
-            // Inventory should be content-height, NOT stretched to viewport bottom.
-            const inventoryUsedHeight = metrics.inventory.scrollHeight;
-            const inventoryRenderedHeight = metrics.inventory.height;
-            expect(inventoryRenderedHeight).toBeLessThan(
-              inventoryUsedHeight * 2 + 40,
-            );
-          }
-        } else {
-          // Tablet layout: stacked, no rail, has inventory panel
-          expect(metrics.rail).toBeNull();
-          expect(metrics.inventory).not.toBeNull();
-          await expect(page.getByTestId("dh-inventory-panel")).toBeVisible();
-
-          if (
-            metrics.header &&
-            metrics.house &&
-            metrics.score &&
-            metrics.analysis &&
-            metrics.inventory
-          ) {
-            // Score is below header
-            expect(metrics.score.y).toBeGreaterThanOrEqual(
-              metrics.header.bottom - 2,
-            );
-            // Analysis is below score
-            expect(metrics.analysis.y).toBeGreaterThanOrEqual(
-              metrics.score.bottom - 4,
-            );
-            // Nothing overflows
-            expect(metrics.score.right).toBeLessThanOrEqual(
-              metrics.viewportWidth + 1,
-            );
-            expect(metrics.analysis.right).toBeLessThanOrEqual(
-              metrics.viewportWidth + 1,
-            );
-          }
-        }
-
-        if (viewport.width < 1280 && difficulty === "medium") {
-          await expect(page.getByTestId("dh-room-zone-bedroom")).toBeVisible();
-          await expect(
-            page.getByTestId("dh-room-zone-entry-exterior"),
-          ).toBeVisible();
-          expect(await deviceLabelFits(page, "work-laptop")).toBeTruthy();
-          expect(await deviceLabelFits(page, "guest-phone")).toBeTruthy();
-          expect(await deviceLabelFits(page, "doorbell-camera")).toBeTruthy();
-        }
-
-        if (viewport.width >= 1280 && difficulty === "medium") {
-          await expect(
-            page.getByRole("button", { name: /room zones/i }),
-          ).toHaveCount(0);
-          await expect(page.getByTestId("dh-room-zone-bedroom")).toBeVisible();
-          await expect(
-            page.getByTestId("dh-room-zone-entry-exterior"),
-          ).toBeVisible();
-        }
       });
     }
   }
@@ -399,13 +454,12 @@ test.describe("Digital House desktop audit", () => {
     await expect(helpModal).toBeVisible();
 
     await page.getByRole("checkbox", { name: /don't show again/i }).check();
-    await page.getByRole("button", { name: /dismiss/i }).click();
+    await helpModal.getByLabel("Close", { exact: true }).click();
     await expect(helpModal).toHaveCount(0);
 
     // Reload: CoachMark should be suppressed by the preference
     await page.reload({ waitUntil: "networkidle" });
     await stabilize(page);
-    await page.waitForTimeout(600);
     // The onboarding pref key is shared, so neither coach nor help opens
     await expect(page.getByTestId("dh-help-modal")).toHaveCount(0);
 
@@ -440,96 +494,17 @@ test.describe("Digital House desktop audit", () => {
 test.describe("Digital House phone audit", () => {
   test.use({ hasTouch: true, isMobile: true });
   test.beforeEach(({ browserName }) => {
-    test.skip(browserName === "firefox", "isMobile not supported in Firefox");
+    test.skip(browserName === "firefox", "isMobile not supported in Firefox"); // NOSONAR
   });
 
   for (const viewport of PHONE_VIEWPORTS) {
     test(`phone medium ${viewport.width}x${viewport.height}`, async ({
       page,
     }, testInfo) => {
-      await page.setViewportSize(viewport);
-      await openGame(page, "medium");
-
-      const baseName = `phone-medium-${viewport.width}x${viewport.height}`;
-      await attachScreenshot(page, testInfo, baseName);
-      const metrics = await attachMetrics(
-        page,
-        testInfo,
-        baseName + "-metrics",
+      const metrics = await auditPhoneViewport(page, testInfo, viewport);
+      expect(metrics.documentScrollWidth).toBeLessThanOrEqual(
+        metrics.viewportWidth + 1,
       );
-
-      expect(metrics.score).not.toBeNull();
-      expect(metrics.house).not.toBeNull();
-      expect(metrics.deviceStrip).not.toBeNull();
-      expect(metrics.analysis).not.toBeNull();
-
-      if (
-        metrics.score &&
-        metrics.house &&
-        metrics.header &&
-        metrics.deviceStrip &&
-        metrics.analysis
-      ) {
-        expect(metrics.score.y).toBeGreaterThanOrEqual(
-          metrics.header.bottom - 2,
-        );
-        expect(metrics.score.bottom).toBeLessThanOrEqual(metrics.house.y + 10);
-        expect(metrics.house.right).toBeLessThanOrEqual(
-          metrics.viewportWidth + 1,
-        );
-        expect(metrics.score.right).toBeLessThanOrEqual(
-          metrics.viewportWidth + 1,
-        );
-        expect(metrics.analysis.right).toBeLessThanOrEqual(
-          metrics.viewportWidth + 1,
-        );
-        expect(metrics.deviceStrip.right).toBeLessThanOrEqual(
-          metrics.viewportWidth + 1,
-        );
-
-        // Device strip should be below the house
-        expect(metrics.deviceStrip.y).toBeGreaterThanOrEqual(
-          metrics.house.y - 2,
-        );
-      }
-
-      const canScroll = await page.evaluate(() => {
-        const scrollHeight =
-          document.scrollingElement?.scrollHeight ?? document.body.scrollHeight;
-        return scrollHeight > window.innerHeight + 4;
-      });
-      const startScroll = await page.evaluate(() => window.scrollY);
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await page.waitForTimeout(100);
-      const endScroll = await page.evaluate(() => window.scrollY);
-      if (canScroll) expect(endScroll).toBeGreaterThan(startScroll);
-
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.waitForTimeout(100);
-
-      await page.getByTestId("dh-room-zone-bedroom").click();
-      await expect(
-        page.getByTestId("dh-room-zone-popover-bedroom"),
-      ).toBeVisible();
-      await page.getByTestId("dh-room-zone-option-bedroom-main").click();
-      await expect(
-        page.getByTestId("dh-room-zone-popover-bedroom"),
-      ).toHaveCount(0);
-
-      await page.getByTestId("dh-device-personal-phone").click();
-      await page.getByTestId("dh-room-bedroom").click();
-      await expect(page.getByTestId("dh-analysis-card")).not.toContainText(
-        "Drag a device to a room to begin",
-      );
-      expect(await roomHasDevice(page, "bedroom", "Personal phone")).toBe(1);
-
-      // Click once to return from bedroom, again to select, then place in office
-      await page.getByTestId("dh-device-personal-phone").click();
-      await page.waitForTimeout(80);
-      await page.getByTestId("dh-device-personal-phone").click();
-      await page.getByTestId("dh-room-office").click();
-      expect(await roomHasDevice(page, "bedroom", "Personal phone")).toBe(0);
-      expect(await roomHasDevice(page, "office", "Personal phone")).toBe(1);
     });
   }
 
@@ -557,7 +532,7 @@ test.describe("Digital House phone audit", () => {
     await page.getByRole("button", { name: /how to play/i }).click();
     const helpModal = page.getByTestId("dh-help-modal");
     await expect(helpModal).toBeVisible();
-    await page.getByRole("button", { name: /dismiss/i }).tap();
+    await helpModal.getByLabel("Close", { exact: true }).tap();
     await expect(helpModal).toHaveCount(0);
 
     await attachScreenshot(page, testInfo, "help-modal-touch-dismiss");
@@ -586,7 +561,7 @@ test.describe("Digital House phone audit", () => {
       .evaluate((el) => getComputedStyle(el).color);
 
     await page.getByRole("button", { name: /switch to light mode/i }).click();
-    await page.waitForTimeout(120);
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
 
     const scoreAfter = await page
       .getByTestId("dh-score-hud")
@@ -630,17 +605,17 @@ test.describe("Digital House scoring audit", () => {
     await placeDevice(page, "camera-hub", "kitchen");
 
     await page
-      .getByRole("button", { name: /after-action report/i })
+      .getByRole("button", { name: /results/i })
       .scrollIntoViewIfNeeded();
-    await page.getByRole("button", { name: /after-action report/i }).click();
+    await page.getByRole("button", { name: /results/i }).click();
     const summary = page.getByLabel(/after-action report/i);
     await expect(summary).toBeVisible();
     await expect(page.getByTestId("dh-summary-score")).toHaveText("88");
     await expect(summary).toContainText(
-      "Easy mode doesn't let you create a separate guest network.",
+      "Easy mode does not include a separate Guest network.",
     );
     await expect(summary).toContainText(
-      "Easy mode doesn't have a guest network. Try Medium or Hard to separate visitor devices.",
+      "Easy mode does not include a Guest network. Try Medium or Hard to separate visitor devices.",
     );
 
     await attachScreenshot(page, testInfo, "scoring-easy-best-case");
@@ -670,9 +645,9 @@ test.describe("Digital House scoring audit", () => {
     await placeDevice(page, "camera-hub", "entry-exterior");
 
     await page
-      .getByRole("button", { name: /after-action report/i })
+      .getByRole("button", { name: /results/i })
       .scrollIntoViewIfNeeded();
-    await page.getByRole("button", { name: /after-action report/i }).click();
+    await page.getByRole("button", { name: /results/i }).click();
     const summary = page.getByLabel(/after-action report/i);
     await expect(summary).toBeVisible();
     await expect(page.getByTestId("dh-summary-score")).toHaveText("100");

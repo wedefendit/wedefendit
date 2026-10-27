@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { GetServerSideProps } from "next";
+import type { GetServerSideProps } from "next";
+import { isJsonFile, jsonFileStem } from "@/lib/build-files";
+import { SITE_URL } from "@/lib/og";
 
 const Sitemap = () => null;
 
@@ -16,6 +18,22 @@ const REMOTE_SERVICE_DIR = path.join(
 const REMOTE_PAGE_DIR = path.join(process.cwd(), "src/pages/services/remote");
 const LOCATION_DIR = path.join(process.cwd(), "data/locations");
 const PAGE_EXTENSIONS = new Set([".tsx", ".ts", ".jsx", ".js"]);
+const SITEMAP_PATH = { tsx: "sitemap.xml.tsx", ts: "sitemap.xml.ts", api: "api/", index: "index", openParameter: "[", closeParameter: "]" };
+const PRIORITY = { home: "1.00", services: "0.95", contact: "0.90", primary: "0.85", secondary: "0.80", standard: "0.70", legal: "0.30", sigintPrivacy: "0.25", hidden: "0.10" };
+const EXACT_PRIORITY: Record<string, string> = {
+  services: PRIORITY.services,
+  contact: PRIORITY.contact,
+  sigint: PRIORITY.primary,
+  "service-areas": PRIORITY.secondary,
+  awareness: PRIORITY.secondary,
+  "services/remote": PRIORITY.secondary,
+  about: PRIORITY.standard,
+  privacy: PRIORITY.legal,
+  terms: PRIORITY.legal,
+  "privacy/sigint": PRIORITY.sigintPrivacy,
+  "thank-you": PRIORITY.hidden,
+  "sigint/confirmed": PRIORITY.hidden,
+};
 
 function readJsonSlugs(dir: string) {
   if (!fs.existsSync(dir)) {
@@ -24,9 +42,9 @@ function readJsonSlugs(dir: string) {
 
   return fs
     .readdirSync(dir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => file.replace(/\.json$/, ""))
-    .sort();
+    .filter(isJsonFile)
+    .map(jsonFileStem)
+    .sort((left, right) => left.localeCompare(right));
 }
 
 function readNestedIndexSlugs(dir: string) {
@@ -43,16 +61,16 @@ function readNestedIndexSlugs(dir: string) {
         fs.existsSync(path.join(dir, entry.name, "index.ts")),
     )
     .map((entry) => entry.name)
-    .sort();
+    .sort((left, right) => left.localeCompare(right));
 }
 
 function toRoute(relativeFilePath: string) {
   const normalizedPath = relativeFilePath.replaceAll("\\", "/");
 
   if (
-    normalizedPath === "sitemap.xml.tsx" ||
-    normalizedPath === "sitemap.xml.ts" ||
-    normalizedPath.startsWith("api/")
+    normalizedPath === SITEMAP_PATH.tsx ||
+    normalizedPath === SITEMAP_PATH.ts ||
+    normalizedPath.startsWith(SITEMAP_PATH.api)
   ) {
     return null;
   }
@@ -63,12 +81,12 @@ function toRoute(relativeFilePath: string) {
   if (
     segments.length === 0 ||
     segments.some((segment) => segment.startsWith("_")) ||
-    segments.some((segment) => segment.includes("[") || segment.includes("]"))
+    segments.some((segment) => segment.includes(SITEMAP_PATH.openParameter) || segment.includes(SITEMAP_PATH.closeParameter))
   ) {
     return null;
   }
 
-  if (segments.at(-1) === "index") {
+  if (segments.at(-1) === SITEMAP_PATH.index) {
     segments.pop();
   }
 
@@ -119,26 +137,17 @@ function readPageRoutes(dir: string, baseDir = dir): string[] {
 }
 
 function priorityForRoute(route: string) {
-  if (route === "") return "1.00";
-  if (route === "services") return "0.95";
-  if (route === "contact") return "0.90";
-  if (route === "sigint") return "0.85";
+  if (route === "") return PRIORITY.home;
+  const exact = EXACT_PRIORITY[route];
+  if (exact) return exact;
   if (route.startsWith("services/") && !route.startsWith("services/remote")) {
-    return "0.85";
+    return PRIORITY.primary;
   }
-  if (route.startsWith("service-areas/")) return "0.85";
-  if (route === "service-areas") return "0.80";
-  if (route === "awareness" || route === "services/remote") return "0.80";
-  if (route === "about" || route.startsWith("services/remote/")) return "0.70";
-  if (route === "privacy" || route === "terms") return "0.30";
-  if (route === "privacy/sigint") return "0.25";
-  if (route === "thank-you" || route === "sigint/confirmed") return "0.10";
-
-  return "0.70";
+  if (route.startsWith("service-areas/")) return PRIORITY.primary;
+  return PRIORITY.standard;
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-  const baseUrl = "https://www.wedefendit.com";
+export const getServerSideProps: GetServerSideProps = ({ res }) => {
   const now = new Date().toISOString();
   const pageRoutes = readPageRoutes(PAGES_DIR);
   const serviceSlugs = readJsonSlugs(LOCAL_SERVICE_DIR);
@@ -173,7 +182,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     return a.localeCompare(b);
   });
 
-  const toUrlTag = (loc: string, priority = "0.70") =>
+  const toUrlTag = (loc: string, priority = PRIORITY.standard) =>
     `
     <url>
       <loc>${loc}</loc>
@@ -184,7 +193,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   let urls = "";
 
   for (const route of routes) {
-    urls += toUrlTag(`${baseUrl}/${route}`, priorityForRoute(route));
+    urls += toUrlTag(`${SITE_URL}/${route}`, priorityForRoute(route));
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -197,7 +206,7 @@ ${urls}
   res.write(xml);
   res.end();
 
-  return { props: {} };
+  return Promise.resolve({ props: {} });
 };
 
 export default Sitemap;

@@ -1,19 +1,13 @@
-/*
-Copyright \u00A9 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
-
-import { DEVICES, isCamera, isTrusted, type DeviceId } from "./devices";
-import type { ZoneId } from "./zones";
+import {
+  DEVICES,
+  DeviceCategoryValue,
+  DeviceIdValue,
+  getDevice,
+  isCamera,
+  isTrusted,
+  type DeviceId,
+} from "./devices";
+import { ZoneIdValue, type ZoneId } from "./zones";
 
 export type ScoreDelta = {
   privacy: number;
@@ -26,7 +20,19 @@ export type DevicePlacement = {
   zoneId: ZoneId;
 };
 
-export type PlacementFindingSeverity = "wrong" | "critical";
+export enum PlacementFindingSeverityValue {
+  Wrong = "wrong",
+  Critical = "critical",
+}
+
+export type PlacementFindingSeverity = `${PlacementFindingSeverityValue}`;
+
+export enum AppliedComboIdValue {
+  GuestMixedWithTrusted = "guest-mixed-with-trusted",
+  CameraOnMain = "camera-on-main",
+  EntertainmentClutter = "entertainment-clutter",
+  SingleZoneDump = "single-zone-dump",
+}
 
 export type PlacementFinding = {
   deviceId: DeviceId;
@@ -48,17 +54,15 @@ export type ScoreResult = {
 };
 
 export type AppliedCombo = {
-  id:
-    | "guest-mixed-with-trusted"
-    | "camera-on-main"
-    | "entertainment-clutter"
-    | "single-zone-dump";
+  id: `${AppliedComboIdValue}`;
   label: string;
   delta: ScoreDelta;
   count?: number;
 };
 
 const STARTING_SCORE = 50;
+const MAX_SCORE = 100;
+const SCORE_DIMENSION_COUNT = 3;
 
 const BASE_MATRIX: Record<DeviceId, Record<ZoneId, ScoreDelta>> = {
   "work-laptop": {
@@ -113,53 +117,27 @@ const BASE_MATRIX: Record<DeviceId, Record<ZoneId, ScoreDelta>> = {
   },
 };
 
-const COMBO_A_GUEST_WITH_TRUSTED: ScoreDelta = {
-  privacy: -12,
-  blastRadius: -16,
-  recovery: -10,
-};
+enum ScoreRuleValue { GuestWithTrusted = "guest-with-trusted", CameraOnMain = "camera-on-main", EntertainmentClutter = "entertainment-clutter", SingleZoneDump = "single-zone-dump", WrongZone = "wrong-zone", CriticalZone = "critical-zone" }
 
-const COMBO_B_CAMERA_ON_MAIN: ScoreDelta = {
-  privacy: -10,
-  blastRadius: -10,
-  recovery: -10,
-};
-
-const COMBO_C_ENTERTAINMENT_CLUTTER_PER_DEVICE: ScoreDelta = {
-  privacy: -4,
-  blastRadius: -8,
-  recovery: -10,
-};
-
-const COMBO_D_SINGLE_ZONE_DUMP: ScoreDelta = {
-  privacy: -15,
-  blastRadius: -20,
-  recovery: -20,
-};
-
-const WRONG_ZONE_CEILING_PENALTY: ScoreDelta = {
-  privacy: 10,
-  blastRadius: 12,
-  recovery: 14,
-};
-
-const CRITICAL_ZONE_CEILING_PENALTY: ScoreDelta = {
-  privacy: 18,
-  blastRadius: 20,
-  recovery: 22,
-};
-
-const IDEAL_ZONE_BY_DEVICE: Record<DeviceId, ZoneId> = {
-  "work-laptop": "main",
-  "personal-phone": "main",
-  tablet: "main",
-  "guest-phone": "guest",
-  printer: "iot",
-  "smart-tv": "iot",
-  "smart-speaker": "iot",
-  "game-console": "iot",
-  "doorbell-camera": "iot",
-  "camera-hub": "iot",
+const SCORE_DELTAS: Record<ScoreRuleValue, ScoreDelta> = {
+  [ScoreRuleValue.GuestWithTrusted]: {
+    privacy: -12, blastRadius: -16, recovery: -10,
+  },
+  [ScoreRuleValue.CameraOnMain]: {
+    privacy: -10, blastRadius: -10, recovery: -10,
+  },
+  [ScoreRuleValue.EntertainmentClutter]: {
+    privacy: -4, blastRadius: -8, recovery: -10,
+  },
+  [ScoreRuleValue.SingleZoneDump]: {
+    privacy: -15, blastRadius: -20, recovery: -20,
+  },
+  [ScoreRuleValue.WrongZone]: {
+    privacy: 10, blastRadius: 12, recovery: 14,
+  },
+  [ScoreRuleValue.CriticalZone]: {
+    privacy: 18, blastRadius: 20, recovery: 22,
+  },
 };
 
 function zero(): ScoreDelta {
@@ -168,7 +146,7 @@ function zero(): ScoreDelta {
 
 function clamp(value: number): number {
   if (value < 0) return 0;
-  if (value > 100) return 100;
+  if (value > MAX_SCORE) return MAX_SCORE;
   return value;
 }
 
@@ -189,13 +167,13 @@ function scaleDelta(delta: ScoreDelta, count: number): ScoreDelta {
 }
 
 function idealZoneFor(deviceId: DeviceId): ZoneId {
-  return IDEAL_ZONE_BY_DEVICE[deviceId];
+  return getDevice(deviceId).idealZone;
 }
 
 function penaltyForSeverity(severity: PlacementFindingSeverity): ScoreDelta {
-  return severity === "wrong"
-    ? WRONG_ZONE_CEILING_PENALTY
-    : CRITICAL_ZONE_CEILING_PENALTY;
+  return severity === PlacementFindingSeverityValue.Wrong
+    ? SCORE_DELTAS[ScoreRuleValue.WrongZone]
+    : SCORE_DELTAS[ScoreRuleValue.CriticalZone];
 }
 
 function classifyPlacementSeverity(
@@ -206,30 +184,29 @@ function classifyPlacementSeverity(
   if (actualZone === idealZone) return null;
 
   if (isTrusted(deviceId)) {
-    return actualZone === "guest" ? "wrong" : "critical";
+    return actualZone === ZoneIdValue.Guest
+      ? PlacementFindingSeverityValue.Wrong
+      : PlacementFindingSeverityValue.Critical;
   }
 
-  switch (deviceId) {
-    case "guest-phone":
-      return actualZone === "iot" ? "wrong" : "critical";
-    case "printer":
-    case "smart-tv":
-    case "smart-speaker":
-    case "game-console":
-    case "doorbell-camera":
-    case "camera-hub":
-      return actualZone === "guest" ? "wrong" : "critical";
+  switch (getDevice(deviceId).category) {
+    case DeviceCategoryValue.Guest:
+      return actualZone === ZoneIdValue.IoT
+        ? PlacementFindingSeverityValue.Wrong
+        : PlacementFindingSeverityValue.Critical;
+    case DeviceCategoryValue.GrayArea:
+    case DeviceCategoryValue.Entertainment:
+    case DeviceCategoryValue.Camera:
+      return actualZone === ZoneIdValue.Guest
+        ? PlacementFindingSeverityValue.Wrong
+        : PlacementFindingSeverityValue.Critical;
     default:
       return null;
   }
 }
 
 function isEntertainmentDevice(deviceId: DeviceId): boolean {
-  return (
-    deviceId === "smart-tv" ||
-    deviceId === "smart-speaker" ||
-    deviceId === "game-console"
-  );
+  return getDevice(deviceId).category === DeviceCategoryValue.Entertainment;
 }
 
 function buildPlacementFinding(
@@ -261,32 +238,38 @@ export function calculateScore(placements: DevicePlacement[]): ScoreResult {
   const appliedCombos: AppliedCombo[] = [];
   let comboDeltas = zero();
 
-  const byZone: Record<ZoneId, DeviceId[]> = { main: [], guest: [], iot: [] };
+  const byZone: Record<ZoneId, DeviceId[]> = {
+    [ZoneIdValue.Main]: [],
+    [ZoneIdValue.Guest]: [],
+    [ZoneIdValue.IoT]: [],
+  };
   for (const placement of placements) {
     byZone[placement.zoneId].push(placement.deviceId);
   }
 
-  const mainDevices = byZone.main;
+  const mainDevices = byZone[ZoneIdValue.Main];
   const mainHasTrusted = mainDevices.some(isTrusted);
   const mainHasWorkOrPersonal =
-    mainDevices.includes("work-laptop") ||
-    mainDevices.includes("personal-phone");
+    mainDevices.includes(DeviceIdValue.WorkLaptop) ||
+    mainDevices.includes(DeviceIdValue.PersonalPhone);
 
-  if (mainDevices.includes("guest-phone") && mainHasTrusted) {
-    comboDeltas = addDelta(comboDeltas, COMBO_A_GUEST_WITH_TRUSTED);
+  if (mainDevices.includes(DeviceIdValue.GuestPhone) && mainHasTrusted) {
+    const delta = SCORE_DELTAS[ScoreRuleValue.GuestWithTrusted];
+    comboDeltas = addDelta(comboDeltas, delta);
     appliedCombos.push({
-      id: "guest-mixed-with-trusted",
+      id: AppliedComboIdValue.GuestMixedWithTrusted,
       label: "A guest device shares the Main network with personal devices",
-      delta: COMBO_A_GUEST_WITH_TRUSTED,
+      delta,
     });
   }
 
   if (mainDevices.some(isCamera)) {
-    comboDeltas = addDelta(comboDeltas, COMBO_B_CAMERA_ON_MAIN);
+    const delta = SCORE_DELTAS[ScoreRuleValue.CameraOnMain];
+    comboDeltas = addDelta(comboDeltas, delta);
     appliedCombos.push({
-      id: "camera-on-main",
+      id: AppliedComboIdValue.CameraOnMain,
       label: "Cameras share the Main network with personal devices",
-      delta: COMBO_B_CAMERA_ON_MAIN,
+      delta,
     });
   }
 
@@ -294,12 +277,12 @@ export function calculateScore(placements: DevicePlacement[]): ScoreResult {
     const clutterCount = mainDevices.filter(isEntertainmentDevice).length;
     if (clutterCount > 0) {
       const delta = scaleDelta(
-        COMBO_C_ENTERTAINMENT_CLUTTER_PER_DEVICE,
+        SCORE_DELTAS[ScoreRuleValue.EntertainmentClutter],
         clutterCount,
       );
       comboDeltas = addDelta(comboDeltas, delta);
       appliedCombos.push({
-        id: "entertainment-clutter",
+        id: AppliedComboIdValue.EntertainmentClutter,
         label:
           "Entertainment and smart devices share the Main network with personal devices",
         delta,
@@ -311,11 +294,12 @@ export function calculateScore(placements: DevicePlacement[]): ScoreResult {
   if (placements.length === DEVICES.length) {
     const usedZones = new Set(placements.map((placement) => placement.zoneId));
     if (usedZones.size === 1) {
-      comboDeltas = addDelta(comboDeltas, COMBO_D_SINGLE_ZONE_DUMP);
+      const delta = SCORE_DELTAS[ScoreRuleValue.SingleZoneDump];
+      comboDeltas = addDelta(comboDeltas, delta);
       appliedCombos.push({
-        id: "single-zone-dump",
+        id: AppliedComboIdValue.SingleZoneDump,
         label: "All devices share one network zone",
-        delta: COMBO_D_SINGLE_ZONE_DUMP,
+        delta,
       });
     }
   }
@@ -335,14 +319,16 @@ export function calculateScore(placements: DevicePlacement[]): ScoreResult {
   const rawRecovery =
     STARTING_SCORE + baseDeltas.recovery + comboDeltas.recovery;
 
-  const privacyCeiling = clamp(100 - ceilingPenalty.privacy);
-  const blastRadiusCeiling = clamp(100 - ceilingPenalty.blastRadius);
-  const recoveryCeiling = clamp(100 - ceilingPenalty.recovery);
+  const privacyCeiling = clamp(MAX_SCORE - ceilingPenalty.privacy);
+  const blastRadiusCeiling = clamp(MAX_SCORE - ceilingPenalty.blastRadius);
+  const recoveryCeiling = clamp(MAX_SCORE - ceilingPenalty.recovery);
 
   const privacy = clamp(Math.min(rawPrivacy, privacyCeiling));
   const blastRadius = clamp(Math.min(rawBlastRadius, blastRadiusCeiling));
   const recovery = clamp(Math.min(rawRecovery, recoveryCeiling));
-  const total = Math.round((privacy + blastRadius + recovery) / 3);
+  const total = Math.round(
+    (privacy + blastRadius + recovery) / SCORE_DIMENSION_COUNT,
+  );
 
   return {
     privacy,
@@ -359,11 +345,4 @@ export function calculateScore(placements: DevicePlacement[]): ScoreResult {
 export const SCORING_INTERNALS = {
   STARTING_SCORE,
   BASE_MATRIX,
-  COMBO_A_GUEST_WITH_TRUSTED,
-  COMBO_B_CAMERA_ON_MAIN,
-  COMBO_C_ENTERTAINMENT_CLUTTER_PER_DEVICE,
-  COMBO_D_SINGLE_ZONE_DUMP,
-  WRONG_ZONE_CEILING_PENALTY,
-  CRITICAL_ZONE_CEILING_PENALTY,
-  IDEAL_ZONE_BY_DEVICE,
 };

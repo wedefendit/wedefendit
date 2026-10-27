@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { DifficultyValue, type Difficulty } from "../../shared/types";
 import type { DeviceId } from "../engine";
 import type { IdleHint } from "../model";
 
@@ -8,9 +9,10 @@ export type IdleSnapshot = Readonly<{
   selectedName: string | null;
   isComplete: boolean;
   hasUnzonedRooms: boolean;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: Difficulty;
   hasAssignedZone: boolean;
 }>;
+type ScheduledHint = { snapshot: string; hint: IdleHint };
 
 const DELAY_INITIAL = 8_000;
 const DELAY_SELECTED = 5_000;
@@ -18,10 +20,12 @@ const DELAY_MIDGAME = 14_000;
 const DELAY_COMPLETE = 4_000;
 const DELAY_ZONE_NUDGE = 10_000;
 
+enum IdleResetEvent { PointerDown = "pointerdown", KeyDown = "keydown" }
+
 function selectMessage(snap: IdleSnapshot): string | null {
   if (snap.isComplete) return "All devices placed. Review your results";
   if (
-    snap.difficulty !== "easy" &&
+    snap.difficulty !== DifficultyValue.Easy &&
     !snap.hasAssignedZone &&
     snap.hasUnzonedRooms &&
     snap.placedCount < 2
@@ -40,7 +44,7 @@ function delayFor(snap: IdleSnapshot): number {
   if (snap.isComplete) return DELAY_COMPLETE;
   if (snap.selectedId) return DELAY_SELECTED;
   if (
-    snap.difficulty !== "easy" &&
+    snap.difficulty !== DifficultyValue.Easy &&
     !snap.hasAssignedZone &&
     snap.hasUnzonedRooms &&
     snap.placedCount < 2
@@ -50,12 +54,26 @@ function delayFor(snap: IdleSnapshot): number {
   return DELAY_MIDGAME;
 }
 
+function snapshotKey(snap: IdleSnapshot): string {
+  return [
+    snap.placedCount,
+    snap.selectedId,
+    snap.selectedName,
+    snap.isComplete,
+    snap.hasUnzonedRooms,
+    snap.difficulty,
+    snap.hasAssignedZone,
+  ].join(":");
+}
+
 export function useIdleHint(snap: IdleSnapshot) {
-  const [hint, setHint] = useState<IdleHint | null>(null);
+  const [scheduled, setScheduled] = useState<ScheduledHint | null>(null);
   const keyRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const snapRef = useRef(snap);
-  snapRef.current = snap;
+  useEffect(() => {
+    snapRef.current = snap;
+  }, [snap]);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current !== null) {
@@ -66,27 +84,29 @@ export function useIdleHint(snap: IdleSnapshot) {
 
   const startTimer = useCallback(() => {
     clearTimer();
-    setHint(null);
     const delay = delayFor(snapRef.current);
     timerRef.current = setTimeout(() => {
-      const message = selectMessage(snapRef.current);
+      const snapshot = snapRef.current;
+      const message = selectMessage(snapshot);
       if (message) {
         keyRef.current += 1;
-        setHint({ key: keyRef.current, message });
+        setScheduled({
+          snapshot: snapshotKey(snapshot),
+          hint: { key: keyRef.current, message },
+        });
       }
     }, delay);
   }, [clearTimer]);
 
   const dismissHint = useCallback(() => {
-    setHint(null);
+    setScheduled(null);
     startTimer();
   }, [startTimer]);
   const resetIdle = useCallback(() => {
-    setHint(null);
+    setScheduled(null);
     startTimer();
   }, [startTimer]);
 
-  // Restart timer on state changes
   useEffect(() => {
     startTimer();
     return clearTimer;
@@ -100,18 +120,18 @@ export function useIdleHint(snap: IdleSnapshot) {
     clearTimer,
   ]);
 
-  // Reset on any user interaction
   useEffect(() => {
     const handler = () => resetIdle();
-    for (const evt of ["pointerdown", "keydown"] as const) {
+    for (const evt of Object.values(IdleResetEvent)) {
       globalThis.addEventListener(evt, handler, { passive: true });
     }
     return () => {
-      for (const evt of ["pointerdown", "keydown"] as const) {
+      for (const evt of Object.values(IdleResetEvent)) {
         globalThis.removeEventListener(evt, handler);
       }
     };
   }, [resetIdle]);
 
+  const hint = scheduled?.snapshot === snapshotKey(snap) ? scheduled.hint : null;
   return { hint, dismissHint, resetIdle };
 }

@@ -1,26 +1,15 @@
-/*
-Copyright © 2026 Defend I.T. Solutions LLC. All Rights Reserved.
-
-This software and its source code are the proprietary property of
-Defend I.T. Solutions LLC and are protected by United States and
-international copyright laws. Unauthorized reproduction, distribution,
-modification, display, or use of this software, in whole or in part, without the
-prior written permission of Defend I.T. Solutions LLC, is strictly prohibited.
-
-This software is provided for use only by authorized employees, contractors, or
-licensees of Defend I.T. Solutions LLC and may not be disclosed to any third
-party without express written consent.
-*/
 import Link from "next/link";
 import { localBusinessLd } from "@/lib/json-ld";
-import { ogImageUrl } from "@/lib/og";
+import { ogImageUrl, SITE_URL } from "@/lib/og";
 import { HeroBanner } from "@/components/HeroBanner";
 import type { ComponentType, SVGProps } from "react";
 import { ShieldCheck, MapPin, MessageCircle, ArrowRight } from "lucide-react";
 import { PageContainer, Meta, BookOnline, BreadCrumbs } from "@/components";
 import { Card } from "@/components/Card";
 
-const valueData = [
+type ValueData = Readonly<{ title: string; description: string; icon: ComponentType<SVGProps<SVGSVGElement>> }>;
+
+const valueData: ReadonlyArray<ValueData> = [
   {
     title: "Practical Security",
     description:
@@ -39,7 +28,11 @@ const valueData = [
       "We explain the problem, the available options, and what can wait so you can make an informed decision.",
     icon: MessageCircle,
   },
-] as const;
+];
+
+const CARD_CLASS = "relative overflow-hidden p-6";
+const MUTED_LEAD_CLASS = "text-lead mt-4 text-ink-muted";
+const ABOUT_SECTION_ID = { introduction: "who-we-are", values: "core-values" };
 
 type ValueItemProps = Readonly<{
   title: string;
@@ -49,7 +42,7 @@ type ValueItemProps = Readonly<{
 
 function ValueItem({ title, description, Icon }: ValueItemProps) {
   return (
-    <Card as="article" wash className="relative overflow-hidden p-6">
+    <Card as="article" wash className={CARD_CLASS}>
       <div className="flex items-center gap-4 mb-3">
         <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border border-border-accent bg-surface">
           <Icon className="w-7 h-7 text-accent" aria-hidden="true" />
@@ -63,22 +56,22 @@ function ValueItem({ title, description, Icon }: ValueItemProps) {
 
 function RenderValues() {
   return (
-    <div className="grid gap-6 md:grid-cols-1" role="list">
+    <ul className="grid gap-6 md:grid-cols-1">
       {valueData.map((item) => (
-        <div key={item.title} role="listitem">
+        <li key={item.title}>
           <ValueItem
             title={item.title}
             description={item.description}
             Icon={item.icon}
           />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
 export default function About() {
-  const canonical = "https://www.wedefendit.com/about";
+  const canonical = `${SITE_URL}/about`;
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -88,7 +81,7 @@ export default function About() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://www.wedefendit.com/",
+        item: `${SITE_URL}/`,
       },
       { "@type": "ListItem", position: 2, name: "About", item: canonical },
     ],
@@ -125,7 +118,6 @@ export default function About() {
       />
 
       <PageContainer>
-        {/* Breadcrumbs: contained, above the full-bleed hero */}
         <div className="mx-auto w-full max-w-6xl px-4 pt-1 sm:px-6">
           <BreadCrumbs
             includeJsonLd={false}
@@ -133,7 +125,6 @@ export default function About() {
           />
         </div>
 
-        {/* Hero: full-bleed, exactly like the homepage */}
         <HeroBanner
           dark="/img/home/home-hero-dark.jpg"
           light="/img/home/home-hero-light.jpg"
@@ -156,11 +147,11 @@ export default function About() {
 
           <Card
             as="section"
-            aria-labelledby="who-we-are"
+            aria-labelledby={ABOUT_SECTION_ID.introduction}
             wash
-            className="relative overflow-hidden p-6"
+            className={CARD_CLASS}
           >
-            <h2 id="who-we-are" className="sr-only">
+            <h2 id={ABOUT_SECTION_ID.introduction} className="sr-only">
               Who we are
             </h2>
             <p className="text-lead text-ink">
@@ -172,22 +163,22 @@ export default function About() {
               separately.
             </p>
 
-            <p className="text-lead mt-4 text-ink-muted">
+            <p className={MUTED_LEAD_CLASS}>
               We help with computer repair, malware removal, scam recovery, Wi-Fi
               and network problems, account security, device setup, and other
               everyday technology needs.
             </p>
 
-            <p className="text-lead mt-4 text-ink-muted">
+            <p className={MUTED_LEAD_CLASS}>
               Our goal is to solve the immediate problem, reduce avoidable risk,
               and explain the result in plain English. You should know what
               changed, why it matters, and what to do next.
             </p>
           </Card>
 
-          <section aria-labelledby="core-values">
+          <section aria-labelledby={ABOUT_SECTION_ID.values}>
             <h2
-              id="core-values"
+              id={ABOUT_SECTION_ID.values}
               className="text-h2 tracking-h2 font-semibold text-ink mb-4"
             >
               How We Work
@@ -195,7 +186,6 @@ export default function About() {
             <RenderValues />
           </section>
 
-          {/* Services CTA */}
           <Card wash className="relative overflow-hidden p-8 text-center">
             <h2 className="text-h2 tracking-h2 font-semibold mb-4 text-ink">
               Find the Right Service
